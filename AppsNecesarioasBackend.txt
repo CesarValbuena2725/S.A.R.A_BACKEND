@@ -1,0 +1,12 @@
+#Permite la comunicación entres Servidores
+pip install django-cors-headers
+
+#permite la creación de Apis HTTP
+pip install Django Rest Framwork
+
+asgiref==3.8.1  # Proporciona utilidades para trabajar con ASGI (Asynchronous Server Gateway Interface)
+Django==4.2  # Framework web para construir aplicaciones web con Python
+django-cors-headers==4.5.0  # Maneja CORS (Cross-Origin Resource Sharing) en aplicaciones Django
+djangorestframework==3.15.2  # Biblioteca para construir APIs RESTful en Django
+sqlparse==0.5.1  # Analizador de SQL que se usa para la funcionalidad de Django
+djangorestframework-simplejwt==5.3.1

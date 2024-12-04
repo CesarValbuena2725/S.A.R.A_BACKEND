@@ -1,0 +1,47 @@
+# Ignorar el entorno virtual llamado "sara"
+ZARA/
+
+# Ignorar archivos compilados de Python
+*.pyc
+*.pyo
+__pycache__/
+*_pycache_/
+
+# Ignorar archivos de migraciones automáticas
+**/migrations/*
+
+# Ignorar archivos de entorno (.env) con variables sensibles
+.env
+.env.*
+
+# Ignorar configuraciones específicas del IDE
+.vscode/
+.idea/
+
+# Ignorar archivos de dependencias de Python
+*.egg-info/
+.eggs/
+*.lock
+
+# Ignorar archivos de bases de datos locales (si las usas)
+*.sqlite3
+
+# Ignorar archivos de caché
+*.log
+*.cache
+*.bak
+*.swp
+*.tmp
+
+# Ignorar archivos de archivos estáticos generados automáticamente
+staticfiles/
+media/
+
+# Ignorar archivos de despliegue local
+.DS_Store
+Thumbs.db
+
+
+# Ignorar archivos de control de versiones o entorno de Git
+.git/
+

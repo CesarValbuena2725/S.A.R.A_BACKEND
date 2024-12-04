@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="email_stylei.css">
+</head>
+<body>
+    <div class="conteaner">
+
+
+        <header>
+            <h1>{{asunto}}</h1>
+        </header>
+        <div class="logo">
+            <h1>logo</h1>
+        </div>
+        <section id="conten">
+            <article>
+                <p>
+                    <p>Estimado/a {{datos.id_empleado.nombres}}</p>
+                    
+                    Hemos recibido una solicitud para restablecer la contraseña de tu cuenta  {{datos}} de SARA.Por favor reportar al area de tegnologia
+                    <br>
+                    Para restablecer tu contraseña, por favor haz clic en el siguiente enlace:
+                </p>
+                    <button>
+                        <a href="{{link}}">restablecer Contraseña</a>
+                    </button>
+
+            </article>
+            <article>
+                <p>
+                    Este es un mensaje generado automáticamente, por lo que te pedimos que no respondas a este correo. 
+                    Si necesitas asistencia o tienes alguna inquietud, no dudes en contactarnos a través de SARASoporte@gmail.com,
+                    Estaremos encantados de ayudarte.           
+                </p>
+    
+            </article>
+
+        </section>
+        <footer>
+            <h1>Pie de pagina</h1>
+        </footer>
+
+    </div>
+    
+</body>
+</html>
