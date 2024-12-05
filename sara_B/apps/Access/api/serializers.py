@@ -71,3 +71,7 @@ class RestablecerPasswordSerializers(serializers.Serializer):
     
         user.set_password(self.validated_data['password'])
         user.save()
+
+class loginserializers(serializers.Serializer):
+    usuario = serializers.CharField(max_length=100)
+    password= serializers.CharField(max_length=250)

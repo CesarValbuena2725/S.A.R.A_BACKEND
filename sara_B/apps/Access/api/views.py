@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework import status,generics
-from apps.Access.api.serializers import UsuarioSerializers,SolicitudRestablecerPassSerializers,RestablecerPasswordSerializers
+from apps.Access.api.serializers import UsuarioSerializers,SolicitudRestablecerPassSerializers,RestablecerPasswordSerializers,loginserializers
 from apps.Access.models import Usuario, Empleado
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
@@ -14,6 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from apps.Utilidades.Email.email_base import send_email_sara
+from django.http import Http404
 
 
 
@@ -58,25 +59,21 @@ class CreateUser(APIView):
 # clase que hace la verificacion de Credenciales y trae el token del usuario correspodiente 
 
 class Login(APIView):
-
-    def get(self, request):
-        try:
-            usuario = self.model.objects.all()
-            serializers = self.serializer_class(usuario, many=True)
-            return Response(serializers.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    model = Usuario
+    serializer_class= loginserializers
 
     def post(self, request):
-        usuario = request.data.get('usuario')
-        password = request.data.get('password')
-
-        if not usuario or not password:
-            return Response({'error': 'Usuario y contraseña son requeridos'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer= self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            usuario = serializer.validated_data['usuario']
+            password = serializer.validated_data['password']
+        else:
+            return Response({'error': 'Usuario y contraseña son requeridos'}, status=status.HTTP_400_BAD_REQUEST)            
 
         try:
             # Buscar al usuario
             user = get_object_or_404(Usuario, usuario=request.data['usuario'])
+
 
             # Verificar si el usuario está activo
             if user.estado == 'AC':
@@ -89,19 +86,17 @@ class Login(APIView):
                 access_token = refresh.access_token
 
                 # Serializar los datos del usuario
-                serializers = UsuarioSerializers(instance=user)
 
                 return Response({
                     'access': str(access_token),
                     'refresh': str(refresh),
-                    'usuario': serializers.data['usuario']
+                    'usuario': serializer.data['usuario']
                 }, status=status.HTTP_200_OK)
 
             else:
                 return Response({'error': 'Usuario inactivo. Contacte al administrador de SARA'}, status=status.HTTP_403_FORBIDDEN)
-
-        except Usuario.DoesNotExist:
-            return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        except Http404:
+            return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
