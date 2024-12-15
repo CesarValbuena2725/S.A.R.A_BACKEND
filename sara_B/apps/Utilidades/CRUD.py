@@ -117,7 +117,7 @@ class PUT_General(BaseGeneral): # Herendan funcionaloidades de las clase base
     # Realiza la revision de los  nuevos datos para el objeto y realiza la actualizacion
     def put(self,request,pk,namemodel):
         try:
-            modelos=self.get_object(pk)
+            modelos=self.get_object(pk,namemodel)
             serializer_class = GetSerializer(namemodel)
             model_serializars=serializer_class(modelos,data=request.data)
             if model_serializars.is_valid():
@@ -140,7 +140,7 @@ class Delete_General(BaseGeneral):
             #instancion del objeto pasando como segundo parametro el modelo para poder hacer la eliminacion
             instance = self.get_object(pk, namemodel)
             instance.delete()
-            return Response({"detail": "Eliminado"}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"detail": "Eliminado"}, status=status.HTTP_202_ACCEPTED)
         except NotFound as e:
             return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)
 

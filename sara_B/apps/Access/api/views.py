@@ -149,8 +149,6 @@ class ContraseñaRestablecida(APIView):
     serializer_class =RestablecerPasswordSerializers
     
     def post(self, request, uidb64, token):
-        print("UIDB64:", uidb64)
-        print("token: ",token)
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             try:
