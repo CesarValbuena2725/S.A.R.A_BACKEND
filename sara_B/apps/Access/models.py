@@ -10,8 +10,8 @@ Errores={'unique': 'Este nombre de usuario  en uso.',
         'blank': 'El campo usuario no puede estar vacío.',
         'max_length': 'Valor no fuera de los limites',
         'invalid':'Formato no valido',
-
         }
+
 
 class Convenio(models.Model):
     nombre = models.CharField(max_length=100, unique=True,error_messages=Errores)
