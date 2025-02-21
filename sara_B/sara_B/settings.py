@@ -49,6 +49,8 @@ APPS_EXTERNA=[
 LOCAL_APP=[
     'apps.Access',
     'apps.Solicitudes',
+    'apps.Creacion_Formularios',
+    'apps.Resultados'
 ]
 
 INSTALLED_APPS=INSTALLED_APPS + LOCAL_APP + APPS_EXTERNA
@@ -94,7 +96,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'sara_b',
         'USER':'root',
-        'PASSWORD':'12345678',
+        'PASSWORD':'Tragamundos4ever2024',
         'HOST':'127.0.0.1',
         'PORT':'3306',
     }
@@ -168,8 +170,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),  # Tiempo de vida del token de acceso
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),     # Tiempo de vida del token de refresco
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=5),  # Tiempo de vida del token de acceso
+    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=15),     # Tiempo de vida del token de refresco
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'ALGORITHM': 'HS256',

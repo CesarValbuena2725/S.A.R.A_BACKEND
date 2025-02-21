@@ -13,7 +13,6 @@ urlpatterns=[
     path('creacionuser/',CreateUser.as_view()),
 
     path('login/',Login.as_view()),
-
     path('solicitarpassword/', SolicitudRestablecerPass.as_view()),
     path('restablecerpassword/<uidb64>/<token>/',ContraseñaRestablecida.as_view())
 ]
