@@ -3,7 +3,6 @@ from apps.Solicitudes.models import Solicitud
 from apps.Creacion_Formularios.models import CategoriaOpciones
 from apps.Creacion_Formularios.models import CreacionFormulario, CampoItem, RespuestaCampo
 
-# Create your models here.
 
 class Opciones(models.Model):
     nombres = models.CharField(max_length=50)
