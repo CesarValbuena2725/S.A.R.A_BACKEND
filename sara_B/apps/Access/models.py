@@ -59,6 +59,7 @@ class UsuarioManager(BaseUserManager):
         if not usuario:
             raise ValueError("El nombre de usuario es obligatorio")
         user = self.model(usuario=usuario, **extra_fields)
+        user = make_password(password)
         user.save(using=self._db)
         return user
 
@@ -104,7 +105,9 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = []
 
     def save(self, *args, **kwargs):
-        if not self.pk: 
+    #verifica el estado de la encriptacion
+        if not self.password.startswith('pbkdf2_sha256$'):
+            #Si la contraseña no está encriptada, la encripta
             self.password = make_password(self.password)
         super(Usuario, self).save(*args, **kwargs)
 
