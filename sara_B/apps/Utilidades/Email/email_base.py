@@ -9,10 +9,11 @@ def send_email_sara(contexto, asunto, destinario, plantilla,solicitante):
 
     message_id = f"<{uuid.uuid4()}@gmail.com>"
     template = get_template(plantilla)
+
     context = {
-        'asunto': asunto,
-        'link': contexto,
-        'datos':solicitante
+            'asunto': asunto,
+            'link': contexto,
+            'datos':solicitante
     }
 
     body_html = template.render(context)

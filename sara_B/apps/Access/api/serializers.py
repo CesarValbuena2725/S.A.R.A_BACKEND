@@ -4,8 +4,6 @@ from .Validaciones import logitud_minima,validate_positive,validate_number,valid
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
-from rest_framework import status
 
 
 

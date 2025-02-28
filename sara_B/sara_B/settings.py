@@ -43,14 +43,15 @@ INSTALLED_APPS = [
 APPS_EXTERNA=[
     'rest_framework',
     'rest_framework.authtoken',
-    'corsheaders'
+    'corsheaders',
+    'rest_framework_simplejwt',
+
 ]
 
 LOCAL_APP=[
     'apps.Access',
-    'apps.Solicitudes',
-    'apps.Creacion_Formularios',
-    'apps.Resultados'
+    'apps.Requests',
+
 ]
 
 INSTALLED_APPS=INSTALLED_APPS + LOCAL_APP + APPS_EXTERNA
@@ -94,9 +95,9 @@ WSGI_APPLICATION = 'sara_B.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sara_b',
+        'NAME': 'sarad_v2',
         'USER':'root',
-        'PASSWORD':'Tragamundos4ever2024',
+        'PASSWORD':'12345678',
         'HOST':'127.0.0.1',
         'PORT':'3306',
     }

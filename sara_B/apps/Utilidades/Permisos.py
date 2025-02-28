@@ -1,8 +1,7 @@
 from rest_framework.permissions import BasePermission
 from rest_framework.exceptions import PermissionDenied
 from apps.Access.api.utils import Map_Model_Accesss,Map_Serializer_Accesss
-from apps.Solicitudes.api.utils import Map_Model_Solicitud,Map_Serializer_solicitud
-
+from apps.Requests.api.utils import MaMap_Model_Requests, Map_Serializer_Requests
 
 class RolePermission(BasePermission):
     message= "No tienes permisos para Esta Accion"
@@ -20,13 +19,13 @@ Map_Model={
 
 }
 Map_Model.update(Map_Model_Accesss)
-Map_Model.update(Map_Model_Solicitud)
+Map_Model.update(MaMap_Model_Requests)
 
 Map_Serializer={
 
 }
 Map_Serializer.update(Map_Serializer_Accesss)
-Map_Serializer.update(Map_Serializer_solicitud)
+Map_Serializer.update(Map_Serializer_Requests)
 
 def getModelName(model):
     return Map_Model.get(model.lower())
