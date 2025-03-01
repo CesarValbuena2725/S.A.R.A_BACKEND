@@ -9,6 +9,6 @@ urlpatterns=[
     path('api/<str:namemodel>/delete/<int:pk>/',Delete_General.as_view()),
   
 
-    path ('resquestpost',PostRequests.as_view() ) 
+    path ('requestpost',PostRequests.as_view() ) 
 ]
     
