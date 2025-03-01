@@ -95,9 +95,9 @@ WSGI_APPLICATION = 'sara_B.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sarad_v2',
+        'NAME': 'sarav3',
         'USER':'root',
-        'PASSWORD':'12345678',
+        'PASSWORD':'Tragamundos4ever2024',
         'HOST':'127.0.0.1',
         'PORT':'3306',
     }
