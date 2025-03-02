@@ -6,9 +6,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import NotFound
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from  apps.Requests.models import Solicitud
-from  apps.Requests.api.serializers import SolicitudSerializers
+from  apps.Requests.models import Solicitud, Plan, VehiculoPlan
+from  apps.Requests.api.serializers import SolicitudSerializers, PlanSerializers
 from apps.Utilidades.Email.email_base import send_email_sara
+from rest_framework.views import APIView
 
 
 class PostRequests(generics.GenericAPIView):
@@ -57,3 +58,29 @@ class PostRequests(generics.GenericAPIView):
             )
         
 #Crear un  en path para hacer el filtro de planes de solictudes  // el Frontend debe poder  enviar el tipo de Vehiculo y hacer la peticion al Servidor ; 
+class FiltrarPlanes(APIView):
+    def get(self, request, id_tipo_vehiculo):
+        """
+        Filtra los planes según el tipo de vehículo dado.
+        """
+        # Verificamos si el id_tipo_vehiculo existe en VehiculoPlan, filtrando los planes asociados al tipo_vehiculo
+        planes_ids = VehiculoPlan.objects.filter(id_vehiculo=id_tipo_vehiculo).values_list('id_plan', flat=True)
+        
+
+        #Si no se encuentran planes asociados a ese id, retorna un error 404
+        if not planes_ids:
+            return Response(
+                {"error": "No hay planes disponibles para este tipo de vehículo."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        #Filtra los objetos de plan que tengan un id dentro del tipo_vehiculo
+        planes = Plan.objects.filter(id__in=planes_ids)
+        serializer = PlanSerializers(planes, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class CrearSolicitudAPIView(generics.CreateAPIView):
+    """
+    Vista para crear solicitudes validando que el plan y el tipo de vehículo coincidan.
+    """
+    queryset = Solicitud.objects.all()
+    serializer_class = SolicitudSerializers
