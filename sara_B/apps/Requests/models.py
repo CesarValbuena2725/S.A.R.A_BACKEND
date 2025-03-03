@@ -41,7 +41,7 @@ class Solicitud(models.Model):
     telefono = models.CharField(max_length=10)
     fecha =  models.DateTimeField (default=timezone.now)
     id_empleado =models.ForeignKey(Empleado, on_delete=models.CASCADE, null=True)
-    observaciones= models.TextField()
+    observaciones= models.TextField(null=True )
     id_plan =models.ForeignKey(Plan, on_delete=models.CASCADE)
     id_tipo_vehiculo = models.ForeignKey(TipoVehiculo, on_delete=models.CASCADE)
     
