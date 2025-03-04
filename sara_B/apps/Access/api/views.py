@@ -131,9 +131,11 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
 
                 #Realiza el envio del correo / pendiente por mejorar y cambiar esta aspecto
                 try:
-                    send_email_sara(reset_link,"Restablecer Contarseña SARA",[request.data['correo']],"base_email.html",usuario)
+                    send_email_sara("Restablecer Password","base_email.html",[request.data['correo']],usuario,reset_link)
                     #send_mail('Restablecer Contarseña SARA',f'link de restablecimineto  {reset_link}',None,[request.data['correo']] )
+
                     return Response({'message':'Se realizo el envio correo para el restablecimiento de contarseña'}, status=status.HTTP_200_OK)
+                
                 except Exception as error_valid:
                     return Response({'detail': 'Error al enviar el correo: ' + str(error_valid)}, 
                                     status=status.HTTP_500_INTERNAL_SERVER_ERROR)

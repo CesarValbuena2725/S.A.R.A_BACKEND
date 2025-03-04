@@ -1,5 +1,5 @@
 from django.urls import path
-from apps.Requests.api.views import PostRequests
+from apps.Requests.api.views import PostRequests, GetRequests, PutRequest, DeleteRequestDB
 from apps.Utilidades.CRUD import GetGeneral, PostGeneral,Delete_General, PUT_General
 urlpatterns=[
 

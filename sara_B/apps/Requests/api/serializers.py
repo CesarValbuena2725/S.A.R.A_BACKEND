@@ -7,21 +7,9 @@ class SolicitudSerializers(serializers.ModelSerializer):
     class Meta:
         model =Solicitud
         exclude = ['fecha']
+        read_only_fields = ['Placa', 'id_empleado']  # Campos que no se pueden modificar
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if 'data' in kwargs: #Validos los datos De entrda 
-
-            id_vehiculos= kwargs['data'].get('id_tipo_vehiculo') #invocamos los datos dados
-
-            if id_vehiculos: #verificamos que los datos sean validos 
-                planes_ids = VehiculoPlan.objects.filter(
-                    id_vehiculo=id_vehiculos).values_list('id_plan', flat=True) #filtamos los planes seguin el tipo de Vehiclo y los convertimos en listas 
-
-
-                self.fields['id_plan'].queryset = Plan.objects.filter(id__in=planes_ids) #le asignaos las posibles opciones a id_plan
-
+  
     def validate(self, data):
 
         id_plan = data.get("id_plan")
