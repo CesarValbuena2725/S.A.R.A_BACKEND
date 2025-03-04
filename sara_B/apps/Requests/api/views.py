@@ -23,14 +23,6 @@ class PostRequests(generics.GenericAPIView):
 
     def get_queryset(self):
         return self.model.objects.all()  
-    
-    def get(self,request):
-            try:
-                usuario = self.model.objects.all()
-                serializers = self.serializer_class(usuario, many=True)
-                return Response(serializers.data, status=status.HTTP_200_OK)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
     def post(self, request):
@@ -43,10 +35,9 @@ class PostRequests(generics.GenericAPIView):
             instancie= serializers.save()
             send_email_sara(
                 contexto=f"Nueva solicitud {instancie.pk}",
-                asunto= f"Nueva solicitud {instancie.pk}",
-                plantilla="base_request.html",
+                affair= f"Nueva solicitud {instancie.pk}",
+                template="base_request.html",
                 solicitante= instancie.placa,
-                destinario= [""]
             )
 
             return Response(serializers.data ,status=status.HTTP_201_CREATED)
@@ -84,3 +75,102 @@ class CrearSolicitudAPIView(generics.CreateAPIView):
     """
     queryset = Solicitud.objects.all()
     serializer_class = SolicitudSerializers
+#Crear un  en path para hacer el filtro de planes de solictudes  // el Frontend debe poder  enviar el tipo de Vehiculo y hacer la peticion al Servidor ;
+
+# Get Solicitudes
+
+class GetRequests(generics.GenericAPIView):
+    """
+        authentication_classes = [JWTAuthentication]
+        permission_classes = [IsAuthenticated, RolePermission]
+        allowed_roles = ['AD', 'RC', 'CA',] 
+    """
+    model = Solicitud
+    serializer_class=SolicitudSerializers
+
+    def get_queryset(self):
+         return self.model.objects.all()
+    
+    def get(self,request):
+            try:
+                usuario = self.model.objects.all()
+                serializers = self.serializer_class(usuario, many=True)
+                return Response(serializers.data, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        
+         
+#Crear  genera notificacion  put para estado !=
+
+class PutRequest(APIView):
+    """
+        authentication_classes = [JWTAuthentication]
+        permission_classes = [IsAuthenticated, RolePermission]
+        allowed_roles = ['AD', 'CA',] 
+    """
+    model = Solicitud
+    serializer_class = SolicitudSerializers
+    
+    def get(self, request, pk):
+        try:
+            instance = self.model.objects.get(pk=pk)
+            serializer = self.serializer_class(instance)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except NotFound as e:
+            return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)
+        
+    def put(self, request, pk):
+        try:
+            instancia = self.model.objects.get(pk=pk)
+        except self.model.DoesNotExist:
+            return Response({"detail": "Solicitud no encontrada"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Serializar con la instancia existente y datos nuevos 
+        model_serializers = self.serializer_class(instancia, data=request.data, partial=True)
+
+        if not model_serializers.is_valid():
+            return Response(model_serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+        if model_serializers.validated_data.get('estado') == "CAL":
+            try:
+                #Crear Pantilla de modificacion
+                send_email_sara(
+                    contexto=f"Nueva solicitud {instancia.pk}",
+                    affair= f"Nueva solicitud {instancia.pk}",
+                    template="base_request.html",
+                    solicitante= instancia.placa,
+                )
+
+
+            except Exception as e:
+                return Response(
+                    {"detalles": f"Error al procesar la solicitud: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        model_serializers.save()
+        return Response(model_serializers.data, status=status.HTTP_200_OK)
+
+
+#eliminar  genera notificiaon  notificicaion 
+
+class DeleteRequestDB(APIView):
+    """
+    Vista para eliminar una solicitud por su PK.
+    
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles = ['AD', 'RC', 'CA']
+    """
+    def delete(self, request, pk):
+        try:
+            instancia = Solicitud.objects.get(pk=pk)
+            instancia.delete()
+            return Response({"detail": "Eliminado"}, status=status.HTTP_202_ACCEPTED)
+        except Solicitud.DoesNotExist:
+            return Response({"detail": "PK no válido"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
