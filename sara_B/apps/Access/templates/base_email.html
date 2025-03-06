@@ -1,50 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="email_stylei.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ajuste para que sea responsive -->
+    <title>Reestablecer Contraseña</title>
+
+    <style>
+        /* Estilos generales */
+
+        /* Estilos para el banner superior */
+        .top-banner {
+            background-color: #00c5d6;
+            width: 100%;
+            height: 120px;
+            text-align: center;
+            line-height: 60px;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Estilos generales del cuerpo */
+        body {
+            margin: 0; 
+            padding: 0; 
+            font-family: Helvetica, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        /* Contenedor principal del contenido */
+        .container {
+            max-width: 600px;
+            margin: -70px auto 20px auto; 
+            background-color: #ffffff; 
+            border-radius: 8px; 
+            overflow: hidden; /* Oculta el contenido que se desborda */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
+        }
+
+        /* Encabezado dentro del contenedor */
+        header {
+            background-color: white; 
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0; 
+            color: black;
+        }
+
+        /* Contenido principal del mensaje */
+        .content {
+            padding: 20px; 
+        }
+
+        /* Estilo del botón principal */
+        .btn {
+            display: inline-block; /* Se comporta como un elemento en línea con propiedades de bloque */
+            background-color: #00c5d6; 
+            color: #ffffff;
+            text-decoration: none; /* Elimina subrayado en el enlace */
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            margin: 20px 0;
+        }
+
+        /* Pie de página */
+        footer {
+            background-color: #f4f4f4;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #777777;
+        }
+
+        footer a {
+            color: #00c5d6; 
+            text-decoration: none;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="conteaner">
+    <!-- Banner superior -->
+    <div class="top-banner"></div>
 
-
+    <!-- Contenedor principal -->
+    <div class="container">
+        
         <header>
-            <h1>{{asunto}}</h1>
+            <h1>Reestablecimiento de contraseña</h1>
         </header>
-        <div class="logo">
-            <h1>logo</h1>
+
+        <!-- Cuerpo del mensaje -->
+        <div class="content">
+            <!-- Saludo personalizado -->
+            <p>Estimado/a {{datos.id_empleado.nombres}}</p>
+            <br>
+
+            
+            <p>Hemos recibido una solicitud para reestablecer la contraseña de tu cuenta {{datos}} de S.A.R.A</p>
+            <p>Para reestablecer tu contraseña, por favor, haz click en el siguiente enlace:</p>
+
+            <!-- Botón principal -->
+            <p style="text-align: center">
+                <a href="{{link_confirmacion}}" class="btn">Reestablecer Contraseña</a>
+            </p>
+
+            
+            <p>
+                Si el botón anterior no funciona, copia y pega el siguiente enlace en tu navegador:
+                <br><br>
+                <a href="{{link_confirmacion}}" style="color: #00c5d6;">{{Reestablecer Contraseña}}</a>
+            </p>
+
+            
+            <p>Si tienes alguna pregunta, solo responde a este correo y con gusto te ayudaremos.</p>
+            <p>Saludos,<br>El equipo de S.A.R.A</p>
         </div>
-        <section id="conten">
-            <article>
-                <p>
-                    <p>Estimado/a {{datos.id_empleado.nombres}}</p>
-                    
-                    Hemos recibido una solicitud para restablecer la contraseña de tu cuenta  {{datos}} de SARA.Por favor reportar al area de tegnologia
-                    <br>
-                    Para restablecer tu contraseña, por favor haz clic en el siguiente enlace:
-                </p>
-                    <button>
-                        <a href="{{link}}">restablecer Contraseña</a>
-                    </button>
 
-            </article>
-            <article>
-                <p>
-                    Este es un mensaje generado automáticamente, por lo que te pedimos que no respondas a este correo. 
-                    Si necesitas asistencia o tienes alguna inquietud, no dudes en contactarnos a través de SARASoporte@gmail.com,
-                    Estaremos encantados de ayudarte.           
-                </p>
-    
-            </article>
+        <!-- Logo centrado al final del contenido -->
+        <div style="text-align: center;">
+            <img src="LogoSARA2.png" alt="logosara" 
+            style="display: block; margin: 0 auto; width: 200px; height: auto; padding-bottom: 20px;"> <!-- Imagen centrada -->
+        </div>
 
-        </section>
+        <!-- Pie de página -->
         <footer>
-            <h1>Pie de pagina</h1>
+            <p>
+                ¿Necesitas ayuda? <a href="mailto:SARAsoporte@gmail.com">Contáctanos</a>
+            </p>
+            <p>
+                Recibiste este correo porque te registraste en nuestro servicio.
+            </p>
+            <p>
+                Este es un mensaje generado automáticamente,
+                por lo que te pedimos que no respondas a este correo.
+            </p>
         </footer>
-
     </div>
-    
 </body>
+
 </html>

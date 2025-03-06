@@ -101,7 +101,7 @@ class Login(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        
+
 #Se realiza el envio de la dirrecion para restablecer contraseña
 class SolicitudRestablecerPass(generics.GenericAPIView):
     serializer_class = SolicitudRestablecerPassSerializers
