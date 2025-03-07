@@ -2,145 +2,144 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ajuste para que sea responsive -->
-    <title>Reestablecer Contraseña</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reestablecimiento de contraseña</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      font-family: Helvetica, sans-serif;
+    }
 
-    <style>
-        /* Estilos generales */
+    /* Contenedor principal con borde azul */
+    .main-container {
+      max-width: 600px;
+      margin: 40px auto;
+      position: relative;
+      border: 2px solid #00c5d6;
+      /* Borde azul */
+      border-radius: 8px;
+      overflow: hidden;
+      /* Para que no se salga el contenido del borde */
+      background-color: #ffffff;
+    }
 
-        /* Estilos para el banner superior */
-        .top-banner {
-            background-color: #00c5d6;
-            width: 100%;
-            height: 120px;
-            text-align: center;
-            line-height: 60px;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
+    /* Banner azul en la parte superior */
+    .banner {
+      background-color: #00c5d6;
+      text-align: center;
+      padding: 40px 20px;
+      color: black;
+      font-size: 28px;
+      font-weight: bold;
+    }
 
-        /* Estilos generales del cuerpo */
-        body {
-            margin: 0; 
-            padding: 0; 
-            font-family: Helvetica, sans-serif;
-            background-color: #f4f4f4;
-        }
+    /* Contenedor blanco que se superpone con el banner */
+    .content-container {
+      padding: 40px 20px 20px;
+      margin-top: -20px;
+      /* Superposición con el banner */
+    }
 
-        /* Contenedor principal del contenido */
-        .container {
-            max-width: 600px;
-            margin: -70px auto 20px auto; 
-            background-color: #ffffff; 
-            border-radius: 8px; 
-            overflow: hidden; /* Oculta el contenido que se desborda */
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
-        }
+    .content-container p {
+      color: #333;
+      font-size: 16px;
+      line-height: 1.5;
+      margin: 10px 0;
+    }
 
-        /* Encabezado dentro del contenedor */
-        header {
-            background-color: white; 
-            padding: 20px;
-            text-align: center;
-        }
+    /* Estilos del botón */
+    .btn {
+      display: inline-block;
+      background-color: #00c5d6;
+      /* Fondo del botón */
+      color: white;
+      /* Cambiar color del texto a blanco */
+      text-decoration: none;
+      /* Eliminar subrayado del enlace */
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+    }
 
-        header h1 {
-            margin: 0; 
-            color: black;
-        }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: #777777;
+      background-color: #f4f4f4;
+    }
 
-        /* Contenido principal del mensaje */
-        .content {
-            padding: 20px; 
-        }
+    .footer a {
+      text-decoration: none;
+      color: #00c5d6;
+    }
 
-        /* Estilo del botón principal */
-        .btn {
-            display: inline-block; /* Se comporta como un elemento en línea con propiedades de bloque */
-            background-color: #00c5d6; 
-            color: #ffffff;
-            text-decoration: none; /* Elimina subrayado en el enlace */
-            padding: 10px 20px; 
-            border-radius: 5px; 
-            margin: 20px 0;
-        }
-
-        /* Pie de página */
-        footer {
-            background-color: #f4f4f4;
-            padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            color: #777777;
-        }
-
-        footer a {
-            color: #00c5d6; 
-            text-decoration: none;
-        }
-    </style>
+    .logo {
+      display: block;
+      margin: 20px auto;
+      width: 200px;
+      height: auto;
+    }
+  </style>
 </head>
 
 <body>
-    <!-- Banner superior -->
-    <div class="top-banner"></div>
-
-    <!-- Contenedor principal -->
-    <div class="container">
-        
-        <header>
-            <h1>Reestablecimiento de contraseña</h1>
-        </header>
-
-        <!-- Cuerpo del mensaje -->
-        <div class="content">
-            <!-- Saludo personalizado -->
-            <p>Estimado/a {{datos.id_empleado.nombres}}</p>
-            <br>
-
-            
-            <p>Hemos recibido una solicitud para reestablecer la contraseña de tu cuenta {{datos}} de S.A.R.A</p>
-            <p>Para reestablecer tu contraseña, por favor, haz click en el siguiente enlace:</p>
-
-            <!-- Botón principal -->
-            <p style="text-align: center">
-                <a href="{{link_confirmacion}}" class="btn">Reestablecer Contraseña</a>
-            </p>
-
-            
-            <p>
-                Si el botón anterior no funciona, copia y pega el siguiente enlace en tu navegador:
-                <br><br>
-                <a href="{{link_confirmacion}}" style="color: #00c5d6;">{{Reestablecer Contraseña}}</a>
-            </p>
-
-            
-            <p>Si tienes alguna pregunta, solo haz click en el boton 'contactanos' en la parte inferior.</p>
-            <p>Saludos,<br>El equipo de S.A.R.A</p>
-        </div>
-
-        <!-- Logo centrado al final del contenido -->
-        <div style="text-align: center;">
-            <img src="LogoSARA2.png" alt="logosara" 
-            style="display: block; margin: 0 auto; width: 200px; height: auto; padding-bottom: 20px;"> <!-- Imagen centrada -->
-        </div>
-
-        <!-- Pie de página -->
-        <footer>
-            <p>
-                ¿Necesitas ayuda? <a href="mailto:SARAsoporte@gmail.com">Contáctanos</a>
-            </p>
-            <p>
-                Recibiste este correo porque te registraste en nuestro servicio.
-            </p>
-            <p>
-                Este es un mensaje generado automáticamente,
-                por lo que te pedimos que no respondas a este correo.
-            </p>
-        </footer>
+  <div class="main-container">
+    <!-- Banner azul -->
+    <div class="banner">
+      Reestablecimiento de contraseña
     </div>
+
+    <!-- Contenedor del contenido que se superpone con el banner -->
+    <div class="content-container">
+      <p>Estimado/a {{datos.nombres}},</p>
+      <p>
+        Hemos recibido una solicitud para reestablecer la contraseña de tu cuenta {{datos.nombres}} de S.A.R.A.
+      </p>
+      <p>
+        Para reestablecer tu contraseña, haz click en el siguiente enlace:
+      </p>
+      <p style="text-align: center;">
+        <a href="{{link}}" class="btn" style="color: white">Reestablecer Contraseña</a>
+      </p>
+      <p>
+        Si el botón anterior no funciona, copia y pega el siguiente enlace en tu navegador:
+      </p>
+      <p>
+        <a href="{{link}}" style="color: #00c5d6;">Reestablecer Contraseña</a>
+      </p>
+      <p>
+        Si tienes alguna pregunta, haz click en el botón "Contáctanos" que encontrarás en el pie del mensaje.
+      </p>
+      <p>
+        Saludos,<br>
+        El equipo de S.A.R.A
+      </p>
+    </div>
+
+    <!-- Logo centrado -->
+    <div style="text-align: center;">
+      <a href="https://ibb.co/R4GL7Zsj">
+        <img src="https://i.ibb.co/1JYHbhPz/Logo-SARA2.png" alt="Logo-SARA2" border="0"
+          style="width: 200px; height: auto;">
+      </a>
+    </div>
+
+
+    <!-- Pie de página -->
+    <div class="footer">
+      <p>¿Necesitas ayuda? <a href="mailto:SARAsoporte@gmail.com">Contáctanos</a></p>
+      <p>Recibiste este correo porque te registraste en nuestro servicio.</p>
+      <p>
+        Este es un mensaje generado automáticamente, por lo que te pedimos que no respondas a este correo.
+      </p>
+    </div>
+  </div>
 </body>
 
 </html>
