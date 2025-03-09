@@ -5,8 +5,8 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from rest_framework.exceptions import ValidationError
 
-
-
+from apps.Utilidades.Permisos import set_serializers
+@set_serializers
 class ConvenioSerializers(serializers.ModelSerializer):
     class Meta:
         model=Convenio
@@ -18,12 +18,19 @@ class ConvenioSerializers(serializers.ModelSerializer):
     def validate_nit(self, value):
         if logitud_minima(value):
             return validate_number(value)
-
+@set_serializers
 class SucursalSeralizers(serializers.ModelSerializer):
     class Meta:
         model=Sucursal
         fields= '__all__'
         
+
+@set_serializers
+class EmpleadoSerialzers(serializers.ModelSerializer):
+    class Meta:
+        model=Empleado
+        fields='__all__'
+
 
 class UsuarioSerializers(serializers.ModelSerializer):
     class Meta:
@@ -33,12 +40,6 @@ class UsuarioSerializers(serializers.ModelSerializer):
     def validate_usuario(self, value):
         if logitud_minima(value):
             return validate_text(value)
-
-
-class EmpleadoSerialzers(serializers.ModelSerializer):
-    class Meta:
-        model=Empleado
-        fields='__all__'
 
 class SolicitudRestablecerPassSerializers(serializers.Serializer):
     usuario = serializers.CharField(max_length=100)

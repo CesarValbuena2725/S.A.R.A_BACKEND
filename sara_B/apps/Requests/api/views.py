@@ -34,10 +34,10 @@ class PostRequests(generics.GenericAPIView):
         try:
             instancie= serializers.save()
             send_email_sara(
-                contexto=f"Nueva solicitud {instancie.pk}",
+                contexto=f"Solicitud Cancelada {instancie.pk}",
                 affair= f"Nueva solicitud {instancie.pk}",
-                template="base_request.html",
-                solicitante= instancie.placa,
+                template="base_update_request.html",
+                solicitante= instancie,
             )
 
             return Response(serializers.data ,status=status.HTTP_201_CREATED)
@@ -112,12 +112,15 @@ class PutRequest(APIView):
             try:
                 #Crear Pantilla de modificacion
                 send_email_sara(
-                    contexto=f"Nueva solicitud {instancia.pk}",
-                    affair= f"Nueva solicitud {instancia.pk}",
-                    template="base_request.html",
-                    solicitante= instancia.placa,
+                #Es informacion infortante para el correo 
+                contexto= instancia.pk,
+                #Asusnto de la Solcitud 
+                affair= f"Solicitud Cancelada {instancia.pk}",
+                #Base HTMl que se va a renderiar para el correo
+                template="base.html",
+                #sin Solicitante// default None
+                #sin Destinatario// Default correo SARA
                 )
-
 
             except Exception as e:
                 return Response(

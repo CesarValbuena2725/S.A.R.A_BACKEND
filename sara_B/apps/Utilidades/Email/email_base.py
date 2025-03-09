@@ -14,7 +14,7 @@ def send_email_sara(affair, template, destinario=["tosaraweb@gmail.com"], solici
     template = get_template(template)
     context = {
         'asunto': affair,
-        'link': contexto,
+        'informacion': contexto,
         'datos': solicitante
     }
     body_html = template.render(context)
@@ -29,7 +29,8 @@ def send_email_sara(affair, template, destinario=["tosaraweb@gmail.com"], solici
     email.content_subtype = 'html'
     message_id = f"<{uuid.uuid4()}@gmail.com>"
     email.extra_headers = {'Message-ID': message_id}
-    # Enviar el correo
+
+
     try:
         email.send()
     except Exception as e:

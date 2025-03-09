@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Correo con fondo</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #c9cfdf; text-align: center; font-family: 'Helvetica', sans-serif;">
+
+  <!-- Fondo superior ajustado -->
+  <div style="
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px; /* Se redujo la altura */
+    background-color: #ccfcff;
+  ">
+  </div>
+
+  <!-- Contenedor del contenido -->
+  <div style="
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 0;
+  ">
+    <!-- Tarjeta central -->
+    <div style="
+      position: relative;
+      width: 600px;
+      background-color: #def0ff;
+      padding: 20px;
+      border-radius: 5px;
+      text-align: center;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    ">
+      <!-- Logo en la esquina superior derecha -->
+      <img src="https://i.ibb.co/DfsJDR9x/Logo-Gradient.png" alt="Logo" style="
+        width: 50px;
+        height: auto;
+        position: absolute;
+        top: -20px; /* Se sube un poco para que quede alineado */
+        right: 15px;
+      ">
+
+      <h1 style="color: #222;">Nueva Solicitud {{datos.id}}</h1>
+      <p style="color: #222; text-align: left;">
+        Le informamos que su solicitud ha sido creada exitosamente en nuestro sistema. A continuación, le proporcionamos los detalles:
+      </p>
+      <ul style="color: #222; font-size: 16px; text-align: left;">
+        <li><strong>Placa:</strong> {{datos.plca}}</li>
+        <li><strong>Estado:</strong> {{datos.estado}}</li>
+        <li><strong>Descripción:</strong> {{datos.observaciones}}</li>
+      </ul>
+      <p>Para más información de la solicitud, por favor contáctenos.</p>
+
+      <a href="[Enlace al sistema]" style="
+        display: inline-block;
+        background: #007BFF;
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 16px;
+      ">
+        🔗 Ir a S.A.R.A
+      </a>
+    </div>
+  </div>
+
+  <!-- Fondo inferior (Pie de página) -->
+  <footer style="
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #b0ebff;
+    padding: 10px; /* Se redujo el padding para que no sea tan alto */
+    text-align: center;
+  ">
+    <div>
+      <p><strong>S.A.R.A</strong></p>
+      <p>📧 <a href="mailto:tosoporteSARA@gmail.com" style="color: #007BFF; text-decoration: none;">tosoporteSARA@gmail.com</a> | 📞 [Teléfono de Soporte]</p>
+    </div>
+  </footer>
+
+</body>
+</html>
