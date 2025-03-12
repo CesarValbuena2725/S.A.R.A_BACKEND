@@ -18,7 +18,6 @@ class Convenio(models.Model):
     nombre = models.CharField(max_length=100, unique=True, error_messages=Errores)
     nit = models.CharField(max_length=100, unique=True, null=False, error_messages=Errores)
     telefono = models.BigIntegerField(error_messages=Errores)
-    ciudad = models.CharField(max_length=100, error_messages=Errores)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
 
     def __str__(self):
@@ -66,7 +65,7 @@ class UsuarioManager(BaseUserManager):
             raise ValueError('Superuser debe tener is_superuser=True.')
 
         return self.create_user(usuario, password, **extra_fields)
-
+@set_model
 class Usuario(AbstractBaseUser, PermissionsMixin):
     class Roles(models.TextChoices):
         ADMINISTRADOR = 'AD', "Administrador"

@@ -1,85 +1,156 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
+
 <head>
-  <title>Correo con fondo</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #c9cfdf; text-align: center; font-family: 'Helvetica', sans-serif;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reestablecimiento de contraseña</title>
+  <style>
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, sans-serif;
+    background: linear-gradient(to bottom, #0affff    25%, white 25%);
+    min-height: 100vh; /* Se ajusta a la altura completa de la pantalla */
+}
 
-  <!-- Fondo superior ajustado -->
-  <div style="
+.container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 80px; /* Se redujo la altura */
-    background-color: #ccfcff;
-  ">
-  </div>
+    height: 100vh; /* Ajusta el contenido verticalmente */
+}
 
-  <!-- Contenedor del contenido -->
-  <div style="
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 30px 0;
-  ">
-    <!-- Tarjeta central -->
-    <div style="
+
+    /* Contenedor principal con borde azul */
+    .main-container {
+      max-width: 600px;
+      margin: 40px auto;
       position: relative;
-      width: 600px;
-      background-color: #def0ff;
-      padding: 20px;
-      border-radius: 5px;
+      border: 2px solid #b9d4dc      ;
+      /* Borde azul */
+      border-radius: 8px;
+      overflow: hidden;
+      /* Para que no se salga el contenido del borde */
+      background-color: #ffffff;
+    }
+
+    /* Banner azul en la parte superior */
+    .banner {
+      background-color: #ccfcff      ;
       text-align: center;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    ">
-      <!-- Logo en la esquina superior derecha -->
-      <img src="https://i.ibb.co/DfsJDR9x/Logo-Gradient.png" alt="Logo" style="
-        width: 50px;
-        height: auto;
-        position: absolute;
-        top: -20px; /* Se sube un poco para que quede alineado */
-        right: 15px;
-      ">
+      padding: 40px 20px;
+      color: black;
+      font-size: 28px;
+      font-weight: bold;
+    }
 
-      <h1 style="color: #222;">Nueva Solicitud {{datos.id}}</h1>
-      <p style="color: #222; text-align: left;">
-        Le informamos que su solicitud ha sido creada exitosamente en nuestro sistema. A continuación, le proporcionamos los detalles:
-      </p>
-      <ul style="color: #222; font-size: 16px; text-align: left;">
-        <li><strong>Placa:</strong> {{datos.plca}}</li>
+    /* Contenedor blanco que se superpone con el banner */
+    .content-container {
+      padding: 40px 20px 20px;
+      margin-top: -20px;
+      /* Superposición con el banner */
+    }
+
+    .content-container p {
+      color: #333;
+      font-size: 16px;
+      line-height: 1.5;
+      margin: 10px 0;
+    }
+
+    /* Estilos del botón */
+    .btn {
+      display: inline-block;
+      background-color: #00c5d6;
+      /* Fondo del botón */
+      color: white;
+      /* Cambiar color del texto a blanco */
+      text-decoration: none;
+      /* Eliminar subrayado del enlace */
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: #777777;
+      background-color: #f4f4f4;
+    }
+
+    .footer a {
+      text-decoration: none;
+      color: #00c5d6;
+    }
+
+    .logo {
+      display: block;
+      margin: 20px auto;
+      width: 200px;
+      height: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-container">
+    <!-- Banner azul -->
+    <div class="banner">
+      <h3>Cancelacion de Solicitud</h3>
+    </div>
+
+    <!-- Contenedor del contenido que se superpone con el banner -->
+    <div class="content-container">
+      <p>Estimado/a </p><br>
+      <p>
+        Le informamos que su solicitud ha sido cancelado exitosamente en nuestro sistema. A continuación, le proporcionamos los detalles:
+    </p><br>
+
+    <ul style="color: #222; font-family:'Helvetica' 16px; text-align: left;">
+        <li><strong>Número de Solicitud:</strong> {{datos.Placa}}</li>
+        <li><strong>Placa:</strong> {{datos.fecha}}</li>
         <li><strong>Estado:</strong> {{datos.estado}}</li>
-        <li><strong>Descripción:</strong> {{datos.observaciones}}</li>
-      </ul>
-      <p>Para más información de la solicitud, por favor contáctenos.</p>
+        <li><strong>Descripción:</strong> {{datos.observaciones}}s</li>
+    </ul> 
 
-      <a href="[Enlace al sistema]" style="
-        display: inline-block;
-        background: #007BFF;
-        color: white;
-        text-decoration: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        font-size: 16px;
-      ">
-        🔗 Ir a S.A.R.A
+      <p>
+        Para consultar más detalles sobre su solicitud, haga clic en el siguiente enlace:
+    </p><br>
+      <p style="text-align: center;">
+        <a href="{{link}}" class="btn" style="color: white">Ver Solicitud </a>
+      </p><br>
+      
+      <p>
+        Si tiene alguna duda o requiere asistencia, no dude en contactarnos mediante nuestro caneles de atencion.
+      <p>
+        Atentamente,<br>
+        El equipo de S.A.R.A
+      </p>
+    </div>
+
+    <!-- Logo centrado -->
+    <div style="text-align: center;">
+      <a href="https://ibb.co/R4GL7Zsj">
+        <img src="https://i.ibb.co/1JYHbhPz/Logo-SARA2.png" alt="Logo-SARA2" border="0"
+          style="width: 200px; height: auto;">
       </a>
     </div>
-  </div>
 
-  <!-- Fondo inferior (Pie de página) -->
-  <footer style="
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #b0ebff;
-    padding: 10px; /* Se redujo el padding para que no sea tan alto */
-    text-align: center;
-  ">
-    <div>
-      <p><strong>S.A.R.A</strong></p>
-      <p>📧 <a href="mailto:tosoporteSARA@gmail.com" style="color: #007BFF; text-decoration: none;">tosoporteSARA@gmail.com</a> | 📞 [Teléfono de Soporte]</p>
+
+    <!-- Pie de página -->
+    <div class="footer">
+      <p>¿Necesitas ayuda? <a href="mailto:SARAsoporte@gmail.com">Contáctanos</a></p>
+      <p>Recibiste este correo porque te registraste en nuestro servicio.</p>
+      <p>
+        Este es un mensaje generado automáticamente, por lo que te pedimos que no respondas a este correo.
+      </p>
     </div>
-  </footer>
-
+  </div>
 </body>
+
 </html>

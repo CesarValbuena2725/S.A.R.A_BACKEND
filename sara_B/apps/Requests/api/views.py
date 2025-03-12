@@ -36,7 +36,7 @@ class PostRequests(generics.GenericAPIView):
             send_email_sara(
                 contexto=f"Solicitud Cancelada {instancie.pk}",
                 affair= f"Nueva solicitud {instancie.pk}",
-                template="base_update_request.html",
+                template="base_request.html",
                 solicitante= instancie,
             )
 
@@ -63,7 +63,7 @@ class GetRequests(generics.GenericAPIView):
     serializer_class=SolicitudSerializers
 
     def get_queryset(self):
-         return self.model.objects.all()
+         return self.model.objects.all() # paginacion / filtros 
     
     def get(self,request):
             try:
@@ -117,7 +117,7 @@ class PutRequest(APIView):
                 #Asusnto de la Solcitud 
                 affair= f"Solicitud Cancelada {instancia.pk}",
                 #Base HTMl que se va a renderiar para el correo
-                template="base.html",
+                template="base_update_request.html",
                 #sin Solicitante// default None
                 #sin Destinatario// Default correo SARA
                 )

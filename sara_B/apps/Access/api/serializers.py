@@ -31,7 +31,7 @@ class EmpleadoSerialzers(serializers.ModelSerializer):
         model=Empleado
         fields='__all__'
 
-
+@set_serializers
 class UsuarioSerializers(serializers.ModelSerializer):
     class Meta:
         model= Usuario

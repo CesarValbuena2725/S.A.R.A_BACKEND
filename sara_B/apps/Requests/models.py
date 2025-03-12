@@ -18,7 +18,7 @@ class TipoVehiculo(models.Model):
     def __str__(self):
         return self.nombre_vehiculo
     
-@set_model  
+@set_model 
 class VehiculoPlan(models.Model):
     id_plan =models.ForeignKey(Plan, on_delete=models.CASCADE)
     id_vehiculo = models.ForeignKey(TipoVehiculo, on_delete=models.CASCADE)
@@ -42,7 +42,7 @@ class Solicitud(models.Model):
     turno = models.IntegerField()
     telefono = models.CharField(max_length=10)
     fecha =  models.DateTimeField (default=timezone.now)
-    id_empleado =models.ForeignKey(Empleado, on_delete=models.CASCADE, null=True)
+    id_empleado =models.ForeignKey(Empleado, on_delete=models.CASCADE)
     observaciones= models.TextField(null=True )
     id_plan =models.ForeignKey(Plan, on_delete=models.CASCADE)
     id_tipo_vehiculo = models.ForeignKey(TipoVehiculo, on_delete=models.CASCADE)
