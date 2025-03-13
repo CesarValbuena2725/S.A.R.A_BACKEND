@@ -1,0 +1,1 @@
+from celery import STATICA_HACK

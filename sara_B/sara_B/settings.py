@@ -181,3 +181,12 @@ SIMPLE_JWT = {
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': 'tu_clave_secreta_aqui',  # Asegúrate de cambiar esto
 }
+
+# Configuración de Celery
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//' #Servidor de broker
+CELERY_ACCEPT_CONTENT = ['json'] # Defini que los broker  se hacen mediante Json
+CELERY_TASK_SERIALIZER = 'json' # Defini que la worker  Seran serilizado
+CELERY_RESULT_SERIALIZER = 'json' #  Definie que  los Resuktados Seran serializados
+CELERY_TIMEZONE = 'UTC'
+CELERY_RESULT_BACKEND = "django-db"  #donde guarda los resultados
+INSTALLED_APPS += ["django_celery_results"]  # Agregar en settings.py

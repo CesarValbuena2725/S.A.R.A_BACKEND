@@ -1,0 +1,10 @@
+🔹 Práctica	                ✅ Recomendación
+Broker confiable	        Usa Redis en lugar de RabbitMQ si puedes.
+Evitar bloqueos	            Usa -P threads para tareas I/O y -P prefork para CPU intensivo.
+Reintentos	                Usa self.retry() para evitar fallos definitivos.
+Monitoreo	                Usa Flower (celery -A proyecto flower).
+Colas de prioridad	        Define tareas en diferentes colas (queue='alta_prioridad').
+Tareas periódicas	        Usa Celery Beat para programarlas.
+
+
+Celery + WebSockets (Recomendado para datos en tiempo real) manejor de estadsiticas 

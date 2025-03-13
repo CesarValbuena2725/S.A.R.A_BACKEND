@@ -1,0 +1,77 @@
+Instalación de Erlang en Windows
+
+* Descarga Erlang desde el sitio oficial: https://www.erlang.org/downloads.
+    -Ejecuta el instalador descargado (.exe) y sigue las instrucciones.
+
+* Agrega Erlang al PATH de Windows:
+    - Abre el Explorador de archivos y navega a: C:\Program Files\Erlang OTP\bin.
+        -Copia la ruta completa de la carpeta bin.
+
+    - Abrir CMD y ejecutar sysdm.cpl o Abre el Panel de Control y ve a "Sistema y seguridad" > "Sistema" 
+
+        -Haz clic en "Configuración avanzada del sistema".
+            -Haz clic en "Variables de entorno".
+                -En "Variables del sistema", busca PATH y haz clic en "Editar".
+                    -Agrega una nueva entrada con la ruta de Erlang (C:\Program Files\Erlang OTP\bin).
+                        -Reinicia tu equipo.
+
+* Verifica la instalación:
+    -Abre una terminal y ejecuta erl.
+        -Deberías ver algo como: Erlang/OTP 24 [erts-12.3] [source] [64-bit] [...].
+
+#########################################################
+
+Instalación de RabbitMQ en Windows
+
+* Descarga RabbitMQ desde el sitio oficial: https://www.rabbitmq.com/download.html.
+
+    -Ejecuta el instalador y sigue las instrucciones.
+    -Verifica que el servicio de RabbitMQ esté en ejecución:Servicos de windows
+        -Abre una terminal y ejecuta rabbitmq-service status.
+
+* Agrega RabbitMQ al PATH de Windows:
+
+    -Navega a la carpeta sbin de RabbitMQ: C:\Program Files\RabbitMQ Server\rabbitmq_server-4.0.7\sbin.
+
+    - Abrir CMD y ejecutar sysdm.cpl o Abre el Panel de Control y ve a "Sistema y seguridad" > "Sistema" 
+        -Haz clic en "Configuración avanzada del sistema".
+            -Haz clic en "Variables de entorno".
+                -En "Variables del sistema", busca PATH y haz clic en "Editar".
+                    -Agrega una nueva entrada con la ruta  (C:\Program Files\RabbitMQ Server\rabbitmq_server-4.0.7\sbin).
+                        -Reinicia tu equipo.
+
+
+* Habilita el panel de administración de RabbitMQ:
+
+    -Ejecuta en PowerShell: rabbitmq-plugins enable rabbitmq_management.
+
+        -Accede al panel de administración:
+            -Abre tu navegador y ve a: http://localhost:15672/.
+                Usuario: guest
+                Contraseña: guest
+
+##############################################
+
+Instalación y uso de Celery
+
+* Instala Celery:
+    -  pip install celery
+
+* Inicia un worker de Celery:
+        - Para tareas intensivas en E/S (como envío de correos):
+            - celery -A sara_B worker --loglevel=info -P threads
+        - Para tareas intensivas en CPU (como procesamiento de imágenes):
+            - celery -A sara_B worker --loglevel=info -P prefork
+
+
+* Monitoreo con Flower
+    - Instala Flower:
+        - pip install flower
+
+* Inicia el servidor de Flower:
+    - cd nombre del proyecto # SARA es sara_B
+        -Ejecutar Servidor:
+            - celery -A nombre del proyecto flower  # SARA es sara_B
+            -ingresar Al link  http://localhost:5555/  # Esto tiende a ser siempre el mismo 
+
+

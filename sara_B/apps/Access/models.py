@@ -13,6 +13,7 @@ Errores = {
     'max_length': 'Valor fuera de los límites.',
     'invalid': 'Formato no válido',
 }
+
 @set_model
 class Convenio(models.Model):
     nombre = models.CharField(max_length=100, unique=True, error_messages=Errores)
@@ -22,6 +23,8 @@ class Convenio(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+
 @set_model
 class Sucursal(models.Model):
     nombre = models.CharField(max_length=100, error_messages=Errores)
