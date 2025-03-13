@@ -29,11 +29,6 @@ def send_email_sara(affair, template, destinario=["tosaraweb@gmail.com"], solici
     email.content_subtype = 'html'
     message_id = f"<{uuid.uuid4()}@gmail.com>"
     email.extra_headers = {'Message-ID': message_id}
-<<<<<<< HEAD
-    # Enviar el correo
-=======
-
->>>>>>> origin/ever
 
     try:
         email.send()

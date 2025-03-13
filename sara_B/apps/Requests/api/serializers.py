@@ -8,11 +8,7 @@ class SolicitudSerializers(serializers.ModelSerializer):
         exclude = ['fecha']
         read_only_fields = ['Placa', 'id_empleado']  # Campos que no se pueden modificar
 
-<<<<<<< HEAD
   
-=======
-
->>>>>>> origin/ever
     def validate(self, data):
 
         id_plan = data.get("id_plan")

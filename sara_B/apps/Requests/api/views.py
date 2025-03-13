@@ -12,6 +12,7 @@ from apps.Utilidades.Email.email_base import send_email_sara
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import rest_framework as filters
+from apps.Utilidades.CRUD import FiltroGeneral
 
 """
 class CustomPagination(pagination.PageNumberPagination):
@@ -19,12 +20,6 @@ class CustomPagination(pagination.PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 100
 """
-class SolicitudFilter(filters.FilterSet):
-    estado = filters.ChoiceFilter(choices=Solicitud.Estados_solcitud.choices)  # Solo acepta valores válidos
-
-    class Meta:
-        model = Solicitud
-        fields = ['estado']
 
 
 class PostRequests(generics.GenericAPIView):
@@ -106,7 +101,7 @@ class GetRequests(generics.ListAPIView):
     queryset = Solicitud.objects.all()
 
     filter_backends = [DjangoFilterBackend]
-    filterset_class = SolicitudFilter      
+    filterset_class = FiltroGeneral
          
 #Crear  genera notificacion  put para estado !=
 

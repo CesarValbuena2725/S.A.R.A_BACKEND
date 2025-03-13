@@ -27,11 +27,7 @@ SECRET_KEY = 'django-insecure-u^wy6%4api-8+h^9b#%0gykmymcd=-b3bn26q+ia=%vlar+re0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-<<<<<<< HEAD
 ALLOWED_HOSTS = ['127.0.0.1','localhost']
-=======
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
->>>>>>> origin/ever
 
 
 # Application definition
@@ -100,9 +96,9 @@ WSGI_APPLICATION = 'sara_B.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sarad_v2',
+        'NAME': 'sarav3',
         'USER':'root',
-        'PASSWORD':'12345678',
+        'PASSWORD':'Tragamundos4ever2024',
         'HOST':'127.0.0.1',
         'PORT':'3306',
     }
@@ -179,7 +175,7 @@ REST_FRAMEWORK = {
     
     'DEFAULT_PAGINATION_CLASS': 
         'rest_framework.pagination.PageNumberPagination',
-        'PAGE_SIZE': 50,
+        'PAGE_SIZE': 20,
 
     'DEFAULT_FILTER_BACKENDS' : ['django_filters.rest_framework.DjangoFilterBackend'],
 }   

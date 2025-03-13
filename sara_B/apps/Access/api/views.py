@@ -107,14 +107,11 @@ class Login(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-<<<<<<< HEAD
-=======
 
 
 
 
 ######################################################################################################
->>>>>>> origin/ever
 #Se realiza el envio de la dirrecion para restablecer contraseña
 
 

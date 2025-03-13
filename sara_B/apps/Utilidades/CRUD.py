@@ -7,6 +7,18 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import NotFound
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from apps.Utilidades.Permisos import getModelName,getSerializer
+from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import rest_framework as filters
+from apps.Requests.models import Solicitud
+from rest_framework.exceptions import ValidationError
+
+class FiltroGeneral(filters.FilterSet):
+    estado = filters.ChoiceFilter(choices=Solicitud.Estados_solcitud.choices)
+
+    class Meta:
+        model = Solicitud
+        fields = ['estado']
+
 
 class BaseGeneral(generics.GenericAPIView):
     """
@@ -56,19 +68,24 @@ class BaseGeneral(generics.GenericAPIView):
 
     def get_queryset(self):
         
-        #Pendiente aplicar filtros 
-
-        return self.get_model().objects.all()  
+        queryset = self.get_model().objects.all()
+        
+        #Filtros aplicados con filterset_class
+        if self.filterset_class:
+            filterset = self.filterset_class(self.request.GET, queryset=self.get_model().objects.all())
+            if filterset.is_valid():
+                queryset = filterset.qs
+        
+        return queryset  
 
     
     #realiza la validacion del objeto indicado segun el model que corresponda.
     def get_object(self, pk):
-
-        model = self.get_model()
+        queryset = self.get_queryset()
         try:
-            return model.objects.get(id=pk)
-        except model.DoesNotExist:
-            raise NotFound(detail=f"Objeto con id {pk} no encontrado en el modelo {model.__name__}.")
+            return queryset.get(id=pk)
+        except queryset.model.DoesNotExist:
+            raise NotFound(detail=f"Objeto con id {pk} no encontrado en el modelo {queryset.model.__name__}.")
         
     #Llama los objetos dependiendo si pasan o no un PK
 
@@ -96,8 +113,7 @@ class GetGeneral(BaseGeneral):
     allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC'] 
     """
 
-    def get(self, request,*args, **kwargs):
-        model = self.get_model()    
+    def get(self, request,*args, **kwargs):  
         try:
             serializer_class = self.get_serializer_class()
             # Llama a get_queryset
@@ -109,9 +125,13 @@ class GetGeneral(BaseGeneral):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-#ApiGenerla para la creacion de registros en los model
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = FiltroGeneral
 
-class PostGeneral(BaseGeneral): # Herendan funcionaloidades de las clase base 
+
+#Api General para la creacion de registros en los model
+
+class PostGeneral(BaseGeneral): # Heredan funcionalidades de las clase base 
     """
     allowed_roles = ['AD', 'CA']  # Roles Administrativos
     """
@@ -121,13 +141,16 @@ class PostGeneral(BaseGeneral): # Herendan funcionaloidades de las clase base
         try:          
             # Obtiene el serializador basado en `namemodel` mediante `get_serializer_class`
             serializer_class = self.get_serializer_class()
-
             serializer = serializer_class(data=request.data)
 
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)        
+            
+            return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)        
+        
+        except ValidationError as e:
+            return Response({"validation_error": e.detail},status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
