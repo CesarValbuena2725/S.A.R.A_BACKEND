@@ -11,3 +11,9 @@ djangorestframework==3.15.2  # Biblioteca para construir APIs RESTful en Django
 sqlparse==0.5.1  # Analizador de SQL que se usa para la funcionalidad de Django
 djangorestframework-simplejwt==5.3.1
 mysqlclient==2.2.7 # libreria que maneja la converison de django a Mysql 
+
+#########funciones Asincronicos###############
+
+celery==5.4.0 # procesos Asincronicos 
+flower==2.0.1 # sistemas de monitorio  de celery 
+celery django-celery-results  # para guardar los resultados en DB

@@ -45,6 +45,8 @@ APPS_EXTERNA=[
     'rest_framework.authtoken',
     'corsheaders',
     'rest_framework_simplejwt',
+    'django_celery_results',
+
 
 ]
 
@@ -138,10 +140,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # Carpeta global de archivos estáticos
-]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -189,4 +188,3 @@ CELERY_TASK_SERIALIZER = 'json' # Defini que la worker  Seran serilizado
 CELERY_RESULT_SERIALIZER = 'json' #  Definie que  los Resuktados Seran serializados
 CELERY_TIMEZONE = 'UTC'
 CELERY_RESULT_BACKEND = "django-db"  #donde guarda los resultados
-INSTALLED_APPS += ["django_celery_results"]  # Agregar en settings.py
