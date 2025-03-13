@@ -10,6 +10,21 @@ from  apps.Requests.models import Solicitud, Plan, VehiculoPlan
 from  apps.Requests.api.serializers import SolicitudSerializers, PlanSerializers
 from apps.Utilidades.Email.email_base import send_email_sara
 from rest_framework.views import APIView
+from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import rest_framework as filters
+
+"""
+class CustomPagination(pagination.PageNumberPagination):
+    page_size = 50
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+"""
+class SolicitudFilter(filters.FilterSet):
+    estado = filters.ChoiceFilter(choices=Solicitud.Estados_solcitud.choices)  # Solo acepta valores válidos
+
+    class Meta:
+        model = Solicitud
+        fields = ['estado']
 
 
 class PostRequests(generics.GenericAPIView):
@@ -47,7 +62,7 @@ class PostRequests(generics.GenericAPIView):
                 {"detalles": f"Error al procesar la solicitud: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-        
+
 #Crear un  en path para hacer el filtro de planes de solictudes  // el Frontend debe poder  enviar el tipo de Vehiculo y hacer la peticion al Servidor ; 
 class FiltrarPlanes(APIView):
     def get(self, request, id_tipo_vehiculo):
@@ -79,26 +94,19 @@ class CrearSolicitudAPIView(generics.CreateAPIView):
 
 # Get Solicitudes
 
-class GetRequests(generics.GenericAPIView):
+class GetRequests(generics.ListAPIView):
     """
         authentication_classes = [JWTAuthentication]
         permission_classes = [IsAuthenticated, RolePermission]
         allowed_roles = ['AD', 'RC', 'CA',] 
     """
-    model = Solicitud
+    
     serializer_class=SolicitudSerializers
 
-    def get_queryset(self):
-         return self.model.objects.all()
-    
-    def get(self,request):
-            try:
-                usuario = self.model.objects.all()
-                serializers = self.serializer_class(usuario, many=True)
-                return Response(serializers.data, status=status.HTTP_200_OK)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-        
+    queryset = Solicitud.objects.all()
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = SolicitudFilter      
          
 #Crear  genera notificacion  put para estado !=
 

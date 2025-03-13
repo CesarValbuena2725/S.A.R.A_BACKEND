@@ -9,6 +9,8 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from apps.Utilidades.Permisos import getModelName,GetSerializer
 
 class BaseGeneral(generics.GenericAPIView):
+
+    
     #Clase base para manejar operaciones generales con modelos.
     def get_queryset(self):
         return self.model.objects.all()  
@@ -47,8 +49,18 @@ class GetGeneral(generics.GenericAPIView):
     """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
-    allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC'] 
+    allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC']
     """
+
+    """
+    class SolicitudFilter(filters.FilterSet):
+    estado = filters.ChoiceFilter(choices=Solicitud.Estados_solcitud.choices)  # Solo acepta valores válidos
+
+    class Meta:
+        model = Solicitud
+        fields = ['estado']
+    """
+
     def get_queryset(self):
         return self.model.objects.all()  
 
