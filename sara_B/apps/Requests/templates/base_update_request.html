@@ -101,22 +101,21 @@ body {
   <div class="main-container">
     <!-- Banner azul -->
     <div class="banner">
-      <h3>Confirmación de Nueva Solicitud</h3>
+      <h3>Cancelacion de Solicitud</h3>
     </div>
 
     <!-- Contenedor del contenido que se superpone con el banner -->
     <div class="content-container">
       <p>Estimado/a </p><br>
       <p>
-        Le informamos que su solicitud ha sido creada exitosamente en nuestro sistema. A continuación, le proporcionamos los detalles:
+        Le informamos que su solicitud ha sido cancelado exitosamente en nuestro sistema. A continuación, le proporcionamos los detalles:
     </p><br>
 
     <ul style="color: #222; font-family:'Helvetica' 16px; text-align: left;">
-        <li><strong>Número de Solicitud:</strong> {{datos.pk}}</li>
-        <li><strong>Placa:</strong> {{datos.placa}}</li>
-        <li><strong>fecha:</strong> {{datos.fecha}}</li>
+        <li><strong>Número de Solicitud:</strong> {{datos.Placa}}</li>
+        <li><strong>Placa:</strong> {{datos.fecha}}</li>
         <li><strong>Estado:</strong> {{datos.estado}}</li>
-        <li><strong>Descripción:</strong> {{datos.observaciones}}</li>
+        <li><strong>Descripción:</strong> {{datos.observaciones}}s</li>
     </ul> 
 
       <p>

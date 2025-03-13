@@ -49,10 +49,10 @@ class PostRequests(generics.GenericAPIView):
         try:
             instancie= serializers.save()
             send_email_sara(
-                contexto=f"Nueva solicitud {instancie.pk}",
+                contexto=f"Solicitud Cancelada {instancie.pk}",
                 affair= f"Nueva solicitud {instancie.pk}",
                 template="base_request.html",
-                solicitante= instancie.placa,
+                solicitante= instancie,
             )
 
             return Response(serializers.data ,status=status.HTTP_201_CREATED)
@@ -146,12 +146,15 @@ class PutRequest(APIView):
             try:
                 #Crear Pantilla de modificacion
                 send_email_sara(
-                    contexto=f"Nueva solicitud {instancia.pk}",
-                    affair= f"Nueva solicitud {instancia.pk}",
-                    template="base_request.html",
-                    solicitante= instancia.placa,
+                #Es informacion infortante para el correo 
+                contexto= instancia.pk,
+                #Asusnto de la Solcitud 
+                affair= f"Solicitud Cancelada {instancia.pk}",
+                #Base HTMl que se va a renderiar para el correo
+                template="base_update_request.html",
+                #sin Solicitante// default None
+                #sin Destinatario// Default correo SARA
                 )
-
 
             except Exception as e:
                 return Response(
@@ -181,4 +184,28 @@ class DeleteRequestDB(APIView):
             return Response({"detail": "PK no válido"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+#Crear un  en path para hacer el filtro de planes de solictudes  // el Frontend debe poder  enviar el tipo de Vehiculo y hacer la peticion al Servidor ; 
+class FiltrarPlanes(APIView):
+    def get(self, request, id_tipo_vehiculo):
+        """
+        Filtra los planes según el tipo de vehículo dado.
+        """
+        # Verificamos si el id_tipo_vehiculo existe en VehiculoPlan, filtrando los planes asociados al tipo_vehiculo
+        planes_ids = VehiculoPlan.objects.filter(id_vehiculo=id_tipo_vehiculo).values_list('id_plan', flat=True)
+        
+
+        #Si no se encuentran planes asociados a ese id, retorna un error 404
+        if not planes_ids:
+            return Response(
+                {"error": "No hay planes disponibles para este tipo de vehículo."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        #Filtra los objetos de plan que tengan un id dentro del tipo_vehiculo
+        planes = Plan.objects.filter(id__in=planes_ids)
+        serializer = PlanSerializers(planes, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 

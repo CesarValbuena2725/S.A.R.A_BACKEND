@@ -27,7 +27,11 @@ SECRET_KEY = 'django-insecure-u^wy6%4api-8+h^9b#%0gykmymcd=-b3bn26q+ia=%vlar+re0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = ['127.0.0.1','localhost']
+=======
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+>>>>>>> origin/ever
 
 
 # Application definition
@@ -96,9 +100,9 @@ WSGI_APPLICATION = 'sara_B.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sarav3',
+        'NAME': 'sarad_v2',
         'USER':'root',
-        'PASSWORD':'Tragamundos4ever2024',
+        'PASSWORD':'12345678',
         'HOST':'127.0.0.1',
         'PORT':'3306',
     }
@@ -140,6 +144,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Carpeta global de archivos estáticos
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -159,7 +166,7 @@ EMAIL_HOST_PASSWORD = 's e r o j b e q p w i k o b a q '
 
 
 #Servidores Permitodos para hacer Peticiones
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
+CORS_ALLOWED_ORIGINS = ["http://localhost:5174"]
 
 #configuracion del Vida del token
 

@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from apps.Requests.models import Solicitud, Plan, VehiculoPlan,TipoVehiculo
-
-
+from apps.Utilidades.Permisos import set_serializers
 
 class SolicitudSerializers(serializers.ModelSerializer):
     class Meta:
@@ -9,7 +8,11 @@ class SolicitudSerializers(serializers.ModelSerializer):
         exclude = ['fecha']
         read_only_fields = ['Placa', 'id_empleado']  # Campos que no se pueden modificar
 
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> origin/ever
     def validate(self, data):
 
         id_plan = data.get("id_plan")
@@ -21,17 +24,20 @@ class SolicitudSerializers(serializers.ModelSerializer):
                 raise serializers.ValidationError("La combinación de Plan y Tipo de Vehículo no es válida.")
         return data
 
+@set_serializers
 class PlanSerializers(serializers.ModelSerializer):
 
     class Meta:
         model= Plan
         fields= '__all__'
-
+        
+@set_serializers
 class TipovehiculoSerializers(serializers.ModelSerializer):
     class Meta:
         model= TipoVehiculo
         fields= '__all__'
 
+@set_serializers
 class VehiculoplanSerializers(serializers.ModelSerializer):
     class Meta:
         model= VehiculoPlan

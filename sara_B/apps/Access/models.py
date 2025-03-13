@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.contrib.auth.hashers import make_password, check_password
+from apps.Utilidades.Permisos import set_model
 
 class Estado(models.TextChoices):
     ACTIVO = 'AC', 'Activo'
@@ -12,17 +13,16 @@ Errores = {
     'max_length': 'Valor fuera de los límites.',
     'invalid': 'Formato no válido',
 }
-
+@set_model
 class Convenio(models.Model):
     nombre = models.CharField(max_length=100, unique=True, error_messages=Errores)
     nit = models.CharField(max_length=100, unique=True, null=False, error_messages=Errores)
     telefono = models.BigIntegerField(error_messages=Errores)
-    ciudad = models.CharField(max_length=100, error_messages=Errores)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
 
     def __str__(self):
         return self.nombre
-
+@set_model
 class Sucursal(models.Model):
     nombre = models.CharField(max_length=100, error_messages=Errores)
     ciudad = models.CharField(max_length=100, error_messages=Errores)
@@ -34,7 +34,7 @@ class Sucursal(models.Model):
 
     def __str__(self):
         return self.nombre
-
+@set_model
 class Empleado(models.Model):
     nombres = models.CharField(max_length=100, error_messages=Errores)
     apellidos = models.CharField(max_length=100, error_messages=Errores)
@@ -65,7 +65,7 @@ class UsuarioManager(BaseUserManager):
             raise ValueError('Superuser debe tener is_superuser=True.')
 
         return self.create_user(usuario, password, **extra_fields)
-
+@set_model
 class Usuario(AbstractBaseUser, PermissionsMixin):
     class Roles(models.TextChoices):
         ADMINISTRADOR = 'AD', "Administrador"

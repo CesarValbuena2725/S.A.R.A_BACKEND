@@ -15,11 +15,13 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from apps.Utilidades.Email.email_base import send_email_sara
 from django.http import Http404
+from apps.Utilidades.CRUD import BaseGeneral
 
+#Clase para realiza la Creacion del usuarios con la asignacion de toekn para verificaicon  
+class pruenda(BaseGeneral):
+    def get(self, request, pk, namemodel=Usuario):
+        return super().get(request, pk, namemodel)()
 
-
-
-#Clase para realiza la Creacion del usuarios con la asignacion de toekn para verificaicon      
 class CreateUser(APIView):
     """
     authentication_classes = [JWTAuthentication]
@@ -56,7 +58,10 @@ class CreateUser(APIView):
                 return Response(serializers.data, status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+#######################################################################################3
 # clase que hace la verificacion de Credenciales y trae el token del usuario correspodiente 
+
 
 class Login(APIView):
     model = Usuario
@@ -78,7 +83,7 @@ class Login(APIView):
             # Verificar si el usuario está activo
             if user.estado == 'AC':
                 # Verificar la contraseña
-                if not user.Verificar_contraseña(request.data['password']):
+                if not user.verificar_contraseña(request.data['password']):
                     return Response({'error': 'Contraseña incorrecta'}, status=status.HTTP_401_UNAUTHORIZED)
 
                 # Generar los tokens (JWT)
@@ -102,7 +107,18 @@ class Login(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+<<<<<<< HEAD
+=======
+
+
+
+
+######################################################################################################
+>>>>>>> origin/ever
 #Se realiza el envio de la dirrecion para restablecer contraseña
+
+
+
 class SolicitudRestablecerPass(generics.GenericAPIView):
     serializer_class = SolicitudRestablecerPassSerializers
 
@@ -131,7 +147,13 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
 
                 #Realiza el envio del correo / pendiente por mejorar y cambiar esta aspecto
                 try:
-                    send_email_sara("Restablecer Password","base_email.html",[request.data['correo']],usuario,reset_link)
+                    send_email_sara(
+                        affair="Restablecer Password",
+                        template="base_email.html",
+                        destinario=[request.data['correo']],
+                        solicitante=usuario,
+                        contexto=reset_link,
+                    )
                     #send_mail('Restablecer Contarseña SARA',f'link de restablecimineto  {reset_link}',None,[request.data['correo']] )
 
                     return Response({'message':'Se realizo el envio correo para el restablecimiento de contarseña'}, status=status.HTTP_200_OK)
@@ -145,6 +167,9 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
                 return Response({'detail': error}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+#############################################################################
 
 #Serealiza el cambio de contarseña 
 class ContraseñaRestablecida(APIView):
