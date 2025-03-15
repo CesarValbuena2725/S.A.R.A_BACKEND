@@ -8,3 +8,4 @@ Tareas periódicas	        Usa Celery Beat para programarlas.
 
 
 Celery + WebSockets (Recomendado para datos en tiempo real) manejor de estadsiticas 
+

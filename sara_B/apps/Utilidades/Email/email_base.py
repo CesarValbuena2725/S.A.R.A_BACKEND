@@ -3,6 +3,7 @@ from django.core.mail import EmailMessage
 from django.template.loader import get_template
 from django.conf import settings
 
+
 def send_email_sara(affair, template, destinario=["tosaraweb@gmail.com"], solicitante=None, contexto=None):
 
     unique_id = uuid.uuid4().hex[:6]  # Tomar los primeros 6 caracteres del UUID
@@ -33,5 +34,7 @@ def send_email_sara(affair, template, destinario=["tosaraweb@gmail.com"], solici
 
     try:
         email.send()
+        return ("HTTP_200_OK")
+
     except Exception as e:
-        print(f"Error al enviar el correo: {e}")
+        return {"status": "error", "message": str(e)}  # ✅ Agregamos return aquí

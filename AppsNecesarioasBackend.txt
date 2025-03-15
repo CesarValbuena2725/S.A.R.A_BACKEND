@@ -17,3 +17,5 @@ mysqlclient==2.2.7 # libreria que maneja la converison de django a Mysql
 celery==5.4.0 # procesos Asincronicos 
 flower==2.0.1 # sistemas de monitorio  de celery 
 celery django-celery-results  # para guardar los resultados en DB
+
+rabbitmqctl feature_flags enable_all

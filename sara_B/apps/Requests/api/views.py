@@ -10,7 +10,7 @@ from  apps.Requests.models import Solicitud, Plan, VehiculoPlan
 from  apps.Requests.api.serializers import SolicitudSerializers, PlanSerializers
 from apps.Utilidades.Email.email_base import send_email_sara
 from rest_framework.views import APIView
-
+from apps.Utilidades.tasks import send_email_asincr
 
 class PostRequests(generics.GenericAPIView):
     """
@@ -32,14 +32,14 @@ class PostRequests(generics.GenericAPIView):
              return Response(serializers.errors ,status=status.HTTP_406_NOT_ACCEPTABLE)
         
         try:
-            instancie= serializers.save()
-            send_email_sara(
-                contexto=f"Solicitud Cancelada {instancie.pk}",
-                affair= f"Nueva solicitud {instancie.pk}",
-                template="base_request.html",
-                solicitante= instancie,
-            )
+            instance= serializers.save()
+            contexto=f"Solicitud Cancelada {instance.pk}"
+            affair= f"Nueva solicitud {instance.pk}"
+            template="base_request.html"
+            solicitante_data = self.serializer_class(instance).data
 
+            send_email_asincr.delay(affair, template, ["tosaraweb@gmail.com"], solicitante_data, contexto)
+        
             return Response(serializers.data ,status=status.HTTP_201_CREATED)
 
         except Exception as e:

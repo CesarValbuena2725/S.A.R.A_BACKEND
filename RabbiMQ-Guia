@@ -1,4 +1,4 @@
-Instalación de Erlang en Windows
+Instalación de Erlang en Windows/ linux
 
 * Descarga Erlang desde el sitio oficial: https://www.erlang.org/downloads.
     -Ejecuta el instalador descargado (.exe) y sigue las instrucciones.
@@ -43,7 +43,9 @@ Instalación de RabbitMQ en Windows
 
 * Habilita el panel de administración de RabbitMQ:
 
-    -Ejecuta en PowerShell: rabbitmq-plugins enable rabbitmq_management.
+    -Ejecuta en PowerShell o CMD Como Administrador: rabbitmq-plugins enable rabbitmq_management.
+        -ejecutar rabbitmq-service start
+        ejecutar rabbitmq-service Stop
 
         -Accede al panel de administración:
             -Abre tu navegador y ve a: http://localhost:15672/.
