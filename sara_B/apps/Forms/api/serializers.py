@@ -117,15 +117,15 @@ class CreateFormsSerializers(serializers.Serializer):
         def update(self, instance, validated_data):
             try:
                 with transaction.atomic():
-                    # ✅ Actualizar nombre del formulario
+                    
                     formulario_data = validated_data.get("formulario", {})
                     instance.nombre_formulario = formulario_data.get("nombre_formulario", instance.nombre_formulario)
                     instance.save()
 
-                    # ✅ Obtener los ítems enviados en la actualización
+                    
                     creacion_formulario_data = formulario_data.get("creacion_formulario", [])
 
-                    # ✅ Obtener los ítems actualmente relacionados con el formulario
+                    
                     items_actuales = set(instance.creacionformulario_set.values_list('id_items_id', flat=True))
                     items_nuevos = set()
 
@@ -134,11 +134,11 @@ class CreateFormsSerializers(serializers.Serializer):
                         nuevo_nombre = item_data.get("nombre_item")
 
                         try:
-                            # ✅ Buscar CreacionFormulario por formulario e ítem
+                           
                             creacion_instance = CreacionFormulario.objects.get(id_formulario=instance, id_items_id=item_id)
                             item_instance = creacion_instance.id_items
 
-                            # ✅ Actualizar nombre del ítem si es necesario
+                            
                             if nuevo_nombre:
                                 item_instance.nombre_items = nuevo_nombre
                                 item_instance.save()
@@ -151,14 +151,14 @@ class CreateFormsSerializers(serializers.Serializer):
                                 "creacion_formulario": f"El ítem con id {item_id} no está relacionado con este formulario."
                             })
 
-                    # ✅ Eliminar ítems que ya no están en la actualización
+                    
                     items_a_eliminar = items_actuales - items_nuevos
                     CreacionFormulario.objects.filter(id_formulario=instance, id_items_id__in=items_a_eliminar).delete()
 
             except Exception as e:
                 raise APIException({"detail": f"Error al actualizar: {str(e)}"})
 
-            # ✅ Retornar los datos actualizados
+            
             return {
                 "formulario": FormularioSerializers(instance).data,
                 "creacion_formulario": [
