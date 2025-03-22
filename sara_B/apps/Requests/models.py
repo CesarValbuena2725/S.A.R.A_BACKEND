@@ -14,7 +14,7 @@ class Plan(models.Model):
         return self.nombre_plan
 @set_model  
 class TipoVehiculo(models.Model):
-    nombre_vehiculo= models.CharField(max_length=50)
+    nombre_vehiculo = models.CharField(max_length=50)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
 
     def __str__(self):

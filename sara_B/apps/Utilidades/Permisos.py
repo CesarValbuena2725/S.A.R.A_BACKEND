@@ -32,7 +32,6 @@ def set_model(model):
 
 # Decorador para registrar serializers
 def set_serializers(serializer):
-
     # ingresa al atributo model de la clase meta para que la llave quede con el mismo nombre del model
     #permitiendo que el namemodel del path lo reconosco pasando solo un atributp
     name = serializer.Meta.model.__name__.lower()  

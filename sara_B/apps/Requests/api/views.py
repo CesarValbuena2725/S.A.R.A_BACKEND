@@ -6,8 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import NotFound
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from  apps.Requests.models import Solicitud, Plan, VehiculoPlan
-from  apps.Requests.api.serializers import SolicitudSerializers, PlanSerializers
+from  apps.Requests.models import Solicitud, Plan, VehiculoPlan, TipoVehiculo
+from  apps.Requests.api.serializers import SolicitudSerializers, PlanSerializers, TipovehiculoSerializers
 from apps.Utilidades.Email.email_base import send_email_sara
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -204,3 +204,21 @@ class FiltrarPlanes(APIView):
 
 
 
+class CrearVehiculo(APIView):
+    def post(self, request):
+        serializer = TipovehiculoSerializers(data=request.data)
+        if serializer.is_valid():
+            tipo_vehiculo = serializer.save()
+            return Response(TipovehiculoSerializers(tipo_vehiculo).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+class ActualizarTipoVehiculo(generics.RetrieveUpdateAPIView):  
+    queryset = TipoVehiculo.objects.all()
+    serializer_class = TipovehiculoSerializers
+
+
+class EliminarTipoVehiculo(generics.RetrieveDestroyAPIView):
+    queryset = TipoVehiculo.objects.all()
+    serializer_class = TipovehiculoSerializers
