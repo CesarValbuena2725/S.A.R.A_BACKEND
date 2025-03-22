@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-
+from apps.Utilidades.CRUD import GetGeneral, PostGeneral,DeleteGeneral, PUTGeneral
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from django.contrib import admin
 from django.urls import path,include
@@ -25,6 +25,12 @@ urlpatterns = [
     path('access/', include('apps.Access.api.urls')),
     path('request/', include('apps.Requests.api.urls')),
     path('forms/', include('apps.Forms.api.urls')),
+
+
+    path('api/<str:namemodel>/get/',GetGeneral.as_view()),
+    path('api/<str:namemodel>/post/',PostGeneral.as_view()),
+    path('api/<str:namemodel>/put/<int:pk>/',PUTGeneral.as_view()),
+    path('api/<str:namemodel>/delete/<int:pk>/',DeleteGeneral.as_view()),
 
     # Tres rutas generales para manejar el teme de tokes y refrecos del mismo,Son rutas predefinidad por la libreria Simple-JWT
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # Obtener Access y Refresh Token

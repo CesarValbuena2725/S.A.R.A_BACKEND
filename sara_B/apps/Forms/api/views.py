@@ -1,57 +1,47 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
-from rest_framework import status,generics
-from apps.Forms.api.serializers import CreacionPlantillaSerializers, CategoriaItemsSerializers, ItemsSerializers, FormularioSerializers, FormularioPlanSerializers
-from apps.Forms.models import CreacionPlantilla, CategoriaItems, Items, Formulario, FormularioPlan
+from apps.Forms.api.serializers import CreateFormsSerializers
+from rest_framework import status
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
-from rest_framework.authentication import TokenAuthentication
-from ...Utilidades.Permisos import RolePermission
-from apps.Utilidades.Permisos import RolePermission
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.tokens import RefreshToken
-from apps.Utilidades.Email.email_base import send_email_sara
-from django.http import Http404
-from apps.Utilidades.CRUD import BaseGeneral
-from .custom_renderer import RenderApiPersonalizado
-from rest_framework.renderers import JSONRenderer
+from apps.Forms.models import Formulario, CreacionFormulario,Items
+from apps.Forms.api.serializers import CreacionFormularioSerializers
+from django.db import transaction
 
-class CreacionFormularios(APIView):
-    model = Formulario
-    serializer_class = FormularioSerializers
-    renderer_classes = [RenderApiPersonalizado, JSONRenderer]
-
-    def get(self, request):
-        return Response(
-            {"message": "Usa POST para crear formularios"},
-            status=status.HTTP_200_OK
-        )
+class PostCreateForms(APIView):
+    serializer_class = CreateFormsSerializers
 
     def post(self, request):
+
         serializer = self.serializer_class(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
-        else:
-            nombre_formulario = request.data.get("nombre_formulario")
-            items_ids = request.data.get("items", [])
 
-            items = Items.objects.filter(id__in=items_ids)
-            if len(items) != len(items_ids):
-                return Response(
-                    {"Error":"Alguno o más items no existen"}
-                    , status=status.HTTP_404_NOT_FOUND
-                )
-            
-            formulario = Formulario.objects.create(nombre_formulario=nombre_formulario)
-          
-            for item in items:
-                CreacionPlantilla.objects.create(id_items=item, id_formulario=formulario)
+        if serializer.is_valid():
+            formulario = serializer.save()
 
-            return Response(
-                {"message": "Formulario creado exitosamente"},
-                status=status.HTTP_201_CREATED
-            )
+            return Response(formulario, status=status.HTTP_201_CREATED)
+
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class DeleteForms(APIView):
+
+    def delete(self,request,pk):
+        try:
+
+            instanacia= Formulario.objects.get(pk=pk)
+            creacionformulario =  CreacionFormulario.objects.filter(id_formulario=instanacia.pk)
+
+        except Formulario.DoesNotExist:
+            return Response({'Errors':f"Form key not exist: {pk}"},status=status.HTTP_404_NOT_FOUND)
+        
+        #serralizers  = CreacionFormularioSerializers(creacionformulario,many=True)
+        try:
+            with transaction.atomic():
+
+                for items  in  creacionformulario: #Elimina Cada items de cada formulario
+                    delete_items= Items.objects.filter(pk=items.id_items.pk)
+                    delete_items.delete()
+                creacionformulario.delete()
+                instanacia.delete()
+                return Response({"Exito":"El formulario Fue eliminado"}, status=status.HTTP_202_ACCEPTED)
+        except Exception as e:
+            return Response({'Errors':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

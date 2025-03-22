@@ -45,6 +45,7 @@ class BaseGeneral(generics.GenericAPIView):
 
 #Devuelve el serializer basado en el `namemodel` proporcionado en la solicitud.
 
+
     def get_serializer_class(self,*args, **kwargs):
         #self.kwargs = Es un dicionario con todos los datos pasados en el Path
         namemodel = self.kwargs.get('namemodel')
@@ -113,6 +114,10 @@ class GetGeneral(BaseGeneral):
     """
     allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC'] 
     """
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = FiltroGeneral
+    
+    
 
     def get(self, request,*args, **kwargs):  
         try:
@@ -126,8 +131,6 @@ class GetGeneral(BaseGeneral):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = FiltroGeneral
 
 
 #Api General para la creacion de registros en los model

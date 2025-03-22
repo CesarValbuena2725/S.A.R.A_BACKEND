@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework import status,generics
-from apps.Access.api.serializers import UsuarioSerializers,SolicitudRestablecerPassSerializers,RestablecerPasswordSerializers,loginserializers
+from apps.Access.api.serializers import UsuarioSerializers,SolicitudRestablecerPassSerializers,RestablecerPasswordSerializers,loginserializers,EmpleadoSerialzers
 from apps.Access.models import Usuario, Empleado
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
@@ -13,14 +13,11 @@ from apps.Utilidades.Permisos import RolePermission
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
-from apps.Utilidades.Email.email_base import send_email_sara
 from django.http import Http404
 from apps.Utilidades.CRUD import BaseGeneral
+from apps.Utilidades.tasks import send_email_asincr
+from apps.Utilidades.Email.email_base import send_email_sara
 
-#Clase para realiza la Creacion del usuarios con la asignacion de toekn para verificaicon  
-class pruenda(BaseGeneral):
-    def get(self, request, pk, namemodel=Usuario):
-        return super().get(request, pk, namemodel)()
 
 class CreateUser(APIView):
     """
@@ -120,10 +117,14 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
     serializer_class = SolicitudRestablecerPassSerializers
 
     def post(self,request):
+
         serializer = self.serializer_class(data= request.data)
+
         if serializer.is_valid():
+
             try:
-                #Hace la instancia del Objetos segun el usuario que se indica en el formulario
+
+                #Hace la instancia del Usuario 
                 usuario = Usuario.objects.select_related('id_empleado').get(usuario=request.data['usuario'])
 
                 #Valida que el usuario Exista y este Activo
@@ -144,16 +145,19 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
 
                 #Realiza el envio del correo / pendiente por mejorar y cambiar esta aspecto
                 try:
-                    send_email_sara(
-                        affair="Restablecer Password",
-                        template="base_email.html",
-                        destinario=[request.data['correo']],
-                        solicitante=usuario,
-                        contexto=reset_link,
-                    )
-                    #send_mail('Restablecer Contarseña SARA',f'link de restablecimineto  {reset_link}',None,[request.data['correo']] )
+                    
+             
+                    data_usuario = EmpleadoSerialzers(usuario.id_empleado).data
 
-                    return Response({'message':'Se realizo el envio correo para el restablecimiento de contarseña'}, status=status.HTTP_200_OK)
+                    print(data_usuario)
+                    send_email_asincr.delay(affair="Restablecer Password",
+                                            template="base_email.html",
+                                            destinatario=[request.data['correo']], 
+                                            solicitante=data_usuario, contexto=reset_link)
+                    
+
+                    return Response({'message':'Se realizo el envio correo para el restablecimiento de contarseña'},
+                                    status=status.HTTP_200_OK)
                 
                 except Exception as error_valid:
                     return Response({'detail': 'Error al enviar el correo: ' + str(error_valid)}, 

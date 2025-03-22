@@ -48,6 +48,7 @@ APPS_EXTERNA=[
     'rest_framework_simplejwt',
     'django_celery_results',
 
+
 ]
 
 LOCAL_APP=[
@@ -92,6 +93,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'sara_B.wsgi.application'
 
+STATIC_URL = '/static/'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -142,10 +144,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # Carpeta global de archivos estáticos
-]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -162,7 +161,6 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = DEFAULT_FROM_EMAIL 
 EMAIL_HOST_PASSWORD = 's e r o j b e q p w i k o b a q '
-
 
 #Servidores Permitodos para hacer Peticiones
 CORS_ALLOWED_ORIGINS = ["http://localhost:5174"]
@@ -192,6 +190,7 @@ SIMPLE_JWT = {
     'SIGNING_KEY': 'tu_clave_secreta_aqui',  # Asegúrate de cambiar esto
 }
 
+# Configuración de Celery
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//' #Servidor de broker
 CELERY_ACCEPT_CONTENT = ['json'] # Defini que los broker  se hacen mediante Json
 CELERY_TASK_SERIALIZER = 'json' # Defini que la worker  Seran serilizado

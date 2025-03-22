@@ -3,6 +3,8 @@ from apps.Access.models import Estado
 from django.utils import timezone
 from apps.Access.models import Empleado
 from apps.Utilidades.Permisos import set_model
+
+
 @set_model
 class Plan(models.Model):
     nombre_plan= models.CharField(max_length=50, unique=True)

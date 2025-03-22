@@ -33,9 +33,9 @@ class Sucursal(models.Model):
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
     convenio = models.ForeignKey(Convenio, on_delete=models.CASCADE, null=False)
 
-
     def __str__(self):
         return self.nombre
+    
     
 @set_model
 class Empleado(models.Model):

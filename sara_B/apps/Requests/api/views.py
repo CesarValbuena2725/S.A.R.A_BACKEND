@@ -13,6 +13,8 @@ from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import rest_framework as filters
 from apps.Utilidades.CRUD import FiltroGeneral
+from apps.Utilidades.tasks import send_email_asincr
+
 
 """
 class CustomPagination(pagination.PageNumberPagination):
@@ -20,8 +22,6 @@ class CustomPagination(pagination.PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 100
 """
-
-
 class PostRequests(generics.GenericAPIView):
     """
         authentication_classes = [JWTAuthentication]
@@ -42,14 +42,14 @@ class PostRequests(generics.GenericAPIView):
              return Response(serializers.errors ,status=status.HTTP_406_NOT_ACCEPTABLE)
         
         try:
-            instancie= serializers.save()
-            send_email_sara(
-                contexto=f"Solicitud Cancelada {instancie.pk}",
-                affair= f"Nueva solicitud {instancie.pk}",
-                template="base_request.html",
-                solicitante= instancie,
-            )
+            instance= serializers.save()
+            contexto=f"Solicitud Cancelada {instance.pk}"
+            affair= f"Nueva solicitud {instance.pk}"
+            template="base_request.html"
+            solicitante_data = self.serializer_class(instance).data
 
+            send_email_asincr.delay(affair, template, ["tosaraweb@gmail.com"], solicitante_data, contexto)
+        
             return Response(serializers.data ,status=status.HTTP_201_CREATED)
 
         except Exception as e:

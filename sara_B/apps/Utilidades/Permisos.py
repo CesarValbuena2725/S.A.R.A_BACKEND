@@ -17,19 +17,6 @@ class RolePermission(BasePermission):
         allowed_roles = getattr(view, 'allowed_roles', [])
         return request.user.rol in allowed_roles
     
-"""
-Map_Model={
-
-}
-Map_Model.update(Map_Model_Accesss)
-Map_Model.update(MaMap_Model_Requests)
-
-Map_Serializer={
-
-}
-Map_Serializer.update(Map_Serializer_Accesss)
-Map_Serializer.update(Map_Serializer_Requests)
-"""
 
 MODEL_REGISTRY = {}
 SERIALIZER_REGISTRY = {}
