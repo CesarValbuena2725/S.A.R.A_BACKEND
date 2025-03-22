@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('access/', include('apps.Access.api.urls')),
     path('request/', include('apps.Requests.api.urls')),
+    path('forms/', include('apps.Forms.api.urls')),
 
     # Tres rutas generales para manejar el teme de tokes y refrecos del mismo,Son rutas predefinidad por la libreria Simple-JWT
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # Obtener Access y Refresh Token
