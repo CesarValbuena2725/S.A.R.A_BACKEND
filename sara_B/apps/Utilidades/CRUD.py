@@ -12,12 +12,11 @@ from django_filters import rest_framework as filters
 from apps.Requests.models import Solicitud
 from rest_framework.exceptions import ValidationError
 
-
 class FiltroGeneral(filters.FilterSet):
-    estado = filters.ChoiceFilter(choices=Solicitud.Estados_solcitud.choices)
+    estado = filters.ChoiceFilter(choices=[('Activo', 'AC'), ('CAL', 'Cancelado'), ('PRO', 'En progreso')])
 
     class Meta:
-        model = Solicitud
+        model = None
         fields = ['estado']
 
 
@@ -44,6 +43,7 @@ class BaseGeneral(generics.GenericAPIView):
     """
 
 #Devuelve el serializer basado en el `namemodel` proporcionado en la solicitud.
+
 
     def get_serializer_class(self,*args, **kwargs):
         #self.kwargs = Es un dicionario con todos los datos pasados en el Path
@@ -112,11 +112,12 @@ class BaseGeneral(generics.GenericAPIView):
 class GetGeneral(BaseGeneral):
     """
     allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC'] 
-
     """
     filter_backends = [DjangoFilterBackend]
     filterset_class = FiltroGeneral
     
+    
+
     def get(self, request,*args, **kwargs):  
         try:
             serializer_class = self.get_serializer_class()

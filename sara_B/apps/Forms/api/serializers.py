@@ -89,11 +89,16 @@ class CreateFormsSerializers(serializers.Serializer):
                     created_items = []
 
                     for item_data in items_data:
-
+                        try:
+                            categoria = CategoriaOpciones.objects.get(pk=item_data.get('id_categoria_opciones').pk)
+                        except CategoriaOpciones.DoesNotExist:
+                            raise serializers.ValidationError(
+                                {"items": f"Invalid CategoriaOpciones {item_data['id_categoria_opciones']} NOT Exist."})
+                        
                         item = Items.objects.create(
                             nombre_items=item_data["nombre_items"],
                             descripcion=item_data["descripcion"],
-                            id_categoria_opciones=item_data.get('id_categoria_opciones'))
+                            id_categoria_opciones=categoria)
                                 
                         CreacionFormulario.objects.create(id_formulario=formulario, id_items=item)
                         created_items.append(item)

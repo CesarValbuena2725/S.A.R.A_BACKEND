@@ -92,6 +92,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'sara_B.wsgi.application'
 
+STATIC_URL = '/static/'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -99,9 +100,9 @@ WSGI_APPLICATION = 'sara_B.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sarav3',
+        'NAME': 'sarad_v2',
         'USER':'root',
-        'PASSWORD':'Tragamundos4ever2024',
+        'PASSWORD':'12345678',
         'HOST':'127.0.0.1',
         'PORT':'3306',
     }
@@ -159,7 +160,6 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = DEFAULT_FROM_EMAIL 
 EMAIL_HOST_PASSWORD = 's e r o j b e q p w i k o b a q '
-
 
 #Servidores Permitodos para hacer Peticiones
 CORS_ALLOWED_ORIGINS = ["http://localhost:5174"]
