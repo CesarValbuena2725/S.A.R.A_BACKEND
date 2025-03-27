@@ -13,11 +13,12 @@ from apps.Requests.models import Solicitud
 from rest_framework.exceptions import ValidationError
 
 class FiltroGeneral(filters.FilterSet):
-    estado = filters.ChoiceFilter(choices=[('Activo', 'AC'), ('CAL', 'Cancelado'), ('PRO', 'En progreso')])
+    estado = filters.ChoiceFilter(choices=[('AC', 'Activo'), ('CAL', 'Cancelado'), ('PRO', 'En progreso')])
 
     class Meta:
         model = None
         fields = ['estado']
+
 
 
 class BaseGeneral(generics.GenericAPIView):

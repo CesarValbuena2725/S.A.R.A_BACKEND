@@ -55,6 +55,7 @@ LOCAL_APP=[
     'apps.Access',
     'apps.Requests',
     'apps.Forms',
+    'apps.Results',
 
 ]
 

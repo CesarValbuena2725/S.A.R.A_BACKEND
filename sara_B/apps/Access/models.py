@@ -24,7 +24,6 @@ class Convenio(models.Model):
     def __str__(self):
         return self.nombre
     
-
 @set_model
 class Sucursal(models.Model):
     nombre = models.CharField(max_length=100, error_messages=Errores)
@@ -69,6 +68,7 @@ class UsuarioManager(BaseUserManager):
             raise ValueError('Superuser debe tener is_superuser=True.')
 
         return self.create_user(usuario, password, **extra_fields)
+    
 @set_model
 class Usuario(AbstractBaseUser, PermissionsMixin):
     class Roles(models.TextChoices):
