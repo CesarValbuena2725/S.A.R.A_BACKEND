@@ -2,10 +2,12 @@ from rest_framework.views import APIView
 from apps.Forms.api.serializers import CreateFormsSerializers
 from rest_framework import status, generics
 from rest_framework.response import Response
-from apps.Forms.models import Formulario, CreacionFormulario,Items
-from apps.Forms.api.serializers import CreacionFormularioSerializers, FormularioSerializers, ItemsSerializers
+from apps.Forms.models import Formulario, CreacionFormulario,Items,FormularioPlan
+from apps.Forms.api.serializers import CreacionFormularioSerializers, FormularioSerializers, ItemsSerializers,FormularioPlanSerializers
+from apps.Requests.models import Plan
 from django.db import transaction
 
+from apps.Utilidades.CRUD import BaseGeneral
 class PostCreateForms(APIView):
     serializer_class = CreateFormsSerializers
 
@@ -116,3 +118,44 @@ class DeleteForms(APIView):
                 return Response({"Exito":"El formulario Fue eliminado"}, status=status.HTTP_202_ACCEPTED)
         except Exception as e:
             return Response({'Errors':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ShowForms(APIView):
+
+    def get(self, request, pk):
+        try:
+            plan = Plan.objects.get(pk=pk)
+
+            formularios = FormularioPlan.objects.filter(id_plan=pk).values_list("id_formulario", flat=True)
+            if not formularios:
+                return Response("No se encontraron Formularios relacionaos", status=status.HTTP_204_NO_CONTENT)
+            
+            formularios_list = Formulario.objects.filter(pk__in=formularios)
+            # Se Almacenan datos
+            datas = []
+
+        except Plan.DoesNotExist:
+                return Response("Plan no existe,Validar pk enviado", status=status.HTTP_204_NO_CONTENT)
+
+    
+        #iteramos sobre cada formulario que se encontro
+
+        for formulario in formularios_list:
+            # Buscamos los Items que estan relacioandos a los Formularios
+            item_ids = CreacionFormulario.objects.filter(id_formulario=formulario.pk).values_list("id_items", flat=True)
+
+            # Traemos todos los items del formulario
+            items_list = Items.objects.filter(pk__in=item_ids)
+
+            # Serializar los datos
+            serialized_form = FormularioSerializers(formulario).data
+            serialized_items = ItemsSerializers(items_list, many=True).data
+
+            # Agregar los datos
+            datas.append({
+                "formulario": serialized_form,
+                "items": serialized_items
+            })
+
+        return Response(datas, status=status.HTTP_200_OK)
+
+
