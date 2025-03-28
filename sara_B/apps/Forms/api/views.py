@@ -6,8 +6,10 @@ from apps.Forms.models import Formulario, CreacionFormulario,Items,FormularioPla
 from apps.Forms.api.serializers import CreacionFormularioSerializers, FormularioSerializers, ItemsSerializers,FormularioPlanSerializers
 from apps.Requests.models import Plan
 from django.db import transaction
-
+from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import rest_framework as filters
 from apps.Utilidades.CRUD import BaseGeneral
+
 class PostCreateForms(APIView):
     serializer_class = CreateFormsSerializers
 
@@ -61,7 +63,6 @@ class UpdateForms(APIView):
             try:
                 with transaction.atomic():
                     formulario_serializer.save()  # Guardamos los cambios en Formulario
-
                     
                     if 'items' in request.data:
                         for item_data in request.data['items']:
@@ -120,7 +121,9 @@ class DeleteForms(APIView):
             return Response({'Errors':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ShowForms(APIView):
-
+    
+    filter_backends = [DjangoFilterBackend]
+    
     def get(self, request, pk):
         try:
             plan = Plan.objects.get(pk=pk)
@@ -138,24 +141,26 @@ class ShowForms(APIView):
 
     
         #iteramos sobre cada formulario que se encontro
+        try:
+            for formulario in formularios_list:
+                # Buscamos los Items que estan relacioandos a los Formularios
+                item_ids = CreacionFormulario.objects.filter(id_formulario=formulario.pk).values_list("id_items", flat=True)
 
-        for formulario in formularios_list:
-            # Buscamos los Items que estan relacioandos a los Formularios
-            item_ids = CreacionFormulario.objects.filter(id_formulario=formulario.pk).values_list("id_items", flat=True)
+                # Traemos todos los items del formulario
+                items_list = Items.objects.filter(pk__in=item_ids)
+        
+                # Serializar los datos
+                serialized_form = FormularioSerializers(formulario).data
+                serialized_items = ItemsSerializers(items_list, many=True).data
 
-            # Traemos todos los items del formulario
-            items_list = Items.objects.filter(pk__in=item_ids)
+                # Agregar los datos
+                datas.append({
+                    "formulario": serialized_form,
+                    "items": serialized_items,
+                })
 
-            # Serializar los datos
-            serialized_form = FormularioSerializers(formulario).data
-            serialized_items = ItemsSerializers(items_list, many=True).data
-
-            # Agregar los datos
-            datas.append({
-                "formulario": serialized_form,
-                "items": serialized_items
-            })
-
-        return Response(datas, status=status.HTTP_200_OK)
+            return Response(datas, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'Erros':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

@@ -36,8 +36,9 @@ class TipovehiculoSerializers(serializers.ModelSerializer):
         fields= '__all__'
 
     def create(self, validated_data):
-        planes = validated_data.get("planes", [])
+        
         tipo_vehiculo = TipoVehiculo.objects.create(**validated_data)
+        planes = validated_data.get("planes", [])
 
         for plan_id in planes:
             VehiculoPlan.objects.create(id_vehiculo=tipo_vehiculo, id_plan=plan_id)
