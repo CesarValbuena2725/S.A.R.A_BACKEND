@@ -53,12 +53,10 @@ APPS_EXTERNA=[
 
 LOCAL_APP=[
     'apps.Access',
+    'apps.Forms',  # Mueve esta más arriba si tiene problemas
     'apps.Requests',
-    'apps.Forms',
-    'apps.Results',
-
+    'apps.Result',
 ]
-
 INSTALLED_APPS=INSTALLED_APPS + LOCAL_APP + APPS_EXTERNA
 
 MIDDLEWARE = [

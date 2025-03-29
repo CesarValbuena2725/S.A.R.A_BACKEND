@@ -2,16 +2,9 @@ from django.db import models
 from apps.Access.models import Estado
 from apps.Utilidades.Permisos import set_model
 from apps.Requests.models import Plan
-# Create your models here.
-#Modelo Temporal pruebas 
+from apps.Result.models import CategoriaOpciones
 
-@set_model
-class CategoriaOpciones(models.Model):
-    nombre_categoria=models.CharField(max_length=50)
-    estado =models.CharField(max_length=2,choices=Estado.choices,default=Estado.ACTIVO)
 
-    def __str__(self):
-        return self.nombre_categoria
 @set_model  
 class Items(models.Model):
     nombre_items= models.CharField(max_length=50, null=False)

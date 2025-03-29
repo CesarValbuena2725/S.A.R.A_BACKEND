@@ -1,15 +1,11 @@
 from rest_framework import serializers
-from apps.Forms.models import Formulario,CategoriaOpciones,Items,FormularioPlan,CreacionFormulario
+from apps.Forms.models import Formulario,Items,FormularioPlan,CreacionFormulario
 from apps.Requests.models import Plan
 from apps.Utilidades.Permisos import set_serializers
 from rest_framework.exceptions import APIException
 from django.db import transaction
+from apps.Result.models import CategoriaOpciones
 
-@set_serializers
-class CategoriaOpcionesSerializers(serializers.ModelSerializer):
-    class Meta:
-        model= CategoriaOpciones
-        fields= '__all__'
 
 
 @set_serializers

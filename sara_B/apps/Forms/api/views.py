@@ -3,12 +3,15 @@ from apps.Forms.api.serializers import CreateFormsSerializers
 from rest_framework import status, generics
 from rest_framework.response import Response
 from apps.Forms.models import Formulario, CreacionFormulario,Items,FormularioPlan
-from apps.Forms.api.serializers import CreacionFormularioSerializers, FormularioSerializers, ItemsSerializers,FormularioPlanSerializers
+from apps.Forms.api.serializers import CreacionFormularioSerializers, FormularioSerializers, ItemsSerializers
 from apps.Requests.models import Plan
 from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import rest_framework as filters
 from apps.Utilidades.CRUD import BaseGeneral
+from apps.Result.models import Opciones
+from apps.Result.api.serializers import OpcionesSeralizers
+
 
 class PostCreateForms(APIView):
     serializer_class = CreateFormsSerializers
@@ -120,47 +123,49 @@ class DeleteForms(APIView):
         except Exception as e:
             return Response({'Errors':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+
+
+
 class ShowForms(APIView):
-    
-    filter_backends = [DjangoFilterBackend]
     
     def get(self, request, pk):
         try:
             plan = Plan.objects.get(pk=pk)
 
-            formularios = FormularioPlan.objects.filter(id_plan=pk).values_list("id_formulario", flat=True)
-            if not formularios:
-                return Response("No se encontraron Formularios relacionaos", status=status.HTTP_204_NO_CONTENT)
-            
-            formularios_list = Formulario.objects.filter(pk__in=formularios)
-            # Se Almacenan datos
-            datas = []
+            formularios_ids = FormularioPlan.objects.filter(id_plan=pk).values_list("id_formulario", flat=True)
+            if not formularios_ids:
+                return Response("No se encontraron formularios relacionados", status=status.HTTP_204_NO_CONTENT)
 
-        except Plan.DoesNotExist:
-                return Response("Plan no existe,Validar pk enviado", status=status.HTTP_204_NO_CONTENT)
+            formularios = Formulario.objects.filter(pk__in=formularios_ids)
+            response_data = []
 
-    
-        #iteramos sobre cada formulario que se encontro
-        try:
-            for formulario in formularios_list:
-                # Buscamos los Items que estan relacioandos a los Formularios
-                item_ids = CreacionFormulario.objects.filter(id_formulario=formulario.pk).values_list("id_items", flat=True)
+            for formulario in formularios:
+                # Obtener los ítems del formulario
+                items_ids = Items.objects.filter(
+                    pk__in=CreacionFormulario.objects.filter(id_formulario=formulario.pk).values_list("id_items", flat=True)
+                )
 
-                # Traemos todos los items del formulario
-                items_list = Items.objects.filter(pk__in=item_ids)
-        
-                # Serializar los datos
-                serialized_form = FormularioSerializers(formulario).data
-                serialized_items = ItemsSerializers(items_list, many=True).data
+                # Serializar los ítems para poder relacion las opciones
+                serialized_items = []
+                for item in items_ids:
+                    opciones_ids = Opciones.objects.filter(id_categoria_opciones=item.id_categoria_opciones)
 
-                # Agregar los datos
-                datas.append({
-                    "formulario": serialized_form,
+                    serialized_item = ItemsSerializers(item).data
+                    #Dentro de Cada item, Creamos el campo opciones 
+                    serialized_item["opciones"] = OpcionesSeralizers(opciones_ids, many=True).data 
+                    #Agremos todo al principal
+                    serialized_items.append(serialized_item)
+                    
+                #Agregamos  todo a las respueta 
+                response_data.append({
+                    "formulario": FormularioSerializers(formulario).data,
                     "items": serialized_items,
                 })
 
-            return Response(datas, status=status.HTTP_200_OK)
+            return Response(response_data, status=status.HTTP_200_OK)
+
+        except Plan.DoesNotExist:
+            return Response("Plan no existe, validar PK enviado", status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response({'Erros':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
