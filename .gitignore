@@ -6,7 +6,7 @@ ZARA/
 *.pyo
 __pycache__/
 *_pycache_/
-
+*settings.py
 # Ignorar archivos de migraciones automáticas
 **/migrations/*
 
