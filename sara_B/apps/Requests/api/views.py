@@ -1,33 +1,30 @@
-#Api General para la creaacion y visualizacion de los objetos segun el model Selcionado Dinamicamnete en la URL
-from rest_framework import generics,status
-from rest_framework.response import Response
-from apps.Utilidades.Permisos import RolePermission
-from rest_framework.permissions import IsAuthenticated 
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.exceptions import NotFound
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from  apps.Requests.models import Solicitud, Plan, VehiculoPlan, TipoVehiculo
-from  apps.Requests.api.serializers import SolicitudSerializers, PlanSerializers, TipovehiculoSerializers
-from apps.Utilidades.Email.email_base import send_email_sara
-from rest_framework.views import APIView
+# Third-party imports
 from django_filters.rest_framework import DjangoFilterBackend
-from django_filters import rest_framework as filters
+from rest_framework import generics, status
+from rest_framework.exceptions import NotFound
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+# Local application imports
+from apps.Requests.api.serializers import (
+    PlanSerializers,
+    SolicitudSerializers,
+    TipovehiculoSerializers
+)
+from apps.Requests.models import Plan, Solicitud, TipoVehiculo, VehiculoPlan
 from apps.Utilidades.CRUD import FiltroGeneral
+from apps.Utilidades.Email.email_base import send_email_sara
+from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
 from apps.Utilidades.tasks import send_email_asincr
 
-
-"""
-class CustomPagination(pagination.PageNumberPagination):
-    page_size = 50
-    page_size_query_param = 'page_size'
-    max_page_size = 100
-"""
 class PostRequests(generics.GenericAPIView):
-    """
-        authentication_classes = [JWTAuthentication]
-        permission_classes = [IsAuthenticated, RolePermission]
-        allowed_roles = ['AD', 'RC', 'CA',] 
-    """
+    
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles = ['AD', 'RC', 'CA',] 
+    
     model = Solicitud
     serializer_class=SolicitudSerializers
 
@@ -60,6 +57,11 @@ class PostRequests(generics.GenericAPIView):
 
 #Crear un  en path para hacer el filtro de planes de solictudes  // el Frontend debe poder  enviar el tipo de Vehiculo y hacer la peticion al Servidor ; 
 class FiltrarPlanes(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated,RolePermission]
+    allowed_roles = BASE_PERMISOSOS
+
     def get(self, request, id_tipo_vehiculo):
         """
         Filtra los planes según el tipo de vehículo dado.
@@ -80,6 +82,10 @@ class FiltrarPlanes(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class CrearSolicitudAPIView(generics.CreateAPIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated,RolePermission]
+    allowed_roles = BASE_PERMISOSOS
     """
     Vista para crear solicitudes validando que el plan y el tipo de vehículo coincidan.
     """
@@ -90,27 +96,24 @@ class CrearSolicitudAPIView(generics.CreateAPIView):
 # Get Solicitudes
 
 class GetRequests(generics.ListAPIView):
-    """
-        authentication_classes = [JWTAuthentication]
-        permission_classes = [IsAuthenticated, RolePermission]
-        allowed_roles = ['AD', 'RC', 'CA',] 
-    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated,RolePermission]
+    allowed_roles = BASE_PERMISOSOS
     
     serializer_class=SolicitudSerializers
-
     queryset = Solicitud.objects.all()
-
     filter_backends = [DjangoFilterBackend]
     filterset_class = FiltroGeneral
          
 #Crear  genera notificacion  put para estado !=
 
 class PutRequest(APIView):
-    """
-        authentication_classes = [JWTAuthentication]
-        permission_classes = [IsAuthenticated, RolePermission]
-        allowed_roles = ['AD', 'CA',] 
-    """
+    
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles = ['AD', 'CA',] 
+    
     model = Solicitud
     serializer_class = SolicitudSerializers
     
@@ -163,13 +166,11 @@ class PutRequest(APIView):
 #eliminar  genera notificiaon  notificicaion 
 
 class DeleteRequestDB(APIView):
-    """
-    Vista para eliminar una solicitud por su PK.
     
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ['AD', 'RC', 'CA']
-    """
+    
     def delete(self, request, pk):
         try:
             instancia = Solicitud.objects.get(pk=pk)
@@ -183,6 +184,10 @@ class DeleteRequestDB(APIView):
 
 #Crear un  en path para hacer el filtro de planes de solictudes  // el Frontend debe poder  enviar el tipo de Vehiculo y hacer la peticion al Servidor ; 
 class FiltrarPlanes(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated,RolePermission]
+    allowed_roles = BASE_PERMISOSOS
     def get(self, request, id_tipo_vehiculo):
         """
         Filtra los planes según el tipo de vehículo dado.
@@ -205,6 +210,11 @@ class FiltrarPlanes(APIView):
 
 
 class CrearVehiculo(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated,RolePermission]
+    allowed_roles = BASE_PERMISOSOS
+
     def post(self, request):
         serializer = TipovehiculoSerializers(data=request.data)
         if serializer.is_valid():
@@ -214,11 +224,20 @@ class CrearVehiculo(APIView):
     
 
 
-class ActualizarTipoVehiculo(generics.RetrieveUpdateAPIView):  
+class ActualizarTipoVehiculo(generics.RetrieveUpdateAPIView): 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated,RolePermission]
+    allowed_roles = ['AD', 'RC', 'CA']
+
     queryset = TipoVehiculo.objects.all()
     serializer_class = TipovehiculoSerializers
 
 
 class EliminarTipoVehiculo(generics.RetrieveDestroyAPIView):
+
+    authentication_classes=[JWTAuthentication]
+    permission_classes = [IsAuthenticated,RolePermission]
+    allowed_roles = ['AD', 'RC', 'CA']
+
     queryset = TipoVehiculo.objects.all()
     serializer_class = TipovehiculoSerializers

@@ -1,30 +1,39 @@
-from rest_framework.views import APIView
-from rest_framework import status,generics
-from apps.Access.api.serializers import UsuarioSerializers,SolicitudRestablecerPassSerializers,RestablecerPasswordSerializers,loginserializers,EmpleadoSerialzers
-from apps.Access.models import Usuario, Empleado
-from rest_framework.response import Response
+# Standard library imports
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from rest_framework.authentication import TokenAuthentication
-from ...Utilidades.Permisos import RolePermission
-from apps.Utilidades.Permisos import RolePermission
+
+# Third-party imports
+from rest_framework import status, generics
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.http import Http404
-from apps.Utilidades.CRUD import BaseGeneral
+
+# Local application imports
+from apps.Access.models import Usuario, Empleado
+from apps.Access.api.serializers import (
+    UsuarioSerializers,
+    SolicitudRestablecerPassSerializers,
+    RestablecerPasswordSerializers,
+    loginserializers,
+    EmpleadoSerialzers
+)
+from apps.Utilidades.Permisos import RolePermission
 from apps.Utilidades.tasks import send_email_asincr
 from apps.Utilidades.Email.email_base import send_email_sara
 
 
 class CreateUser(APIView):
-    """
+    
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ['AD','CA'] 
-    """
+    
     model = Usuario
     serializer_class = UsuarioSerializers
 
@@ -105,13 +114,8 @@ class Login(APIView):
 
 
 
-
-
-
 ######################################################################################################
 #Se realiza el envio de la dirrecion para restablecer contraseña
-
-
 
 class SolicitudRestablecerPass(generics.GenericAPIView):
     serializer_class = SolicitudRestablecerPassSerializers
@@ -167,7 +171,6 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
                 error = str(e)
                 return Response({'detail': error}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 #############################################################################
