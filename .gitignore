@@ -8,7 +8,7 @@ __pycache__/
 *_pycache_/
 
 # Ignorar archivos de migraciones automáticas
-**/migrations/*
+
 
 # Ignorar archivos de entorno (.env) con variables sensibles
 .env
