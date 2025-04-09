@@ -75,12 +75,12 @@ class Login(APIView):
 
     def post(self, request):
         serializer= self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            usuario = serializer.validated_data['usuario']
-            password = serializer.validated_data['password']
-        else:
+        if  not serializer.is_valid():
             return Response({'error': 'Usuario y contraseña son requeridos'}, status=status.HTTP_400_BAD_REQUEST)            
 
+        usuario = serializer.validated_data['usuario']
+        password = serializer.validated_data['password']
+      
         try:
             # Buscar al usuario
             user = get_object_or_404(Usuario, usuario=request.data['usuario'])
@@ -101,13 +101,14 @@ class Login(APIView):
                 return Response({
                     'access': str(access_token),
                     'refresh': str(refresh),
-                    'usuario': serializer.data['usuario']
+                    'usuario': serializer.data['usuario'],
+                    'rol':user.rol
                 }, status=status.HTTP_200_OK)
 
             else:
                 return Response({'error': 'Usuario inactivo. Contacte al administrador de SARA'}, status=status.HTTP_403_FORBIDDEN)
         except Http404:
-            return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_403_FORBIDDEN)
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

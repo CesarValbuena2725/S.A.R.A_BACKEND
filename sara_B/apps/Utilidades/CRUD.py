@@ -12,6 +12,8 @@ from apps.Utilidades.Permisos import (
     getModelName,
     getSerializer
 )
+
+
 class FiltroGeneral(filters.FilterSet):
     estado = filters.ChoiceFilter(choices=[('AC', 'Activo'), ('CAL', 'Cancelado'), ('PRO', 'En progreso')])
 
@@ -20,11 +22,11 @@ class FiltroGeneral(filters.FilterSet):
 
 
 class BaseGeneral(generics.GenericAPIView):
-    
+    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated,RolePermission]
     allowed_roles = []  # Definir roles permitidos para cada clase hija
-
+    """
     
     def get_serializer_class(self):
         namemodel = self.kwargs.get('namemodel')
@@ -59,10 +61,11 @@ class BaseGeneral(generics.GenericAPIView):
             raise NotFound(detail=f"Objeto con ID {pk} no encontrado en {queryset.model.__name__}.")
 
 class GetGeneral(BaseGeneral):
+    
     allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC']
     filter_backends = [DjangoFilterBackend]
     filterset_class = FiltroGeneral
-
+    
     def get(self, request, *args, **kwargs):
         try:
             serializer_class = self.get_serializer_class()
