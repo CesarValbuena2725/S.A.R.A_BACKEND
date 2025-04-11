@@ -1,0 +1,26 @@
+jsons de prueba:
+
+Crear vehiculo:
+
+{
+    "nombre_vehiculo": "Blindado",
+    "planes": [1, 2, 3] 
+}
+
+Actualizar Formulario:
+
+{
+    "nombre_formulario": "Nueva Prueba",
+    "items": [
+        {
+            "id": 244,
+            "nombre_items": "Campo prueba",
+            "descripcion": "Cambio de pastillas"
+        },
+        {
+            "id": 245,
+            "nombre_items": "Segunda prueba",
+            "descripcion": "Revisión general"
+        }
+    ]
+}

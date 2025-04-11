@@ -1,30 +1,39 @@
-from rest_framework.views import APIView
-from rest_framework import status,generics
-from apps.Access.api.serializers import UsuarioSerializers,SolicitudRestablecerPassSerializers,RestablecerPasswordSerializers,loginserializers,EmpleadoSerialzers
-from apps.Access.models import Usuario, Empleado
-from rest_framework.response import Response
+# Standard library imports
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from rest_framework.authentication import TokenAuthentication
-from ...Utilidades.Permisos import RolePermission
-from apps.Utilidades.Permisos import RolePermission
+
+# Third-party imports
+from rest_framework import status, generics
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.http import Http404
-from apps.Utilidades.CRUD import BaseGeneral
+
+# Local application imports
+from apps.Access.models import Usuario, Empleado
+from apps.Access.api.serializers import (
+    UsuarioSerializers,
+    SolicitudRestablecerPassSerializers,
+    RestablecerPasswordSerializers,
+    loginserializers,
+    EmpleadoSerialzers
+)
+from apps.Utilidades.Permisos import RolePermission
 from apps.Utilidades.tasks import send_email_asincr
 from apps.Utilidades.Email.email_base import send_email_sara
 
 
 class CreateUser(APIView):
-    """
+    
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ['AD','CA'] 
-    """
+    
     model = Usuario
     serializer_class = UsuarioSerializers
 
@@ -66,12 +75,12 @@ class Login(APIView):
 
     def post(self, request):
         serializer= self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            usuario = serializer.validated_data['usuario']
-            password = serializer.validated_data['password']
-        else:
+        if  not serializer.is_valid():
             return Response({'error': 'Usuario y contraseña son requeridos'}, status=status.HTTP_400_BAD_REQUEST)            
 
+        usuario = serializer.validated_data['usuario']
+        password = serializer.validated_data['password']
+      
         try:
             # Buscar al usuario
             user = get_object_or_404(Usuario, usuario=request.data['usuario'])
@@ -92,26 +101,22 @@ class Login(APIView):
                 return Response({
                     'access': str(access_token),
                     'refresh': str(refresh),
-                    'usuario': serializer.data['usuario']
+                    'usuario': serializer.data['usuario'],
+                    'rol':user.rol
                 }, status=status.HTTP_200_OK)
 
             else:
                 return Response({'error': 'Usuario inactivo. Contacte al administrador de SARA'}, status=status.HTTP_403_FORBIDDEN)
         except Http404:
-            return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_403_FORBIDDEN)
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
-
-
-
 ######################################################################################################
 #Se realiza el envio de la dirrecion para restablecer contraseña
-
-
 
 class SolicitudRestablecerPass(generics.GenericAPIView):
     serializer_class = SolicitudRestablecerPassSerializers
@@ -167,7 +172,6 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
                 error = str(e)
                 return Response({'detail': error}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 #############################################################################

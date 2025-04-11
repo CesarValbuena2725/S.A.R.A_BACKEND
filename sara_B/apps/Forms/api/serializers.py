@@ -43,7 +43,6 @@ class CreateFormsSerializers(serializers.Serializer):
         plan = serializers.PrimaryKeyRelatedField(queryset=Plan.objects.all())
 
         def validate(self, data):
-
             # Validar los datos del formulario usando FormularioSerializers
 
             formulario_data = data.get('formulario')
@@ -62,6 +61,7 @@ class CreateFormsSerializers(serializers.Serializer):
 
         def create(self, validated_data):
             form_data = validated_data.get('formulario')
+
             items_data = validated_data.get('items', [])
             plan_data = validated_data.get('plan')
 

@@ -36,13 +36,21 @@ class EmpleadoSerialzers(serializers.ModelSerializer):
 
 @set_serializers
 class UsuarioSerializers(serializers.ModelSerializer):
+    password = serializers.CharField(required=False, write_only=True)  # Hacer opcional
+
     class Meta:
-        model= Usuario
-        exclude=['is_active','is_staff','is_superuser','last_login']
-        
+        model = Usuario
+        exclude = ['is_active', 'is_staff', 'is_superuser', 'last_login']
+
     def validate_usuario(self, value):
         if logitud_minima(value):
             return validate_text(value)
+
+    def update(self, instance, validated_data):
+        """ Evitar sobreescribir la contraseña si no se envía en la solicitud """
+        validated_data.pop('password', None)  # Si password no está en validated_data, no lo cambia
+        return super().update(instance, validated_data)
+
 
 class SolicitudRestablecerPassSerializers(serializers.Serializer):
     usuario = serializers.CharField(max_length=100)

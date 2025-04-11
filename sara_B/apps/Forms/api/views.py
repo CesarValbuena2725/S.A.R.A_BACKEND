@@ -1,20 +1,37 @@
-from rest_framework.views import APIView
-from apps.Forms.api.serializers import CreateFormsSerializers
-from rest_framework import status, generics
-from rest_framework.response import Response
-from apps.Forms.models import Formulario, CreacionFormulario,Items,FormularioPlan
-from apps.Forms.api.serializers import CreacionFormularioSerializers, FormularioSerializers, ItemsSerializers
-from apps.Requests.models import Plan
+# Standard library imports
 from django.db import transaction
+
+# Third-party imports
 from django_filters.rest_framework import DjangoFilterBackend
-from django_filters import rest_framework as filters
-from apps.Utilidades.CRUD import BaseGeneral
-from apps.Result.models import Opciones
+from rest_framework import generics, status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+# Local application imports
+from apps.Forms.api.serializers import (
+    CreateFormsSerializers,
+    CreacionFormularioSerializers,
+    FormularioSerializers,
+    ItemsSerializers
+)
+from apps.Forms.models import CreacionFormulario, Formulario, FormularioPlan, Items
+from apps.Requests.models import Plan
 from apps.Result.api.serializers import OpcionesSeralizers
+<<<<<<< HEAD
 from apps.Utilidades.CRUD import FiltroGeneral
+=======
+from apps.Result.models import Opciones
+from apps.Utilidades.CRUD import FiltroGeneral
+from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
+>>>>>>> 569a04951c7d5859618d0e146a8d35b56aa9e9c6
 
 
 class PostCreateForms(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles = ['AD', 'RC', 'CA',] 
     serializer_class = CreateFormsSerializers
 
     def post(self, request):
@@ -31,6 +48,10 @@ class PostCreateForms(APIView):
 
 
 class UpdateForms(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles = ['AD', 'RC', 'CA',] 
     
     def get(self, request, pk):
         try:
@@ -102,6 +123,10 @@ class UpdateForms(APIView):
 
 class DeleteForms(APIView):
 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles = ['AD', 'RC', 'CA',] 
+
     def delete(self,request,pk):
         try:
 
@@ -129,6 +154,15 @@ class DeleteForms(APIView):
 
 
 class ShowForms(generics.ListAPIView):
+<<<<<<< HEAD
+=======
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles = BASE_PERMISOSOS
+
+
+>>>>>>> 569a04951c7d5859618d0e146a8d35b56aa9e9c6
     serializer_class = FormularioSerializers
     filter_backends = [DjangoFilterBackend]
     filterset_class = FiltroGeneral
@@ -180,5 +214,9 @@ class ShowForms(generics.ListAPIView):
 
     def paginate_queryset(self, queryset):
         # Pagina los resultados automáticamente usando los métodos de ListAPIView
+<<<<<<< HEAD
         return super().paginate_queryset(queryset)
 
+=======
+        return super().paginate_queryset(queryset)
+>>>>>>> 569a04951c7d5859618d0e146a8d35b56aa9e9c6

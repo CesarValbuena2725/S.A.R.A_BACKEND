@@ -1,12 +1,18 @@
-from rest_framework import generics, status
-from rest_framework.response import Response
-from rest_framework.exceptions import NotFound, ValidationError, PermissionDenied
-from django_filters.rest_framework import DjangoFilterBackend
+# Third-party imports
 from django_filters import rest_framework as filters
-from apps.Utilidades.Permisos import getModelName, getSerializer
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import generics, status
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
+# Local application imports
+from apps.Utilidades.Permisos import (
+    RolePermission,
+    getModelName,
+    getSerializer
+)
+
 
 class FiltroGeneral(filters.FilterSet):
     estado = filters.ChoiceFilter(choices=[('AC', 'Activo'), ('CAL', 'Cancelado'), ('PRO', 'En progreso')])
@@ -14,17 +20,14 @@ class FiltroGeneral(filters.FilterSet):
     class Meta:
         model = None  # Será asignado dinámicamente
 
+
 class BaseGeneral(generics.GenericAPIView):
     """
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    
+    permission_classes = [IsAuthenticated,RolePermission]
     allowed_roles = []  # Definir roles permitidos para cada clase hija
-
-    def check_permissions(self, request):
-        if self.allowed_roles and request.user.role not in self.allowed_roles:
-            raise PermissionDenied("No tienes permiso para esta acción.")
     """
+    
     def get_serializer_class(self):
         namemodel = self.kwargs.get('namemodel')
         serializer_class = getSerializer(namemodel)
@@ -58,10 +61,11 @@ class BaseGeneral(generics.GenericAPIView):
             raise NotFound(detail=f"Objeto con ID {pk} no encontrado en {queryset.model.__name__}.")
 
 class GetGeneral(BaseGeneral):
+    
     allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC']
     filter_backends = [DjangoFilterBackend]
     filterset_class = FiltroGeneral
-
+    
     def get(self, request, *args, **kwargs):
         try:
             serializer_class = self.get_serializer_class()

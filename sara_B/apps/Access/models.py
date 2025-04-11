@@ -82,7 +82,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     password = models.CharField(max_length=150)
     rol = models.CharField(max_length=2, choices=Roles.choices)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
-    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE, default=1)
+    id_empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)

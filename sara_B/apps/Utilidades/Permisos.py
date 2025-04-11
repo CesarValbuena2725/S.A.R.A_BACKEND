@@ -1,11 +1,5 @@
 from rest_framework.permissions import BasePermission
 from rest_framework.exceptions import PermissionDenied
-"""
-from apps.Access.api.utils import Map_Model_Accesss,Map_Serializer_Accesss
-from apps.Requests.api.utils import MaMap_Model_Requests, Map_Serializer_Requests
-"""
-
-
 from rest_framework.permissions import BasePermission
 
 class RolePermission(BasePermission):
@@ -17,15 +11,24 @@ class RolePermission(BasePermission):
             self.message = "Debes estar autenticado para esta acción."
             return False
 
-        allowed_roles = getattr(view, 'allowed_roles', [])
-        
-        # Verificar que el usuario tenga el atributo 'rol' antes de acceder
+        # Obtener roles permitidos en la vista
+        allowed_roles = set(getattr(view, 'allowed_roles', []))
+
+        # Verificar que el usuario tenga un rol asignado
         user_role = getattr(request.user, 'rol', None)
         if user_role is None:
             self.message = "El usuario no tiene un rol asignado."
             return False
+        
+        # Verificar si el usuario tiene un rol permitido
+        if allowed_roles and user_role not in allowed_roles:
+            self.message = "No tienes permisos para esta acción."
+            return False
+        
+        return True
+    
 
-        return user_role in allowed_roles
+BASE_PERMISOSOS = ['AD', 'PR', 'RC', 'CA', 'CC']
 
 
 # Diccionarios de registro
