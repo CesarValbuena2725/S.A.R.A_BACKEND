@@ -94,6 +94,21 @@ class PostGeneral(BaseGeneral):
             return Response({"validation_error": e.detail}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class PatchGeneral(BaseGeneral):
+    allowed_roles = ['AD', 'CA']
+
+    def patch(self, request, pk, *args, **kwargs):
+        try:
+            instance = self.get_object(pk)
+            serializer_class = self.get_serializer_class()
+            serializer = serializer_class(instance, data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+        except NotFound as e:
+            return Response({'errors': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
 class PutGeneral(BaseGeneral):
     allowed_roles = ['AD', 'CA']

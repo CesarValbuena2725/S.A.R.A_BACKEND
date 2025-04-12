@@ -3,7 +3,7 @@ from apps.Access.api.views import CreateUser,Login,SolicitudRestablecerPass,Cont
 
 urlpatterns=[
 
-    path('creacionuser/',CreateUser.as_view()),
+    path('api/createuser/post',CreateUser.as_view()),
 
     path('api/login/',Login.as_view()),
     path('api/solicitarpassword/', SolicitudRestablecerPass.as_view()),

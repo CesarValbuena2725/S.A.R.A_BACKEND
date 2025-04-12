@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from apps.Access.models import Empleado
 from apps.Requests.models import Solicitud, Plan, VehiculoPlan,TipoVehiculo
 from apps.Utilidades.Permisos import set_serializers
 
@@ -8,11 +9,19 @@ class SolicitudSerializers(serializers.ModelSerializer):
         exclude = ['fecha']
         read_only_fields = ['Placa']  # Campos que no se pueden modificar
 
+    def validate_id_empleado(self, value):
+            try:
+                if value.estado != "IN":
+                    return value
+                raise serializers.ValidationError("Empleado inactivo.")
+            except Empleado.DoesNotExist:
+                raise serializers.ValidationError("Empleado no encontrado.")
   
     def validate(self, data):
 
         id_plan = data.get("id_plan")
         id_tipo_vehiculo = data.get("id_tipo_vehiculo")
+        
 
         if id_plan and id_tipo_vehiculo:
             exists = VehiculoPlan.objects.filter(id_plan=id_plan, id_vehiculo=id_tipo_vehiculo).exists()

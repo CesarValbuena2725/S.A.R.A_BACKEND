@@ -45,6 +45,15 @@ class UsuarioSerializers(serializers.ModelSerializer):
     def validate_usuario(self, value):
         if logitud_minima(value):
             return validate_text(value)
+        
+    def validate_id_empleado(self, value):
+            try:
+                if value.estado != "IN":
+                    return value
+                raise serializers.ValidationError("Empleado inactivo.")
+            except Empleado.DoesNotExist:
+                raise serializers.ValidationError("Empleado no encontrado.")
+
 
     def update(self, instance, validated_data):
         """ Evitar sobreescribir la contraseña si no se envía en la solicitud """
