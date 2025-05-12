@@ -108,7 +108,7 @@ class GetRequests(generics.ListAPIView):
          
 #Crear  genera notificacion  put para estado !=
 
-class PutRequest(APIView):
+class PatchRequest(APIView):
     
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
@@ -126,7 +126,7 @@ class PutRequest(APIView):
         except NotFound as e:
             return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)
         
-    def put(self, request, pk):
+    def patch(self, request, pk):
         try:
             instancia = self.model.objects.get(pk=pk)
         except self.model.DoesNotExist:

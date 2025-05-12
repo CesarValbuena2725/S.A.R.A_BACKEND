@@ -14,20 +14,18 @@ class ConvenioSerializers(serializers.ModelSerializer):
     class Meta:
         model=Convenio
         fields= '__all__'
-    # Funciones que hacen validacion de Cada campo 
-    def validate_telefono(self, value):
-        return validate_positive(value)
 
-    def validate_nit(self, value):
-        if logitud_minima(value):
-            return validate_number(value)
+    
+
+
+    # Funciones que hacen validacion de Cada campo 
+
 @set_serializers
 class SucursalSeralizers(serializers.ModelSerializer):
     class Meta:
         model=Sucursal
         fields= '__all__'
         
-
 @set_serializers
 class EmpleadoSerialzers(serializers.ModelSerializer):
     class Meta:
@@ -45,6 +43,15 @@ class UsuarioSerializers(serializers.ModelSerializer):
     def validate_usuario(self, value):
         if logitud_minima(value):
             return validate_text(value)
+        
+    def validate_id_empleado(self, value):
+            try:
+                if value.estado != "IN":
+                    return value
+                raise serializers.ValidationError("Empleado inactivo.")
+            except Empleado.DoesNotExist:
+                raise serializers.ValidationError("Empleado no encontrado.")
+
 
     def update(self, instance, validated_data):
         """ Evitar sobreescribir la contraseña si no se envía en la solicitud """
