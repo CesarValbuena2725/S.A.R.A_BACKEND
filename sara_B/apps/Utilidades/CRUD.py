@@ -22,11 +22,11 @@ class FiltroGeneral(filters.FilterSet):
 
 
 class BaseGeneral(generics.GenericAPIView):
-    """
+    
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated,RolePermission]
     allowed_roles = []  # Definir roles permitidos para cada clase hija
-    """
+    
     
     def get_serializer_class(self):
         namemodel = self.kwargs.get('namemodel')
@@ -60,9 +60,10 @@ class BaseGeneral(generics.GenericAPIView):
         except queryset.model.DoesNotExist:
             raise NotFound(detail=f"Objeto con ID {pk} no encontrado en {queryset.model.__name__}.")
 
-class GetGeneral(BaseGeneral):
+class GetAdmin(BaseGeneral):
+    #!solo Admin 
+    allowed_roles=['AD']
     
-    allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC']
     filter_backends = [DjangoFilterBackend]
     filterset_class = FiltroGeneral
     
@@ -70,6 +71,23 @@ class GetGeneral(BaseGeneral):
         try:
             serializer_class = self.get_serializer_class()
             queryset = self.get_queryset()
+            model_serializers = serializer_class(queryset, many=True) 
+            return Response(model_serializers.data, status=status.HTTP_200_OK)
+        except NotFound as e:
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class GetGeneral(BaseGeneral):
+    allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC']
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = FiltroGeneral
+    
+    def get(self, request, *args, **kwargs):
+        try:
+            serializer_class = self.get_serializer_class()
+            queryset = self.get_queryset().exclude(is_active=False)
             model_serializers = serializer_class(queryset, many=True) 
             return Response(model_serializers.data, status=status.HTTP_200_OK)
         except NotFound as e:
@@ -91,7 +109,7 @@ class PostGeneral(BaseGeneral):
             return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
         except ValidationError as e:
-            return Response({"validation_error": e.detail}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"validation_error": e.detail}, status=status.HTTP_306_RESERVED)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
@@ -111,8 +129,8 @@ class PatchGeneral(BaseGeneral):
             return Response({'errors': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
 class PutGeneral(BaseGeneral):
-    allowed_roles = ['AD', 'CA']
 
+    allowed_roles = ['AD', 'CA']
     def put(self, request, pk, *args, **kwargs):
         try:
             instance = self.get_object(pk)
@@ -132,7 +150,12 @@ class DeleteGeneral(BaseGeneral):
     def delete(self, request, pk, *args, **kwargs):
         try:
             instance = self.get_object(pk)
-            instance.delete()
+
+            if not instance.is_active:
+                return Response({"detail": "El objeto ya está inactivo."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            instance.is_active=False
+            instance.save()
             return Response({"detail": "Eliminado"}, status=status.HTTP_202_ACCEPTED)
         except NotFound as e:
             return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)

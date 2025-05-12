@@ -9,6 +9,7 @@ from apps.Utilidades.Permisos import set_model
 class Plan(models.Model):
     nombre_plan= models.CharField(max_length=50, unique=True)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
+    is_active = models.BooleanField(default=True)  
 
     def __str__(self):
         return self.nombre_plan
@@ -16,6 +17,7 @@ class Plan(models.Model):
 class TipoVehiculo(models.Model):
     nombre_vehiculo = models.CharField(max_length=50)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
+    is_active = models.BooleanField(default=True)  
 
     def __str__(self):
         return self.nombre_vehiculo
@@ -24,6 +26,7 @@ class TipoVehiculo(models.Model):
 class VehiculoPlan(models.Model):
     id_plan =models.ForeignKey(Plan, on_delete=models.CASCADE)
     id_vehiculo = models.ForeignKey(TipoVehiculo, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)  
 
 
     class Meta:
@@ -48,6 +51,7 @@ class Solicitud(models.Model):
     observaciones= models.TextField(null=True )
     id_plan =models.ForeignKey(Plan, on_delete=models.CASCADE)
     id_tipo_vehiculo = models.ForeignKey(TipoVehiculo, on_delete=models.CASCADE)
-    
+    is_active = models.BooleanField(default=True)  
+
     def __str__(self):
         return self.placa

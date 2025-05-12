@@ -10,6 +10,7 @@ class Items(models.Model):
     nombre_items= models.CharField(max_length=50, null=False)
     descripcion = models.CharField(max_length=250, null=True)
     id_categoria_opciones = models.ForeignKey(CategoriaOpciones,on_delete=models.CASCADE, null=False)
+    is_active = models.BooleanField(default=True)  
 
     def __str__(self):
         return self.nombre_items
@@ -18,6 +19,7 @@ class Items(models.Model):
 class Formulario(models.Model):
     nombre_formulario= models.CharField(max_length=50, null=False)
     estado= models.CharField(max_length=2,choices=Estado.choices, default=Estado.ACTIVO)
+    is_active = models.BooleanField(default=True)  
 
     def __str__(self):
         return  self.nombre_formulario
@@ -26,6 +28,7 @@ class Formulario(models.Model):
 class FormularioPlan(models.Model):
     id_formulario= models.ForeignKey(Formulario, on_delete=models.CASCADE, null=False)
     id_plan = models.ForeignKey(Plan, on_delete=models.CASCADE, null=False)
+    is_active = models.BooleanField(default=True)  
 
     class Meta:
 

@@ -20,6 +20,13 @@ class Convenio(models.Model):
     nit = models.CharField(max_length=100, unique=True, null=False, error_messages=Errores)
     telefono = models.BigIntegerField(error_messages=Errores)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
+    is_active = models.BooleanField(default=True) 
+
+    def save(self, *args, **kwargs):
+        if not self.is_active:
+            #! Si el convenio está siendo desactivado, también las sucursales
+            Sucursal.objects.filter(id_convenio=self, is_active=True).update(is_active=False)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.nombre
@@ -31,7 +38,13 @@ class Sucursal(models.Model):
     direccion = models.CharField(max_length=100, error_messages=Errores)
     telefono = models.BigIntegerField(error_messages=Errores)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
-    convenio = models.ForeignKey(Convenio, on_delete=models.CASCADE, null=False)
+    id_convenio = models.ForeignKey(Convenio, on_delete=models.CASCADE, null=False)
+    is_active = models.BooleanField(default=True)  
+
+    def save(self,*args,**kwargs):
+        if not self.is_active:
+            Empleado.objects.filter(id_sucursal=self, is_active=True).update(is_active=False)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.nombre
@@ -45,6 +58,13 @@ class Empleado(models.Model):
     correo = models.EmailField(max_length=50, unique=True, error_messages=Errores)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
     id_sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE, null=False)
+    is_active = models.BooleanField(default=True)  
+
+    def save(self, *args,**kwargs):
+        if not self.is_active:
+            Usuario.objects.filter(id_empleado=self, is_active= True).update(is_active=False)
+        super().save(*args, **kwargs)
+
 
     def __str__(self):
         return self.nombres
