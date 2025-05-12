@@ -19,9 +19,13 @@ from apps.Forms.api.serializers import (
 from apps.Forms.models import CreacionFormulario, Formulario, FormularioPlan, Items
 from apps.Requests.models import Plan
 from apps.Result.api.serializers import OpcionesSeralizers
+<<<<<<< HEAD
 from apps.Result.models import Opciones
 from apps.Utilidades.CRUD import FiltroGeneral
 from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
+=======
+from apps.Utilidades.CRUD import FiltroGeneral
+>>>>>>> 6f4fada2946dbe24874cd592161ebf6e6d534496
 
 
 class PostCreateForms(APIView):
@@ -150,12 +154,15 @@ class DeleteForms(APIView):
 
 
 class ShowForms(generics.ListAPIView):
+<<<<<<< HEAD
 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = BASE_PERMISOSOS
 
 
+=======
+>>>>>>> 6f4fada2946dbe24874cd592161ebf6e6d534496
     serializer_class = FormularioSerializers
     filter_backends = [DjangoFilterBackend]
     filterset_class = FiltroGeneral
@@ -207,4 +214,9 @@ class ShowForms(generics.ListAPIView):
 
     def paginate_queryset(self, queryset):
         # Pagina los resultados automáticamente usando los métodos de ListAPIView
+<<<<<<< HEAD
         return super().paginate_queryset(queryset)
+=======
+        return super().paginate_queryset(queryset)
+
+>>>>>>> 6f4fada2946dbe24874cd592161ebf6e6d534496

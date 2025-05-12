@@ -53,10 +53,13 @@ APPS_EXTERNA=[
 
 LOCAL_APP=[
     'apps.Access',
-    'apps.Forms',  # Mueve esta más arriba si tiene problemas
     'apps.Requests',
-    'apps.Result',
+    'apps.Forms',
+    'apps.Results',
+    'apps.Result'
+
 ]
+
 INSTALLED_APPS=INSTALLED_APPS + LOCAL_APP + APPS_EXTERNA
 
 MIDDLEWARE = [
@@ -99,9 +102,9 @@ STATIC_URL = '/static/'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sarad_v2',
+        'NAME': 'sarav3',
         'USER':'root',
-        'PASSWORD':'12345678',
+        'PASSWORD':'Tragamundos4ever2024',
         'HOST':'127.0.0.1',
         'PORT':'3306',
     }
