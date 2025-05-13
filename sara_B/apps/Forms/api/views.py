@@ -150,12 +150,6 @@ class DeleteForms(APIView):
 
 
 class ShowForms(generics.ListAPIView):
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, RolePermission]
-    allowed_roles = BASE_PERMISOSOS
-
-
     serializer_class = FormularioSerializers
     filter_backends = [DjangoFilterBackend]
     filterset_class = FiltroGeneral
@@ -208,4 +202,3 @@ class ShowForms(generics.ListAPIView):
     def paginate_queryset(self, queryset):
         # Pagina los resultados automáticamente usando los métodos de ListAPIView
         return super().paginate_queryset(queryset)
-
