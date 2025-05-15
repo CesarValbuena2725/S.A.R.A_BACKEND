@@ -79,8 +79,7 @@ class GetAdmin(BaseGeneral):
 
 class GetFilter(BaseGeneral):
     allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC']
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = FiltroGeneral
+   
     
     def get(self, request, *args, **kwargs):
         try:
@@ -100,7 +99,7 @@ class GetFilter(BaseGeneral):
                 )
             
             serializer_class = self.get_serializer_class()
-            queryset = self.get_queryset().filter(**{atribut:value})
+            queryset = self.get_queryset().filter(**{atribut:value}, is_active=True)
             model_serializers = serializer_class(queryset, many=True) 
 
             return Response(model_serializers.data, status=status.HTTP_200_OK)
