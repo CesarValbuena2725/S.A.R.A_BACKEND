@@ -25,8 +25,7 @@ class BaseGeneral(generics.GenericAPIView):
     
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated,RolePermission]
-    allowed_roles = []  # Definir roles permitidos para cada clase hija
-    
+    allowed_roles = []  
     
     def get_serializer_class(self):
         namemodel = self.kwargs.get('namemodel')
@@ -77,6 +76,40 @@ class GetAdmin(BaseGeneral):
             return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class GetFilter(BaseGeneral):
+    allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC']
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = FiltroGeneral
+    
+    def get(self, request, *args, **kwargs):
+        try:
+
+            #/Se llaman los campos pasados por URL
+            atribut = self.kwargs.get('atribut')
+            value = self.kwargs.get('value')
+
+            #Se intancial el model para poder hacer una validacion de Atributos existentes 
+            model = self.get_model()
+            valid_fields = [f.name for f in model._meta.get_fields()]
+
+            if atribut not in valid_fields:
+                return Response(
+                    {'error': f"Campo '{atribut}' no válido para este modelo."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            serializer_class = self.get_serializer_class()
+            queryset = self.get_queryset().filter(**{atribut:value})
+            model_serializers = serializer_class(queryset, many=True) 
+
+            return Response(model_serializers.data, status=status.HTTP_200_OK)
+        except NotFound as e:
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
 class GetGeneral(BaseGeneral):
     allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC']

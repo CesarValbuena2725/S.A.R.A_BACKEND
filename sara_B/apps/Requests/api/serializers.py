@@ -3,30 +3,53 @@ from apps.Access.models import Empleado
 from apps.Requests.models import Solicitud, Plan, VehiculoPlan,TipoVehiculo
 from apps.Utilidades.Permisos import set_serializers
 
+
 class SolicitudSerializers(serializers.ModelSerializer):
     class Meta:
-        model =Solicitud
+        model = Solicitud
         exclude = ['fecha']
-        read_only_fields = ['Placa']  # Campos que no se pueden modificar
+        read_only_fields = ['Placa']
 
     def validate_id_empleado(self, value):
-            try:
-                if value.estado != "IN":
-                    return value
-                raise serializers.ValidationError("Empleado inactivo.")
-            except Empleado.DoesNotExist:
-                raise serializers.ValidationError("Empleado no encontrado.")
-  
+        if value.estado == "IN":
+            raise serializers.ValidationError("Empleado inactivo.")
+        return value
+
     def validate(self, data):
+        try:
+            id_plan = data.get("id_plan")
+            id_tipo_vehiculo = data.get("id_tipo_vehiculo")
+            id_convenio = data.get("id_convenio")
+            id_sucursal = data.get("id_sucursal")
 
-        id_plan = data.get("id_plan")
-        id_tipo_vehiculo = data.get("id_tipo_vehiculo")
-        
+            # Validar convenio
+            if id_convenio:
+                try:
+                    if id_convenio.estado == 'IN':
+                        raise serializers.ValidationError("El convenio está inactivo.")
+                except AttributeError:
+                    raise serializers.ValidationError("Error al acceder al estado del convenio.")
 
-        if id_plan and id_tipo_vehiculo:
-            exists = VehiculoPlan.objects.filter(id_plan=id_plan, id_vehiculo=id_tipo_vehiculo).exists()
-            if not exists:
-                raise serializers.ValidationError("La combinación de Plan y Tipo de Vehículo no es válida.")
+            # Validar sucursal
+            if id_sucursal:
+                try:
+                    if id_sucursal.estado == 'IN':
+                        raise serializers.ValidationError("La sucursal está inactiva.")
+                except AttributeError:
+                    raise serializers.ValidationError("Error al acceder al estado de la sucursal.")
+
+            # Validar relación plan - tipo de vehículo
+            if id_plan and id_tipo_vehiculo:
+                exists = VehiculoPlan.objects.filter(
+                    id_plan=id_plan,
+                    id_vehiculo=id_tipo_vehiculo
+                ).exists()
+                if not exists:
+                    raise serializers.ValidationError("La combinación de Plan y Tipo de Vehículo no es válida.")
+
+        except Exception as e:
+            raise serializers.ValidationError(f"Error al validar los datos: {str(e)}")
+
         return data
 
 @set_serializers

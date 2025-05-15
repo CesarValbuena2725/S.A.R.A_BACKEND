@@ -81,16 +81,6 @@ class FiltrarPlanes(APIView):
         serializer = PlanSerializers(planes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class CrearSolicitudAPIView(generics.CreateAPIView):
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated,RolePermission]
-    allowed_roles = BASE_PERMISOSOS
-    """
-    Vista para crear solicitudes validando que el plan y el tipo de vehículo coincidan.
-    """
-    queryset = Solicitud.objects.all()
-    serializer_class = SolicitudSerializers
 #Crear un  en path para hacer el filtro de planes de solictudes  // el Frontend debe poder  enviar el tipo de Vehiculo y hacer la peticion al Servidor ;
 
 # Get Solicitudes
@@ -174,7 +164,8 @@ class DeleteRequestDB(APIView):
     def delete(self, request, pk):
         try:
             instancia = Solicitud.objects.get(pk=pk)
-            instancia.delete()
+            instancia.is_active= False
+            instancia.save
             return Response({"detail": "Eliminado"}, status=status.HTTP_202_ACCEPTED)
         except Solicitud.DoesNotExist:
             return Response({"detail": "PK no válido"}, status=status.HTTP_404_NOT_FOUND)

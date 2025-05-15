@@ -3,8 +3,7 @@ from apps.Access.models import Estado
 from django.utils import timezone
 from apps.Access.models import Empleado
 from apps.Utilidades.Permisos import set_model
-
-
+from apps.Access.models import Convenio,Sucursal
 @set_model
 class Plan(models.Model):
     nombre_plan= models.CharField(max_length=50, unique=True)
@@ -42,15 +41,15 @@ class Solicitud(models.Model):
         PROGRESO = 'PRO','En Progreso'
 
     placa= models.CharField(max_length=6)
-    central_servicios=models.CharField(max_length=50, default="AutoSef")
     estado = models.CharField(max_length=3 , choices=Estados_solcitud.choices, default=Estados_solcitud.ACTIVO)
-    turno = models.IntegerField()
     telefono = models.CharField(max_length=10)
     fecha =  models.DateTimeField (default=timezone.now)
+    id_convenio = models.ForeignKey(Convenio, on_delete=models.CASCADE)
+    id_sucursal= models.ForeignKey(Sucursal, on_delete=models.CASCADE)
     id_empleado =models.ForeignKey(Empleado, on_delete=models.CASCADE)
-    observaciones= models.TextField(null=True )
     id_plan =models.ForeignKey(Plan, on_delete=models.CASCADE)
     id_tipo_vehiculo = models.ForeignKey(TipoVehiculo, on_delete=models.CASCADE)
+    observaciones= models.TextField(null=True )
     is_active = models.BooleanField(default=True)  
 
     def __str__(self):
