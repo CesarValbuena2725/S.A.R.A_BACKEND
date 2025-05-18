@@ -4,14 +4,9 @@ from django.utils import timezone
 from apps.Access.models import Empleado
 from apps.Utilidades.Permisos import set_model
 from apps.Access.models import Convenio,Sucursal
-@set_model
-class Plan(models.Model):
-    nombre_plan= models.CharField(max_length=50, unique=True)
-    estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
-    is_active = models.BooleanField(default=True)  
+from apps.Forms.models import Formulario
+from django.apps import apps
 
-    def __str__(self):
-        return self.nombre_plan
 @set_model  
 class TipoVehiculo(models.Model):
     nombre_vehiculo = models.CharField(max_length=50)
@@ -20,7 +15,19 @@ class TipoVehiculo(models.Model):
 
     def __str__(self):
         return self.nombre_vehiculo
-    
+@set_model
+class Plan(models.Model):
+    nombre_plan = models.CharField(max_length=50, unique=True)
+    estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
+    cuestionario = models.ForeignKey('Forms.CategoriaFormularios', on_delete=models.CASCADE, null=True)
+    id_tipo_vehiculo = models.ForeignKey(TipoVehiculo, on_delete=models.CASCADE, null=True)
+    lista_adicionales = models.ManyToManyField('Forms.Formulario')
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.nombre_plan
+
+
 @set_model 
 class VehiculoPlan(models.Model):
     id_plan =models.ForeignKey(Plan, on_delete=models.CASCADE)
@@ -43,7 +50,7 @@ class Solicitud(models.Model):
     placa= models.CharField(max_length=6)
     estado = models.CharField(max_length=3 , choices=Estados_solcitud.choices, default=Estados_solcitud.ACTIVO)
     telefono = models.CharField(max_length=10)
-    fecha =  models.DateTimeField (default=timezone.now)
+    fecha = models.DateField(default=timezone.now)     
     id_convenio = models.ForeignKey(Convenio, on_delete=models.CASCADE)
     id_sucursal= models.ForeignKey(Sucursal, on_delete=models.CASCADE)
     id_empleado =models.ForeignKey(Empleado, on_delete=models.CASCADE)

@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from apps.Utilidades.CRUD import GetGeneral, PostGeneral,DeleteGeneral,PutGeneral,PatchGeneral,GetAdmin,GetFilter
+from apps.Utilidades.CRUD import GetGeneral, PostGeneral,DeleteGeneral,PutGeneral,PatchGeneral,GetAdmin,DeleteAdmin,GetFilter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from django.contrib import admin
 from django.urls import path,include
@@ -30,6 +30,7 @@ urlpatterns = [
 
     path('api/<str:namemodel>/<str:atribut>/<str:value>/get/',GetFilter.as_view()),
     path('api/<str:namemodel>/getadmin/',GetAdmin.as_view()),
+    path('api/<str:namemodel>/deleteadmin/<int:pk>/',DeleteAdmin.as_view()),
 
     path('api/<str:namemodel>/post/',PostGeneral.as_view()),
     path('api/<str:namemodel>/put/<int:pk>/',PutGeneral.as_view()),

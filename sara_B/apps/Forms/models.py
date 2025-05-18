@@ -1,9 +1,7 @@
 from django.db import models
 from apps.Access.models import Estado
 from apps.Utilidades.Permisos import set_model
-from apps.Requests.models import Plan
 from apps.Result.models import CategoriaOpciones
-
 
 @set_model  
 class Items(models.Model):
@@ -16,9 +14,20 @@ class Items(models.Model):
         return self.nombre_items
 
 @set_model
+class CategoriaFormularios(models.Model):
+    nombre = models.CharField(max_length=50)
+    is_active= models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.nombre
+
+
+
+@set_model
 class Formulario(models.Model):
     nombre_formulario= models.CharField(max_length=50, null=False)
     estado= models.CharField(max_length=2,choices=Estado.choices, default=Estado.ACTIVO)
+    id_categoria = models.ManyToManyField(CategoriaFormularios)
     is_active = models.BooleanField(default=True)  
 
     def __str__(self):
@@ -27,7 +36,7 @@ class Formulario(models.Model):
 @set_model
 class FormularioPlan(models.Model):
     id_formulario= models.ForeignKey(Formulario, on_delete=models.CASCADE, null=False)
-    id_plan = models.ForeignKey(Plan, on_delete=models.CASCADE, null=False)
+    id_plan = models.ForeignKey('Requests.Plan', on_delete=models.CASCADE, null=False)
     is_active = models.BooleanField(default=True)  
 
     class Meta:

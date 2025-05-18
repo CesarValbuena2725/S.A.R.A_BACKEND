@@ -2,63 +2,129 @@ from rest_framework import serializers
 from apps.Access.models import Empleado
 from apps.Requests.models import Solicitud, Plan, VehiculoPlan,TipoVehiculo
 from apps.Utilidades.Permisos import set_serializers
-
+from apps.Forms.models import FormularioPlan,Formulario
+from rest_framework.exceptions import APIException
+from django.db import transaction
 
 class SolicitudSerializers(serializers.ModelSerializer):
     class Meta:
         model = Solicitud
-        exclude = ['fecha']
-        read_only_fields = ['Placa']
+        fields='__all__'
+        read_only_fields = ['fecha']  # Bloquea escritura, pero permite lectura
 
+    # Validación de empleado
     def validate_id_empleado(self, value):
         if value.estado == "IN":
             raise serializers.ValidationError("Empleado inactivo.")
         return value
 
+    # Validación general
     def validate(self, data):
-        try:
-            id_plan = data.get("id_plan")
-            id_tipo_vehiculo = data.get("id_tipo_vehiculo")
-            id_convenio = data.get("id_convenio")
-            id_sucursal = data.get("id_sucursal")
+        # Validar modificación de Placa
+        if self.instance and 'Placa' in data:
+            raise serializers.ValidationError({"Placa": "No modificable después de creación."})
 
-            # Validar convenio
-            if id_convenio:
-                try:
-                    if id_convenio.estado == 'IN':
-                        raise serializers.ValidationError("El convenio está inactivo.")
-                except AttributeError:
-                    raise serializers.ValidationError("Error al acceder al estado del convenio.")
+        # Validar convenio
+        if data.get("id_convenio") and data["id_convenio"].estado == 'IN':
+            raise serializers.ValidationError({"id_convenio": "Convenio inactivo."})
 
-            # Validar sucursal
-            if id_sucursal:
-                try:
-                    if id_sucursal.estado == 'IN':
-                        raise serializers.ValidationError("La sucursal está inactiva.")
-                except AttributeError:
-                    raise serializers.ValidationError("Error al acceder al estado de la sucursal.")
+        # Validar sucursal
+        if data.get("id_sucursal") and data["id_sucursal"].estado == 'IN':
+            raise serializers.ValidationError({"id_sucursal": "Sucursal inactiva."})
 
-            # Validar relación plan - tipo de vehículo
-            if id_plan and id_tipo_vehiculo:
-                exists = VehiculoPlan.objects.filter(
-                    id_plan=id_plan,
-                    id_vehiculo=id_tipo_vehiculo
-                ).exists()
-                if not exists:
-                    raise serializers.ValidationError("La combinación de Plan y Tipo de Vehículo no es válida.")
-
-        except Exception as e:
-            raise serializers.ValidationError(f"Error al validar los datos: {str(e)}")
+        # Validar plan y tipo de vehículo
+        if data.get("id_plan") and data.get("id_tipo_vehiculo"):
+            if not VehiculoPlan.objects.filter(
+                id_plan=data["id_plan"],
+                id_vehiculo=data["id_tipo_vehiculo"]
+            ).exists():
+                raise serializers.ValidationError(
+                    {"id_plan": "Combinación inválida con el tipo de vehículo."}
+                )
 
         return data
-
+    
 @set_serializers
 class PlanSerializers(serializers.ModelSerializer):
 
+    lista_adicionales = serializers.PrimaryKeyRelatedField(
+        queryset=Formulario.objects.filter(id_categoria=3),
+        many=True
+    )
+
     class Meta:
-        model= Plan
-        fields= '__all__'
-        
+        model = Plan
+        fields = '__all__'
+
+    def validate(self, data):
+        formularios = data.get('lista_adicionales', [])
+
+        for form in formularios:
+            if form.id_categoria_id != 3:  # Usar '_id' por eficiencia si es clave foránea
+                raise serializers.ValidationError(
+                    f'El formulario con ID {form.id} no pertenece a la categoría "Adicionales".'
+                )
+        return data
+
+
+    def create(self, data):
+        list_adic = data.pop('lista_adicionales', [])
+
+        with transaction.atomic():
+            instance = Plan.objects.create(**data)
+            instance.lista_adicionales.set(list_adic)
+
+            try:
+                for formulario in list_adic:
+                    FormularioPlan.objects.create(id_plan=instance, id_formulario=formulario)
+
+                questions = Formulario.objects.filter(id_categoria=instance.cuestionario)
+
+                for formulario in questions:
+                    FormularioPlan.objects.create(id_plan=instance, id_formulario=formulario)
+
+            except Exception as e:
+                raise APIException({"detail": f"Error al Proceesar la Creacion : {str(e)}"})
+
+        return instance
+    
+    def update(self, instance, validated_data):
+        lista_adic = validated_data.pop('lista_adicionales', None)
+        cuestionario_nuevo = validated_data.get('cuestionario', instance.cuestionario)
+
+        with transaction.atomic():
+            # Actualizar campos normales del plan
+            #!mapea la informacion con la funcion items  y la acutalizacon con 
+            #!serattr con eso de debe pasar en el for 
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+            instance.save()
+
+            # Actualizar lista_adicionales si fue enviada
+            if lista_adic is not None:
+                instance.lista_adicionales.set(lista_adic)
+
+            try:
+                # Eliminar todas las relaciones actuales de FormularioPlan para este plan
+                FormularioPlan.objects.filter(id_plan=instance).delete()
+
+                # crea las  nuevas relaciones de lista_adicionales
+                if lista_adic is not None:
+                    for formulario in lista_adic:
+                        FormularioPlan.objects.create(id_plan=instance, id_formulario=formulario)
+
+                # crea las  nuevas relaciones de cuestionario
+                questions = Formulario.objects.filter(id_categoria=cuestionario_nuevo)
+                for formulario in questions:
+                    FormularioPlan.objects.create(id_plan=instance, id_formulario=formulario)
+
+            except Exception as e:
+                raise APIException({"detail": f"Error al procesar la actualización: {str(e)}"})
+
+        return instance
+
+
+
 @set_serializers
 class TipovehiculoSerializers(serializers.ModelSerializer):
     planes = serializers.PrimaryKeyRelatedField(queryset=Plan.objects.all(), many=True, write_only=True)
