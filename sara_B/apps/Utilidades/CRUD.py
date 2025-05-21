@@ -22,11 +22,11 @@ class FiltroGeneral(filters.FilterSet):
 
 
 class BaseGeneral(generics.GenericAPIView):
-    """
+    
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated,RolePermission]
     allowed_roles = []  
-    """
+    
  
     
     def get_serializer_class(self):
@@ -63,7 +63,7 @@ class BaseGeneral(generics.GenericAPIView):
 
 class GetAdmin(BaseGeneral):
     #!solo Admin 
-    #allowed_roles=['AD']
+    allowed_roles=['AD']
     
     filter_backends = [DjangoFilterBackend]
     filterset_class = FiltroGeneral
@@ -80,7 +80,7 @@ class GetAdmin(BaseGeneral):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class GetFilter(BaseGeneral):
-    #allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC']
+    allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC']
    
     
     def get(self, request, *args, **kwargs):
@@ -113,7 +113,7 @@ class GetFilter(BaseGeneral):
 
 
 class GetGeneral(BaseGeneral):
-    #allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC']
+    allowed_roles = ['AD', 'PR', 'RC', 'CA', 'CC']
 
     filter_backends = [DjangoFilterBackend]
     filterset_class = FiltroGeneral
@@ -130,7 +130,7 @@ class GetGeneral(BaseGeneral):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class PostGeneral(BaseGeneral):
-    #allowed_roles = ['AD', 'CA']
+    allowed_roles = ['AD', 'CA']
 
     def post(self, request, *args, **kwargs):
         try:
@@ -148,7 +148,7 @@ class PostGeneral(BaseGeneral):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class PatchGeneral(BaseGeneral):
-    #allowed_roles = ['AD', 'CA']
+    allowed_roles = ['AD', 'CA']
 
     def patch(self, request, pk, *args, **kwargs):
         try:
@@ -164,7 +164,7 @@ class PatchGeneral(BaseGeneral):
 
 class PutGeneral(BaseGeneral):
 
-    #allowed_roles = ['AD', 'CA']
+    allowed_roles = ['AD', 'CA']
     def put(self, request, pk, *args, **kwargs):
         try:
             instance = self.get_object(pk)
@@ -179,7 +179,7 @@ class PutGeneral(BaseGeneral):
             return Response({'errors': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
 class DeleteGeneral(BaseGeneral):
-    #allowed_roles = ['AD', 'CA']
+    allowed_roles = ['AD', 'CA']
 
     def delete(self, request, pk, *args, **kwargs):
         try:
@@ -196,7 +196,7 @@ class DeleteGeneral(BaseGeneral):
 
 
 class DeleteAdmin(BaseGeneral):
-    #allowed_roles = ['AD', 'CA']
+    allowed_roles = ['AD', 'CA']
 
     def delete(self, request, pk, *args, **kwargs):
         try:

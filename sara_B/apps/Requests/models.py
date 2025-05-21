@@ -50,7 +50,7 @@ class Solicitud(models.Model):
     placa= models.CharField(max_length=6)
     estado = models.CharField(max_length=3 , choices=Estados_solcitud.choices, default=Estados_solcitud.ACTIVO)
     telefono = models.CharField(max_length=10)
-    fecha = models.DateField(default=timezone.now)     
+    fecha = models.DateField(default=lambda: timezone.now().date())
     id_convenio = models.ForeignKey(Convenio, on_delete=models.CASCADE)
     id_sucursal= models.ForeignKey(Sucursal, on_delete=models.CASCADE)
     id_empleado =models.ForeignKey(Empleado, on_delete=models.CASCADE)
