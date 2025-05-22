@@ -21,8 +21,8 @@ class SolicitudSerializers(serializers.ModelSerializer):
     # Validación general
     def validate(self, data):
         # Validar modificación de Placa
-        if self.instance and 'Placa' in data:
-            raise serializers.ValidationError({"Placa": "No modificable después de creación."})
+        #if self.instance and 'Placa' in data:
+         #   raise serializers.ValidationError({"Placa": "No modificable después de creación."})
 
         # Validar convenio
         if data.get("id_convenio") and data["id_convenio"].estado == 'IN':
@@ -32,15 +32,13 @@ class SolicitudSerializers(serializers.ModelSerializer):
         if data.get("id_sucursal") and data["id_sucursal"].estado == 'IN':
             raise serializers.ValidationError({"id_sucursal": "Sucursal inactiva."})
 
-        # Validar plan y tipo de vehículo
-        if data.get("id_plan") and data.get("id_tipo_vehiculo"):
-            if not VehiculoPlan.objects.filter(
-                id_plan=data["id_plan"],
-                id_vehiculo=data["id_tipo_vehiculo"]
-            ).exists():
-                raise serializers.ValidationError(
-                    {"id_plan": "Combinación inválida con el tipo de vehículo."}
-                )
+        plan = data["id_plan"]
+        tipo_vehiculo = data["id_tipo_vehiculo"]
+
+        if plan.id_tipo_vehiculo != tipo_vehiculo:
+            raise serializers.ValidationError({
+                "id_plan": "Combinación inválida con el tipo de vehículo."
+            })
 
         return data
     
@@ -68,7 +66,7 @@ class PlanSerializers(serializers.ModelSerializer):
 
 
     def create(self, data):
-        list_adic = data.pop('lista_adicionales', [])
+        list_adic = data.get('lista_adicionales', [])
 
         with transaction.atomic():
             instance = Plan.objects.create(**data)

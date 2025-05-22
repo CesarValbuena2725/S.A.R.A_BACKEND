@@ -45,7 +45,10 @@ class GetRequests(generics.GenericAPIView):
 
 class PostRequests(generics.GenericAPIView):
     
- 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles =BASE_PERMISOSOS
+    
     model = Solicitud
     serializer_class=SolicitudSerializers
 

@@ -1,11 +1,10 @@
 from django.db import models
 from apps.Access.models import Estado
-from django.utils import timezone
+from django.utils.timezone  import localdate
 from apps.Access.models import Empleado
 from apps.Utilidades.Permisos import set_model
 from apps.Access.models import Convenio,Sucursal
-from apps.Forms.models import Formulario
-from django.apps import apps
+
 
 @set_model  
 class TipoVehiculo(models.Model):
@@ -42,6 +41,7 @@ class VehiculoPlan(models.Model):
 
 class Solicitud(models.Model):
 
+
     class Estados_solcitud(models.TextChoices):
         ACTIVO = 'AC', 'Activo'
         CANCELADO = 'CAL', 'Cancelado'
@@ -50,7 +50,7 @@ class Solicitud(models.Model):
     placa= models.CharField(max_length=6)
     estado = models.CharField(max_length=3 , choices=Estados_solcitud.choices, default=Estados_solcitud.ACTIVO)
     telefono = models.CharField(max_length=10)
-    fecha = models.DateField(default=lambda: timezone.now().date())
+    fecha = models.DateField(default=localdate)
     id_convenio = models.ForeignKey(Convenio, on_delete=models.CASCADE)
     id_sucursal= models.ForeignKey(Sucursal, on_delete=models.CASCADE)
     id_empleado =models.ForeignKey(Empleado, on_delete=models.CASCADE)
