@@ -30,7 +30,7 @@ class GetRequests(generics.GenericAPIView):
     serializer_class = SolicitudSerializers
     model_base = Solicitud
     def get_queryset(self):
-        queryset = self.model_base.objects.all()
+        queryset = self.model_base.objects.filter(is_active=True)
         return queryset
     def get(self, request):
         try:
