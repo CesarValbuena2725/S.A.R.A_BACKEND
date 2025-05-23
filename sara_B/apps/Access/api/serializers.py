@@ -15,8 +15,6 @@ class ConvenioSerializers(serializers.ModelSerializer):
         model=Convenio
         fields= '__all__'
 
-    
-
 
     # Funciones que hacen validacion de Cada campo 
 

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.Forms.models import Formulario,Items,FormularioPlan,CreacionFormulario
+from apps.Forms.models import Formulario,Items,FormularioPlan,CreacionFormulario, CategoriaFormularios
 from apps.Requests.models import Plan
 from apps.Utilidades.Permisos import set_serializers
 from rest_framework.exceptions import APIException
@@ -7,6 +7,11 @@ from django.db import transaction
 from apps.Result.models import CategoriaOpciones
 
 
+@set_serializers
+class CategoriaFormulariosSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = CategoriaFormularios
+        fields= '__all__'
 
 @set_serializers
 class ItemsSerializers(serializers.ModelSerializer):

@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.pagination import PageNumberPagination
 
 # Local application imports
 from apps.Requests.api.serializers import (
@@ -19,11 +20,34 @@ from apps.Utilidades.Email.email_base import send_email_sara
 from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
 from apps.Utilidades.tasks import send_email_asincr
 
+
+
+class GetRequests(generics.GenericAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles =BASE_PERMISOSOS
+
+    serializer_class = SolicitudSerializers
+    model_base = Solicitud
+    def get_queryset(self):
+        queryset = self.model_base.objects.filter(is_active=True)
+        return queryset
+    def get(self, request):
+        try:
+            queryset = self.get_queryset()
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except NotFound as e:
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
 class PostRequests(generics.GenericAPIView):
     
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
-    allowed_roles = ['AD', 'RC', 'CA',] 
+    allowed_roles =BASE_PERMISOSOS
     
     model = Solicitud
     serializer_class=SolicitudSerializers
@@ -54,59 +78,6 @@ class PostRequests(generics.GenericAPIView):
                 {"detalles": f"Error al procesar la solicitud: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-#Crear un  en path para hacer el filtro de planes de solictudes  // el Frontend debe poder  enviar el tipo de Vehiculo y hacer la peticion al Servidor ; 
-class FiltrarPlanes(APIView):
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated,RolePermission]
-    allowed_roles = BASE_PERMISOSOS
-
-    def get(self, request, id_tipo_vehiculo):
-        """
-        Filtra los planes según el tipo de vehículo dado.
-        """
-        # Verificamos si el id_tipo_vehiculo existe en VehiculoPlan, filtrando los planes asociados al tipo_vehiculo
-        planes_ids = VehiculoPlan.objects.filter(id_vehiculo=id_tipo_vehiculo).values_list('id_plan', flat=True)
-        
-
-        #Si no se encuentran planes asociados a ese id, retorna un error 404
-        if not planes_ids:
-            return Response(
-                {"error": "No hay planes disponibles para este tipo de vehículo."},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        #Filtra los objetos de plan que tengan un id dentro del tipo_vehiculo
-        planes = Plan.objects.filter(id__in=planes_ids)
-        serializer = PlanSerializers(planes, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-class CrearSolicitudAPIView(generics.CreateAPIView):
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated,RolePermission]
-    allowed_roles = BASE_PERMISOSOS
-    """
-    Vista para crear solicitudes validando que el plan y el tipo de vehículo coincidan.
-    """
-    queryset = Solicitud.objects.all()
-    serializer_class = SolicitudSerializers
-#Crear un  en path para hacer el filtro de planes de solictudes  // el Frontend debe poder  enviar el tipo de Vehiculo y hacer la peticion al Servidor ;
-
-# Get Solicitudes
-
-class GetRequests(generics.ListAPIView):
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated,RolePermission]
-    allowed_roles = BASE_PERMISOSOS
-    
-    serializer_class=SolicitudSerializers
-    queryset = Solicitud.objects.all()
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = FiltroGeneral
-         
-#Crear  genera notificacion  put para estado !=
 
 class PatchRequest(APIView):
     
@@ -162,9 +133,6 @@ class PatchRequest(APIView):
         model_serializers.save()
         return Response(model_serializers.data, status=status.HTTP_200_OK)
 
-
-#eliminar  genera notificiaon  notificicaion 
-
 class DeleteRequestDB(APIView):
     
     authentication_classes = [JWTAuthentication]
@@ -174,12 +142,14 @@ class DeleteRequestDB(APIView):
     def delete(self, request, pk):
         try:
             instancia = Solicitud.objects.get(pk=pk)
-            instancia.delete()
+            instancia.is_active= False
+            instancia.save()
             return Response({"detail": "Eliminado"}, status=status.HTTP_202_ACCEPTED)
         except Solicitud.DoesNotExist:
             return Response({"detail": "PK no válido"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 #Crear un  en path para hacer el filtro de planes de solictudes  // el Frontend debe poder  enviar el tipo de Vehiculo y hacer la peticion al Servidor ; 
