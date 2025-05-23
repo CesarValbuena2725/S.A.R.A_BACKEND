@@ -102,7 +102,7 @@ STATIC_URL = '/static/'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sarav3',
+        'NAME': 'sarav3.1',
         'USER':'root',
         'PASSWORD':'Tragamundos4ever2024',
         'HOST':'127.0.0.1',
