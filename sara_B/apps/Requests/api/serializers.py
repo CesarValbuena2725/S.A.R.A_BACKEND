@@ -54,15 +54,6 @@ class PlanSerializers(serializers.ModelSerializer):
         model = Plan
         fields = '__all__'
 
-    def validate(self, data):
-        formularios = data.get('lista_adicionales', [])
-
-        for form in formularios:
-            if form.id_categoria_id != 3:  # Usar '_id' por eficiencia si es clave foránea
-                raise serializers.ValidationError(
-                    f'El formulario con ID {form.id} no pertenece a la categoría "Adicionales".'
-                )
-        return data
 
 
     def create(self, data):

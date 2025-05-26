@@ -23,9 +23,7 @@ from apps.Utilidades.tasks import send_email_asincr
 
 
 class GetRequests(generics.GenericAPIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, RolePermission]
-    allowed_roles =BASE_PERMISOSOS
+ 
 
     serializer_class = SolicitudSerializers
     model_base = Solicitud
