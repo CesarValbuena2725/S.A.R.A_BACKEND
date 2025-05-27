@@ -1,12 +1,10 @@
 # Third-party imports
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.pagination import PageNumberPagination
 
 # Local application imports
 from apps.Requests.api.serializers import (
@@ -15,21 +13,84 @@ from apps.Requests.api.serializers import (
     TipovehiculoSerializers
 )
 from apps.Requests.models import Plan, Solicitud, TipoVehiculo, VehiculoPlan
+from apps.Forms.models import Formulario, Items,CreacionFormulario
+from apps.Forms.api.serializers import FormularioSerializers,ItemsSerializers,CreacionFormularioSerializers
 from apps.Utilidades.CRUD import FiltroGeneral
 from apps.Utilidades.Email.email_base import send_email_sara
 from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
 from apps.Utilidades.tasks import send_email_asincr
 
+class GetForms(generics.GenericAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles =BASE_PERMISOSOS
 
+    serializer_class= FormularioSerializers
+    model_base  =  Formulario
+
+    def get_queryset(self):
+        return self.model_base.objects.filter(is_active=True)
+
+    def get(self, request, *args, **kwargs):
+        id_request = self.kwargs.get('id_request')
+
+        try:
+            instancie_request = Solicitud.objects.get(pk=id_request)
+        except Solicitud.DoesNotExist:
+            return Response({'detail': 'Solicitud no encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            instancie_plan = Plan.objects.get(pk=instancie_request.id_plan.pk)
+        except Plan.DoesNotExist:
+            return Response({'detail': 'Plan no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Formularios por categoría principal
+        forms = Formulario.objects.filter(id_categoria=instancie_plan.cuestionario, is_active=True)
+
+        # Formularios adicionales
+        data = list(forms)  
+
+        for id_adicional in instancie_plan.lista_adicionales.all():
+            adicionales = Formulario.objects.filter(pk=id_adicional.pk, is_active=True)
+            data.extend(adicionales)  # Agrega los formularios adicionales a la lista
+
+        serializer = self.serializer_class(data, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+#!get para traer los items De los formularios:
+
+class GetFormsItems(generics.GenericAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles =BASE_PERMISOSOS
+
+
+    model = Items
+    serializer_class = CreacionFormularioSerializers
+
+    def get_queryset(self):
+        query = self.model.objects.all()
+        return query
+    
+
+    def get(self, request, *args, **kwargs):
+
+        id_form = self.kwargs.get('id_form')
+        
+        data = CreacionFormulario.objects.filter(id_formulario=id_form)
+        serializer = self.serializer_class(data, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    
 
 class GetRequests(generics.GenericAPIView):
- 
 
     serializer_class = SolicitudSerializers
     model_base = Solicitud
     def get_queryset(self):
         queryset = self.model_base.objects.filter(is_active=True)
         return queryset
+    
     def get(self, request):
         try:
             queryset = self.get_queryset()

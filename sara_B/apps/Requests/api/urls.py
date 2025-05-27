@@ -1,5 +1,8 @@
 from django.urls import path
-from apps.Requests.api.views import PostRequests, GetRequests,PatchRequest, DeleteRequestDB,FiltrarPlanes, CrearVehiculo, ActualizarTipoVehiculo, EliminarTipoVehiculo
+from apps.Requests.api.views import (PostRequests, GetRequests,PatchRequest, 
+                                     DeleteRequestDB,FiltrarPlanes, CrearVehiculo, 
+                                     ActualizarTipoVehiculo, EliminarTipoVehiculo,
+                                     GetForms,GetFormsItems)
 
 urlpatterns=[
 
@@ -7,6 +10,9 @@ urlpatterns=[
     path ('api/solicitud/post/',PostRequests.as_view()),
     path('api/solicitud/patch/<int:pk>/',PatchRequest.as_view()),
     path('api/solicitud/delete/<int:pk>/',DeleteRequestDB.as_view()),
+
+    path('api/formslist/get/<int:id_request>/', GetForms.as_view()),
+    path('api/itemslist/get/<int:id_form>/',GetFormsItems.as_view()),
 
 
     path ('crear_vehiculo', CrearVehiculo.as_view()),

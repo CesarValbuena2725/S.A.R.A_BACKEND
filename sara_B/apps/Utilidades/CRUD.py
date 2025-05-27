@@ -23,8 +23,7 @@ class FiltroGeneral(filters.FilterSet):
 
 class BaseGeneral(generics.GenericAPIView):
     
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, RolePermission]
+  
     allowed_roles = [] 
     
  

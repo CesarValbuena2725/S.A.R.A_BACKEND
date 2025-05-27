@@ -35,6 +35,8 @@ class FormularioPlanSerializers(serializers.ModelSerializer):
 
 @set_serializers
 class CreacionFormularioSerializers(serializers.ModelSerializer):
+    id_items = ItemsSerializers(read_only=True)  # Me trae el objeto completo 
+
     class Meta:
         model = CreacionFormulario
         fields = '__all__'
