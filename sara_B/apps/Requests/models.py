@@ -46,6 +46,7 @@ class Solicitud(models.Model):
         ACTIVO = 'AC', 'Activo'
         CANCELADO = 'CAL', 'Cancelado'
         PROGRESO = 'PRO','En Progreso'
+        FINALIZADO ='FIN', 'Finalizado'
 
     placa= models.CharField(max_length=6)
     estado = models.CharField(max_length=3 , choices=Estados_solcitud.choices, default=Estados_solcitud.ACTIVO)
@@ -57,7 +58,7 @@ class Solicitud(models.Model):
     id_plan =models.ForeignKey(Plan, on_delete=models.CASCADE)
     id_tipo_vehiculo = models.ForeignKey(TipoVehiculo, on_delete=models.CASCADE)
     observaciones= models.TextField(null=True )
-    is_active = models.BooleanField(default=True)  
+    is_active = models.BooleanField(default=True) 
 
     def __str__(self):
         return self.placa

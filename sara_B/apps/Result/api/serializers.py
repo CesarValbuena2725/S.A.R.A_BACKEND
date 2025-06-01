@@ -1,7 +1,11 @@
 from rest_framework import serializers
-from apps.Result.models import CategoriaOpciones,Opciones
+from apps.Result.models import CategoriaOpciones,Opciones, Respuestas
 from apps.Utilidades.Permisos import set_serializers
-
+from apps.Requests.models import Solicitud
+from apps.Forms.models import Formulario,Items
+from apps.Requests.api.tools import listForm
+from apps.Forms.models import CreacionFormulario
+from django.db import transaction
 @set_serializers
 class CategoriaOpcionesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,3 +17,87 @@ class OpcionesSeralizers(serializers.ModelSerializer):
     class Meta:
         model = Opciones
         fields='__all__'
+
+    
+class RespuestaSerializer(serializers.Serializer):
+    solicitud = serializers.PrimaryKeyRelatedField(queryset=Solicitud.objects.filter(is_active=True))
+    formulario = serializers.PrimaryKeyRelatedField(queryset=Formulario.objects.filter(is_active=True))
+    resultados = serializers.JSONField()
+
+    def validate(self, data):
+        result = data.get('resultados')
+        request = data.get('solicitud')
+        form= data.get('formulario')
+        
+        list_forms= listForm(request)
+
+        if  form not in list_forms:
+            raise serializers.ValidationError("Formulario no corresponde")
+
+        if request.estado != "PRO":
+            raise serializers.ValidationError("No se pueden registrar respuestas en ese estado")
+
+        if not result or len(result) == 0:
+            raise serializers.ValidationError("No se enviaron respuestas")
+        if not isinstance(result, list):
+            raise serializers.ValidationError("'resultados' debe ser una lista de respuestas")
+
+        for item in result:
+            if not len(item)==2:  
+                raise serializers.ValidationError("Respuestas incompletas o fuera de rango")
+
+        return data
+    def create(self, validated_data):
+
+        solicitud = validated_data['solicitud']
+        formulario = validated_data['formulario']
+        resultados = validated_data['resultados']
+        respuestas = []
+        try:
+            with transaction.atomic():
+                for item_data in resultados:
+                    # Validacion de estructura que venga en lista con dos Datos nada mas 
+                    if not isinstance(item_data, list) or len(item_data) != 2:
+                        raise serializers.ValidationError(
+                            f"Estructura inválida en respuesta: {item_data}. Se esperaba [id_item, id_opcion]"
+                        )
+
+                    id_item, id_opcion = item_data
+
+                    # Validar que el items  pertenece al formulario
+                    if not CreacionFormulario.objects.filter(id_formulario=formulario,id_items=id_item).exists():
+
+                        raise serializers.ValidationError(
+                            f"El ítem con ID {id_item} no pertenece al formulario {formulario.id}"
+                        )
+
+                    try:
+                        item = Items.objects.get(pk=id_item)
+                    except Items.DoesNotExist:
+                        raise serializers.ValidationError(
+                            f"El ítem con ID {id_item} no existe en el sistema"
+                        )
+
+                    # Validar la Categoria del item
+                    if item.id_categoria_opciones != 16:
+
+                        if not Opciones.objects.filter(id_categoria_opciones=item.id_categoria_opciones,pk=id_opcion).exists():
+                            raise serializers.ValidationError(f"La opción con ID {id_opcion} no es válida para el ítem {id_item}")
+
+                    # Se gurda la respuesta  
+                    respuesta = Respuestas.objects.create(
+                        id_solicitud=solicitud,
+                        id_formulario=formulario,
+                        id_item=id_item,
+                        id_opcion=id_opcion if item.id_categoria_opciones != 16 else None,
+                        respuesta_texto=id_opcion if item.id_categoria_opciones == 16 else None
+                    )
+                    respuestas.append(respuesta)
+        except Exception as e:
+                    
+            raise serializers.ValidationError({"detail": f"Error al procesar la solicitud: {str(e)}"})
+
+        return {'respuestas_creadas': respuestas}
+        
+         
+
