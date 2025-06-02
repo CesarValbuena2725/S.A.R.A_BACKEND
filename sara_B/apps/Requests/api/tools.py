@@ -3,7 +3,7 @@ from apps.Requests.models import Plan, Solicitud
 
 def listForm(id):
     try:
-        solicitud = Solicitud.objects.get(pk=id)
+        solicitud = Solicitud.objects.get(pk=id.pk)
         plan = solicitud.id_plan
 
         # Formularios por cuestionario del plan
@@ -18,9 +18,9 @@ def listForm(id):
         return list(data.values_list('id', flat=True))
 
     except Solicitud.DoesNotExist:
-        return []
+        return ["noenconatadp"]
     except Exception as e:
-        return []
+        return [str(e)]
 
 
 

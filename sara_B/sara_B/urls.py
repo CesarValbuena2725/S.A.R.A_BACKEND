@@ -25,6 +25,7 @@ urlpatterns = [
     path('access/', include('apps.Access.api.urls')),
     path('request/', include('apps.Requests.api.urls')),
     path('forms/', include('apps.Forms.api.urls')),
+    path('result/',include('apps.Result.api.urls')),
 
     path('api/<str:namemodel>/get/',GetGeneral.as_view()),
 

@@ -30,8 +30,7 @@ class RespuestaSerializer(serializers.Serializer):
         form= data.get('formulario')
         
         list_forms= listForm(request)
-
-        if  form not in list_forms:
+        if  form.pk not in list_forms:
             raise serializers.ValidationError("Formulario no corresponde")
 
         if request.estado != "PRO":
@@ -47,16 +46,16 @@ class RespuestaSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Respuestas incompletas o fuera de rango")
 
         return data
-    def create(self, validated_data):
 
+    def create(self, validated_data):
         solicitud = validated_data['solicitud']
         formulario = validated_data['formulario']
         resultados = validated_data['resultados']
         respuestas = []
+
         try:
             with transaction.atomic():
                 for item_data in resultados:
-                    # Validacion de estructura que venga en lista con dos Datos nada mas 
                     if not isinstance(item_data, list) or len(item_data) != 2:
                         raise serializers.ValidationError(
                             f"Estructura inválida en respuesta: {item_data}. Se esperaba [id_item, id_opcion]"
@@ -64,9 +63,7 @@ class RespuestaSerializer(serializers.Serializer):
 
                     id_item, id_opcion = item_data
 
-                    # Validar que el items  pertenece al formulario
-                    if not CreacionFormulario.objects.filter(id_formulario=formulario,id_items=id_item).exists():
-
+                    if not CreacionFormulario.objects.filter(id_formulario=formulario, id_items=id_item).exists():
                         raise serializers.ValidationError(
                             f"El ítem con ID {id_item} no pertenece al formulario {formulario.id}"
                         )
@@ -78,26 +75,27 @@ class RespuestaSerializer(serializers.Serializer):
                             f"El ítem con ID {id_item} no existe en el sistema"
                         )
 
-                    # Validar la Categoria del item
                     if item.id_categoria_opciones != 16:
+                        if not Opciones.objects.filter(id_categoria_opciones=item.id_categoria_opciones, pk=id_opcion).exists():
+                            raise serializers.ValidationError(
+                                f"La opción con ID {id_opcion} no es válida para el ítem {id_item}"
+                            )
+                        option = Opciones.objects.get(pk=id_opcion)
+                    else:
+                        option = None
 
-                        if not Opciones.objects.filter(id_categoria_opciones=item.id_categoria_opciones,pk=id_opcion).exists():
-                            raise serializers.ValidationError(f"La opción con ID {id_opcion} no es válida para el ítem {id_item}")
-
-                    # Se gurda la respuesta  
                     respuesta = Respuestas.objects.create(
                         id_solicitud=solicitud,
                         id_formulario=formulario,
-                        id_item=id_item,
-                        id_opcion=id_opcion if item.id_categoria_opciones != 16 else None,
-                        respuesta_texto=id_opcion if item.id_categoria_opciones == 16 else None
+                        id_item=item,
+                        id_opcion=option if option else None,
+                        respuesta_texto=str(id_opcion) if item.id_categoria_opciones == 16 else None
                     )
                     respuestas.append(respuesta)
+
+        except serializers.ValidationError as ve:
+            raise ve
         except Exception as e:
-                    
-            raise serializers.ValidationError({"detail": f"Error al procesar la solicitud: {str(e)}"})
+            raise serializers.ValidationError({"detail": f"Error inesperado: {str(e)}"})
 
         return {'respuestas_creadas': respuestas}
-        
-         
-

@@ -33,7 +33,7 @@ class Respuestas(models.Model):
     id_formulario = models.ForeignKey('Forms.Formulario', on_delete=models.CASCADE, null=False)
     id_item = models.ForeignKey('Forms.Items', on_delete=models.CASCADE, null=False)
     id_opcion = models.ForeignKey(Opciones, on_delete=models.CASCADE, null= True)
-    respuesta =  models.CharField(max_length=60 , null= True)
+    respuesta_texto =  models.CharField(max_length=60 , null= True)
     is_active = models.BooleanField(default=True) 
 
 
