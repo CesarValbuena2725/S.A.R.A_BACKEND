@@ -58,7 +58,7 @@ class PlanSerializers(serializers.ModelSerializer):
 
     def create(self, data):
         list_adic = data.get('lista_adicionales', [])
-
+        data.pop('lista_adicionales', None)  # <- Esto es clave
         with transaction.atomic():
             instance = Plan.objects.create(**data)
             instance.lista_adicionales.set(list_adic)
@@ -76,36 +76,38 @@ class PlanSerializers(serializers.ModelSerializer):
                 raise APIException({"detail": f"Error al Proceesar la Creacion : {str(e)}"})
 
         return instance
-    
     def update(self, instance, validated_data):
         lista_adic = validated_data.pop('lista_adicionales', None)
         cuestionario_nuevo = validated_data.get('cuestionario', instance.cuestionario)
 
         with transaction.atomic():
-            # Actualizar campos normales del plan
-            #!mapea la informacion con la funcion items  y la acutalizacon con 
-            #!serattr con eso de debe pasar en el for 
+            # Actualizar campos simples
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
             instance.save()
 
-            # Actualizar lista_adicionales si fue enviada
+            # Actualizar M2M lista_adicionales
             if lista_adic is not None:
                 instance.lista_adicionales.set(lista_adic)
 
             try:
-                # Eliminar todas las relaciones actuales de FormularioPlan para este plan
+                # Eliminar relaciones previas del plan
                 FormularioPlan.objects.filter(id_plan=instance).delete()
 
-                # crea las  nuevas relaciones de lista_adicionales
-                if lista_adic is not None:
-                    for formulario in lista_adic:
-                        FormularioPlan.objects.create(id_plan=instance, id_formulario=formulario)
+                # Relacionar adicionales nuevos si fueron enviados
+                if lista_adic:
+                    FormularioPlan.objects.bulk_create([
+                        FormularioPlan(id_plan=instance, id_formulario=formulario)
+                        for formulario in lista_adic
+                    ])
 
-                # crea las  nuevas relaciones de cuestionario
+                # Agregar los formularios del cuestionario (si cambió o si es inicial)
                 questions = Formulario.objects.filter(id_categoria=cuestionario_nuevo)
-                for formulario in questions:
-                    FormularioPlan.objects.create(id_plan=instance, id_formulario=formulario)
+
+                FormularioPlan.objects.bulk_create([
+                    FormularioPlan(id_plan=instance, id_formulario=formulario)
+                    for formulario in questions
+                ])
 
             except Exception as e:
                 raise APIException({"detail": f"Error al procesar la actualización: {str(e)}"})
