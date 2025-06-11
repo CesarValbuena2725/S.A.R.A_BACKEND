@@ -7,7 +7,7 @@ from apps.Result.models import CategoriaOpciones
 class Items(models.Model):
     nombre_items= models.CharField(max_length=50, null=False)
     descripcion = models.CharField(max_length=250, null=True)
-    id_categoria_opciones = models.ForeignKey(CategoriaOpciones,on_delete=models.CASCADE, null=False)
+    id_categoria_opciones = models.ForeignKey(CategoriaOpciones,on_delete=models.CASCADE )
     is_active = models.BooleanField(default=True)  
 
     def __str__(self):

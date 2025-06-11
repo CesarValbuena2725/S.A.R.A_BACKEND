@@ -19,3 +19,4 @@ flower==2.0.1 # sistemas de monitorio  de celery
 celery django-celery-results  # para guardar los resultados en DB
 
 rabbitmqctl feature_flags enable_all
+weasyprint   #Creacion de PDF

@@ -161,7 +161,11 @@ EMAIL_HOST_USER = DEFAULT_FROM_EMAIL
 EMAIL_HOST_PASSWORD = 's e r o j b e q p w i k o b a q '
 
 #Servidores Permitodos para hacer Peticiones
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Modo dev
+    "http://localhost:4173",  # Modo preview
+]
+
 
 #configuracion del Vida del token
 

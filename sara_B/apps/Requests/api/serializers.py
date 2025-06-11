@@ -76,6 +76,7 @@ class PlanSerializers(serializers.ModelSerializer):
                 raise APIException({"detail": f"Error al Proceesar la Creacion : {str(e)}"})
 
         return instance
+    
     def update(self, instance, validated_data):
         lista_adic = validated_data.pop('lista_adicionales', None)
         cuestionario_nuevo = validated_data.get('cuestionario', instance.cuestionario)

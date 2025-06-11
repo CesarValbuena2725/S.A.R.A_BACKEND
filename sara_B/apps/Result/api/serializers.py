@@ -18,6 +18,10 @@ class OpcionesSeralizers(serializers.ModelSerializer):
         model = Opciones
         fields='__all__'
 
+class RespuestaModelSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Respuestas
+        fields = '__all__'
     
 class RespuestaSerializer(serializers.Serializer):
     solicitud = serializers.PrimaryKeyRelatedField(queryset=Solicitud.objects.filter(is_active=True))
@@ -63,6 +67,10 @@ class RespuestaSerializer(serializers.Serializer):
 
                     id_item, id_opcion = item_data
 
+                    data_value= Respuestas.objects.filter(id_solicitud=solicitud, id_formulario=formulario,id_item=id_item)
+                    if data_value.exists():
+                        raise serializers.ValidationError(f"La solicitud: {solicitud},con el formulario: {formulario} del item:{id_item} ya tiene una respuesta Guardad")
+
                     if not CreacionFormulario.objects.filter(id_formulario=formulario, id_items=id_item).exists():
                         raise serializers.ValidationError(
                             f"El ítem con ID {id_item} no pertenece al formulario {formulario.id}"
@@ -70,26 +78,29 @@ class RespuestaSerializer(serializers.Serializer):
 
                     try:
                         item = Items.objects.get(pk=id_item)
+                        print(item.id_categoria_opciones)
                     except Items.DoesNotExist:
                         raise serializers.ValidationError(
                             f"El ítem con ID {id_item} no existe en el sistema"
                         )
 
-                    if item.id_categoria_opciones != 16:
+                    if item.id_categoria_opciones.pk != 16:
                         if not Opciones.objects.filter(id_categoria_opciones=item.id_categoria_opciones, pk=id_opcion).exists():
                             raise serializers.ValidationError(
                                 f"La opción con ID {id_opcion} no es válida para el ítem {id_item}"
                             )
                         option = Opciones.objects.get(pk=id_opcion)
+                        option2= None
                     else:
                         option = None
+                        option2=str(id_opcion)
 
                     respuesta = Respuestas.objects.create(
                         id_solicitud=solicitud,
                         id_formulario=formulario,
                         id_item=item,
                         id_opcion=option if option else None,
-                        respuesta_texto=str(id_opcion) if item.id_categoria_opciones == 16 else None
+                        respuesta_texto=option2
                     )
                     respuestas.append(respuesta)
 
@@ -99,3 +110,47 @@ class RespuestaSerializer(serializers.Serializer):
             raise serializers.ValidationError({"detail": f"Error inesperado: {str(e)}"})
 
         return {'respuestas_creadas': respuestas}
+    
+    def update(self, instance, validated_data):
+        solicitud = validated_data['solicitud']
+        formulario = validated_data['formulario']
+        resultados = validated_data['resultados']
+        respuestas = []
+        
+        for item_data in resultados:
+            id_item, id_opcion = item_data
+            
+            respuesta = Respuestas.objects.get(
+                id_solicitud=solicitud,
+                id_formulario=formulario,
+                id_item=id_item,
+    
+            )
+            try:
+                item = Items.objects.get(pk=id_item)
+            except Items.DoesNotExist:
+                        raise serializers.ValidationError(
+                            f"El ítem con ID {id_item} no existe en el sistema"
+                        )
+
+            if item.id_categoria_opciones.pk != 16:
+
+                if not Opciones.objects.filter(id_categoria_opciones=item.id_categoria_opciones, pk=id_opcion).exists():
+                    raise serializers.ValidationError(
+                                f"La opción con ID {id_opcion} no es válida para el ítem {id_item}"
+                            )
+                option = Opciones.objects.get(pk=id_opcion)
+            else:
+                option = None
+            
+            if respuesta:
+                respuesta.id_opcion = option if option else None
+                respuesta.respuesta_texto = str(id_opcion) if item.id_categoria_opciones == 16 else None
+                respuesta.save()
+            
+            respuestas.append(respuesta.id)
+        
+        return {'respuestas_actualizadas': respuestas}
+
+
+
