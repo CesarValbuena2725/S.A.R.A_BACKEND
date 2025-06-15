@@ -1,163 +1,277 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Informe base de Sara</title>
-    <style>
-        @page {
-            size: A4;
-            margin: 20mm;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Informe Avaluo Comercial</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 20mm;
+    }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-        }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      color: #333;
+      background: #f8f8f8;
+      padding: 0;
+      margin: 0;
+    }
 
-        .tabla-container {
-            margin-top: 20px;
-            width: 50%;
-        }
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #fff;
+    }
 
-        table {
-            width: 50%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            border-radius: 20;
-        }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 10px;
+    }
 
-        th {
-            border: 1px solid black;
-            padding: 10px;
-            text-align: center;
+    .header img {
+      max-height: 50px;
+    }
 
-        }
+    .titulo-header {
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
 
-        td {
-            border: 1px solid black;
-            padding: 10px;
-            text-align: left;
-            
-        }
+    .codigo {
+      border: 2px solid #38d3df;
+      color: #000000;
+      font-weight: bold;
+      padding: 5px 15px;
+      border-radius: 8px;
+      font-size: 18px;
+    }
 
-        th {
-            background-color: #85ebe6;
-        }
+    .seccion {
+      display: flex;
+      margin-top: 20px;
+      gap: 20px;
+    }
+
+.tabla-datos {
+  flex: 1.2;
+  border: 1px solid #ccc;
+  border-radius: 10px; /* 👈 Añadido */
+  overflow: hidden;    
+}
+
+.tabla-datos h3 {
+  background-color: #bce4e2; 
+  color: #333;
+  padding: 8px;
+  margin: 0;
+  font-size: 15px;
+  border-top-left-radius: 10px;  
+  border-top-right-radius: 10px; 
+}
 
 
-    </style>
+    .tabla-datos table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .tabla-datos td {
+      padding: 6px 8px;
+      font-size: 13px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .tabla-datos tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .imagen-vehiculo {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #ccc;
+    }
+
+    .imagen-vehiculo img {
+      width: 100%;
+      max-height: 370px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .tabla-descripcion {
+      border: 1px solid #ccc;
+      margin-top: 20px;
+    }
+
+    .tabla-descripcion h3 {
+      background-color: #f26522;
+      color: #fff;
+      padding: 8px;
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .card {
+      margin-top: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .card-title {
+      background-color: #bce4e2;
+      padding: 8px;
+      font-weight: bold;
+      text-align: center;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .tabla-descripcion table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .tabla-vehiculo {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.tabla-vehiculo th, .tabla-vehiculo td {
+  border-bottom: 1px solid #ddd;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.tabla-vehiculo tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.tabla-vehiculo th {
+  font-weight: bold;
+  color: #333;
+}
+
+
+    .tabla-descripcion td {
+      padding: 6px 8px;
+      font-size: 13px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .tabla-descripcion tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 11px;
+      margin-top: 30px;
+      color: #666;
+    }
+
+    .footer strong {
+      display: inline-block;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 <body>
-    <div class="contenido"> 
-        <header>
-            <h1>Autosef (logo)</h1>
-            <h1>No. 0001 Avaluo Comercial</h1>
-            <h1>{{funcion(2,2)}}</h1>
-        </header>
-
-        <div class="tabla-container">
-
-            <table>
-
-                <tr>
-                    <th colspan="2">Datos de servicio</th>
-                </tr>
-                <tr>
-                    <td>Convenio: </td>
-                    <td>{{forms1.nose.placa}} </td> 
-                </tr>
-                <tr>
-                    <td>Sucursal</td>
-                    <td>SIA Bucaramanga </td>
-                </tr>
-                <tr>
-                    <td>Solicitante: </td>
-                    <td>Marlon Brando</td>
-                </tr>
-                <tr>
-                    <td>Fecha de incio: </td>
-                    <td>10/05/2025</td>
-                </tr>
-                <tr>
-                    <td>Fecha de incio: </td>
-                    <td>10/05/2025</td>
-                </tr>
-                <tr>
-                    <td>Fecha de Finalizacion: </td>
-                    <td>10/09/2025</td>
-                </tr>
-                <tr>
-                    <td>Nombres: </td>
-                    <td>Mareauto Colombia</td>
-                </tr>
-                <tr>
-                    <td>Identificacion: </td>
-                    <td> 1202102145</td>
-                </tr>
-                <tr>
-                    <td>Telefono </td>
-                    <td>3202012541</td>
-                </tr>
-                <tr>
-                    <td>Direccion </td>
-                    <td>cra 854-89 bis</td>
-                </tr>
-
-            </table>
-
-            <div class="second-table-container">
-            <table>
-
-                <tr>
-                    <th colspan="2">Datos del vehiculo</th>
-                </tr>
-                <tr>
-                    <td>Placa </td>
-                    <td>0001 </td> 
-                </tr>
-                <tr>
-                    <td>Tipo Caja</td>
-                    <td>MT </td>
-                </tr>
-                <tr>
-                    <td>Tipo Pintura </td>
-                    <td>Plana </td>
-                </tr>
-                <tr>
-                    <td>Cilindraje  </td>
-                    <td>2488</td>
-                </tr>
-                <tr>
-                    <td>Modelo</td>
-                    <td>2020</td>
-                </tr>
-                <tr>
-                    <td>marca </td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Nombres: </td>
-                    <td>Mareauto Colombia</td>
-                </tr>
-                <tr>
-                    <td>Identificacion: </td>
-                    <td> 1202102145</td>
-                </tr>
-                <tr>
-                    <td>Telefono </td>
-                    <td>3202012541</td>
-                </tr>
-                <tr>
-                    <td>Direccion </td>
-                    <td>cra 854-89 bis</td>
-                </tr>
-
-            </table>
-
-        </div>
+  {% load static %}
+  <div class="container">
+    <!-- ENCABEZADO -->
+    <div class="header">
+      <img src="{% static '/Result/img/autosef.png' %}" alt="Logo Autosef" />
+      <div class="titulo-header">
+        <div>No. 0001</div>
+        <div>AVALÚO COMERCIAL</div>
+      </div>
+      <div class="codigo">{{request.placa}}</div>
     </div>
+
+    <!-- SECCIÓN 1: ASPECTOS GENERALES + IMAGEN -->
+    <div class="seccion">
+      <div class="tabla-datos">
+        <h3>Aspectos Generales</h3>
+        <table>
+          <tr><td><strong>Convenio:</strong></td><td>{{request.id_convenio}}</td></tr>
+            <tr><td><strong>Sucursal:</strong></td><td>{{request.id_sucursal}}</td></tr>
+            <tr><td><strong>Solicitante:</strong></td><td>{{request.id_empleado}}</td></tr>
+            <tr><td><strong>Fecha de Inicio:</strong></td><td>{{request.fecha}}</td></tr>
+            <tr><td><strong>Fecha de Fin:</strong></td><td></td></tr>
+            <tr><td><strong>Nombres:</strong></td><td>{{ cliente.2.respuesta_texto }}</td></tr>
+            <tr><td><strong>Teléfono:</strong></td><td>{{cliente.5.respuesta_texto}}</td></tr>
+            <tr><td><strong>Dirección:</strong></td><td>{{cliente.4.respuesta_texto}}</td></tr>
+        </table>
+      </div>
+      <div class="imagen-vehiculo">
+        <img src="{%  static '/Result/img/carro.jpg' %}" alt="Vehículo inspeccionado" />
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: DESCRIPCIÓN DEL ACTIVO -->
+    <!-- SECCIÓN 2: DESCRIPCIÓN DEL ACTIVO -->
+<div class="card">
+  <div class="card-title">Datos del Vehículo</div>
+  <table class="tabla-vehiculo">
+    <tr>
+      <th>Placa</th><td>{{request.placa}}</td>
+      <th>No. Chasis (VIN)</th><td>{{vehiculo.13}}</td>
+      <th>Servicio</th><td>{{vehiculo.16}}</td>
+    </tr>
+    <tr>
+      <th>Tipo Caja</th><td>{{vehiculo.6}}</td>
+      <th>No. Serial</th><td>{{vehiculo.14}}</td>
+      <th>Color</th><td>{{vehiculo.18}}</td>
+    </tr>
+    <tr>
+      <th>Tipo Pintura</th><td>{{vehiculo.19}}</td>
+      <th>No. Motor</th><td>{{vehiculo.15}}</td>
+      <th>Tracción</th><td>{{vehiculo.9}}</td>
+    </tr>
+    <tr>
+      <th>Cilindraje</th><td>{{vehiculo.7}}</td>
+      <th>Código Fasecolda</th><td>{{vehiculo.2}}</td>
+      <th>Nacionalidad</th><td>{{vehiculo.12}}</td>
+    </tr>
+    <tr>
+      <th>Modelo</th><td>{{vehiculo.1}}</td>
+      <th>Código Fasec.</th><td>{{vehiculo.2}}</td>
+      <th>Línea</th><td>{{vehiculo.4}}</td>
+    </tr>
+    <tr>
+      <th>Marca</th><td>{{vehiculo.11}}</td>
+      <th>Clase</th><td>PICKUP DOBLE CAB</td>
+      <th>Combustible</th><td>{{vehiculo.8}}</td>
+    </tr>
+    <tr>
+      <th>Kilometraje</th><td>{{vehiculo.20}}</td>
+      <th>Aire Acond.</th><td>{{vehiculo.240}}</td>
+      <th>RTM</th><td>{{vehiculo.21}}</td>
+    </tr>
+    <tr>
+      <th>SOAT</th><td>{{vehiculo.22}}</td>
+      <th>Referencia</th><td>{{vehiculo.5}}</td>
+      <th>Puertas</th><td>{{vehiculo.10}}</td>
+    </tr>
+  </table>
+</div>
+
+
+    <!-- FOOTER -->
+    <div class="footer">
+      Ver términos y condiciones del servicio en www.automas.com.co o escanee este código QR<br>
+      <strong>🚗 Un sello de <span style="color:#f26522;">confianza</span> para su vehículo</strong>
+    </div>
+  </div>
 </body>
 </html>

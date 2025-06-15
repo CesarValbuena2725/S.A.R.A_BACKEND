@@ -7,6 +7,8 @@ class Estado(models.TextChoices):
     ACTIVO = 'AC', 'Activo'
     INACTIVO = 'IN', 'Inactivo'
 
+
+
 Errores = {
     'unique': 'Este nombre de usuario está en uso.',
     'blank': 'El campo usuario no puede estar vacío.',

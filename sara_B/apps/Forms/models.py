@@ -3,10 +3,16 @@ from apps.Access.models import Estado
 from apps.Utilidades.Permisos import set_model
 from apps.Result.models import CategoriaOpciones
 
+class Tipo(models.TextChoices):
+    STRING = 'STR', 'texto'
+    ENTERO = 'INT', 'numero entero'
+    OPCIONES = 'OPC', 'booleano'
+    FECHA = 'FEC', 'fecha'
+
 @set_model  
 class Items(models.Model):
     nombre_items= models.CharField(max_length=50, null=False)
-    descripcion = models.CharField(max_length=250, null=True)
+    tipo = models.CharField(max_length=250, choices=Tipo.choices, default=Tipo.OPCIONES)
     id_categoria_opciones = models.ForeignKey(CategoriaOpciones,on_delete=models.CASCADE )
     is_active = models.BooleanField(default=True)  
 

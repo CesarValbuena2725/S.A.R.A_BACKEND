@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from django.shortcuts import render
 from apps.Requests.models import Solicitud
 from apps.Result.api.tools import Amount_Items
-
+from apps.Forms.models import Items
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from weasyprint import HTML
@@ -36,28 +36,23 @@ class Close_Request(APIView):
     def get(self, request, *args ,**kwargs):
 
         id_request = self.kwargs.get('id_request')
-        print("id recibido",id_request)
         result = Amount_Items(id_request)
         if not result:
             return Response("there is not answer for the forms the request", status=status.HTTP_401_UNAUTHORIZED)
-        return Response("Primera validacion correcta")
+        data = Respuestas.objects.filter(id_solicitud = id_request, id_formulario=3).order_by('id_formulario') 
+        data_V = Respuestas.objects.filter(id_solicitud=id_request, id_formulario__in=[1,2])
+        n = {}
+  
 
-
-def prueba(request):
-    data = Respuestas.objects.get(id_item=47,id_formulario=4) # mejor para manejar errores
-    data2=Solicitud.objects.get(pk=9)
-    print(data2)
-    context = {
-        'data': data,
-        'forms1':{
-            'id':1,
-            'nose':data2
-        },
-
-      
-    }
-    return render(request, "report.html", context=context)
-
+        for respuesta in data_V:
+            n.update({respuesta.id_item.pk:  respuesta.id_opcion if respuesta.id_opcion else respuesta.respuesta_texto})
+        solicitud=Solicitud.objects.get(pk=id_request)
+        context = {
+                'request': solicitud,
+                'cliente': data,
+                'vehiculo': n,
+            }
+        return render(request, "report.html", context=context)
         
 
 

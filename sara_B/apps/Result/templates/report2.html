@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe base de Sara</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .tabla-container {
+            margin-top: 20px;
+            width: 50%;
+        }
+
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            border-radius: 20;
+        }
+
+        th {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+
+        }
+
+        td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+            
+        }
+
+        th {
+            background-color: #85ebe6;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="contenido"> 
+        <header>
+            <h1>Autosef (logo)</h1>
+            <h1>No. 0001 Avaluo Comercial</h1>
+            <h1>{{request.placa}}</h1>
+        </header>
+
+        <div class="tabla-container">
+
+            <table>
+
+                <tr>
+                    <th colspan="2">Datos de servicio</th>
+                </tr>
+                <tr>
+                    <td>Convenio: </td>
+                    <td>{{request.id_convenio}} </td> 
+                </tr>
+                <tr>
+                    <td>Sucursal</td>
+                    <td>{{request.id_sucursal}} </td>
+                </tr>
+                <tr>
+                    <td>Solicitante: </td>
+                    <td>{{request.id_empleado}} {{request.id_empleado.apellidos}}</td>
+                </tr>
+                <tr>
+                    <td>Fecha de incio: </td>
+                    <td>{{request.fecha}}</td>
+                </tr>
+                <tr>
+                    <td>Fecha de incio: </td>
+                    <td>10/05/2025</td>
+                </tr>
+                <tr>
+                    <td>Fecha de Finalizacion: </td>
+                    <td>10/09/2025</td>
+                </tr>
+                <tr>
+                    <td>Nombres: </td>
+                    <td>{{cliente.id_formulario}}</td>
+                </tr>
+                <tr>
+                    <td>Identificacion: </td>
+                    <td> 1202102145</td>
+                </tr>
+                <tr>
+                    <td>Telefono </td>
+                    <td>3202012541</td>
+                </tr>
+                <tr>
+                    <td>Direccion </td>
+                    <td>cra 854-89 bis</td>
+                </tr>
+
+            </table>
+
+            <div class="second-table-container">
+            <table>
+
+                <tr>
+                    <th colspan="2">Datos del vehiculo</th>
+                </tr>
+                {% for items in cliente%}
+                <tr>
+                    <td>{{items.id_item}}: </td>
+                    <td>{{items.respuesta_texto}}</td>
+                </tr>
+                {% endfor %}
+
+            </table>
+
+        </div>
+    </div>
+</body>
+</html>

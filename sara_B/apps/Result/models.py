@@ -18,14 +18,14 @@ class CategoriaOpciones(models.Model):
     
 @set_model
 class Opciones(models.Model):
-    nombre_opcione= models.CharField(max_length=50, null=False)
+    nombre_opcion= models.CharField(max_length=50, null=False)
     descripcion = models.CharField(max_length=250, null=True)
     id_categoria_opciones = models.ForeignKey(CategoriaOpciones,on_delete=models.CASCADE, null=False)
     is_active = models.BooleanField(default=True) 
 
 
     def __str__(self):
-        return self.nombre_opcione
+        return self.nombre_opcion
     
 class Respuestas(models.Model):
     

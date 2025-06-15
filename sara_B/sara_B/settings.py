@@ -92,7 +92,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'sara_B.wsgi.application'
 
 STATIC_URL = '/static/'
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
