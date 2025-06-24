@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.Result.models import CategoriaOpciones,Opciones, Respuestas
+from apps.Result.models import CategoriaOpciones,Opciones, Respuestas,Imagen
 from apps.Utilidades.Permisos import set_serializers
 from apps.Requests.models import Solicitud
 from apps.Forms.models import Formulario,Items
@@ -68,8 +68,6 @@ class RespuestaSerializer(serializers.Serializer):
                     id_item, id_opcion = item_data
 
                     data_value= Respuestas.objects.filter(id_solicitud=solicitud, id_formulario=formulario,id_item=id_item)
-                    if data_value.exists():
-                        raise serializers.ValidationError(f"La solicitud: {solicitud},con el formulario: {formulario} del item:{id_item} ya tiene una respuesta Guardad")
 
                     if not CreacionFormulario.objects.filter(id_formulario=formulario, id_items=id_item).exists():
                         raise serializers.ValidationError(
@@ -145,12 +143,17 @@ class RespuestaSerializer(serializers.Serializer):
             
             if respuesta:
                 respuesta.id_opcion = option if option else None
-                respuesta.respuesta_texto = str(id_opcion) if item.id_categoria_opciones == 16 else None
+                respuesta.respuesta_texto = str(id_opcion) if item.id_categoria_opciones.pk == 16 else None
                 respuesta.save()
             
             respuestas.append(respuesta.id)
         
         return {'respuestas_actualizadas': respuestas}
+    
 
+class ImagenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Imagen
+        fields =  '__all__'
 
 

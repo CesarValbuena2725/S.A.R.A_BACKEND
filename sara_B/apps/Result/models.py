@@ -39,3 +39,11 @@ class Respuestas(models.Model):
 
     def __str__(self):
         return self.id_solicitud.placa
+    
+class Imagen(models.Model):
+    titulo = models.CharField(max_length=100)
+    imagen = models.ImageField(upload_to='imagenes/')
+    creado_en = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.titulo

@@ -12,7 +12,7 @@ def Amount_Items(request):
         for i in list_form:
             amount_items = CreacionFormulario.objects.filter(id_formulario=i).count()
             amount_answer = Respuestas.objects.filter(id_solicitud=request, id_formulario=i).count()
-
+            print(f"Formulario ID: {i}, Items: {amount_items}, Respuestas: {amount_answer}")
             if amount_items != amount_answer:
                 return False  
         return True  

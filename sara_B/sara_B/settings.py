@@ -15,7 +15,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
@@ -198,3 +198,8 @@ CELERY_TASK_SERIALIZER = 'json' # Defini que la worker  Seran serilizado
 CELERY_RESULT_SERIALIZER = 'json' #  Definie que  los Resuktados Seran serializados
 CELERY_TIMEZONE = 'UTC'
 CELERY_RESULT_BACKEND = "django-db"  #donde guarda los resultados
+
+
+# Configuración de archivos estáticos y medios
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

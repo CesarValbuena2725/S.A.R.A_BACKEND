@@ -1,4 +1,4 @@
-from apps.Result.api.serializers import CategoriaOpcionesSerializer, Opciones,RespuestaSerializer,Respuestas,RespuestaModelSerializers
+from apps.Result.api.serializers import CategoriaOpcionesSerializer, Opciones,RespuestaSerializer,Respuestas,RespuestaModelSerializers,ImagenSerializer,Imagen
 from rest_framework import generics,status
 from rest_framework.response import Response
 from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
@@ -17,11 +17,51 @@ from rest_framework.response import Response
 from rest_framework import status
 from weasyprint import HTML
 import os
+from rest_framework.parsers import MultiPartParser, FormParser
+from django.conf import settings
 
+
+class Prueba(APIView):
+    def get(self, request):
+        imagenes = Imagen.objects.all()
+        for img in imagenes:
+            #Remplazar la URL relativa por la absoluta
+
+            img.url_absoluta = request.build_absolute_uri(img.imagen.url)
+            print(img.url_absoluta)
+            print(img.imagen.url)
+
+        html_string = render_to_string('galeria.html', {
+            'imagenes': imagenes})
+
+        output_path = os.path.join("C:/Users/tetro/OneDrive/Escritorio/S.A.R.A_BACKEND/sara_B/apps/Result/templates", "ptuen.pdf")
+
+        try:
+            HTML(string=html_string, base_url=settings.MEDIA_ROOT).write_pdf(output_path)
+            return Response("Creación de PDF exitosa", status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error al generar PDF: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
+class ImagenUploadView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, *args, **kwargs):
+        serializer = ImagenSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            instancia = serializer.save()
+            instancia.imagen = request.build_absolute_uri(instancia.imagen.url)
+            instancia.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        
 class PDF(APIView):
     def get(self, request):
         
-        html_string = render_to_string("report.html", {"title": "Reporte de prueba"})
+        html_string = render_to_string("report.html")
+
 
         output_path = os.path.join("C:/Users/tetro/OneDrive/Escritorio/S.A.R.A_BACKEND/sara_B/apps/Result/templates", "ptuen.pdf")
 
@@ -40,19 +80,31 @@ class Close_Request(APIView):
         if not result:
             return Response("there is not answer for the forms the request", status=status.HTTP_401_UNAUTHORIZED)
         data = Respuestas.objects.filter(id_solicitud = id_request, id_formulario=3).order_by('id_formulario') 
-        data_V = Respuestas.objects.filter(id_solicitud=id_request, id_formulario__in=[1,2])
+        data_V = Respuestas.objects.filter(id_solicitud=id_request)
         n = {}
   
 
         for respuesta in data_V:
             n.update({respuesta.id_item.pk:  respuesta.id_opcion if respuesta.id_opcion else respuesta.respuesta_texto})
         solicitud=Solicitud.objects.get(pk=id_request)
+        print("Esto devuelve Request",request.build_absolute_uri())
+        img = Imagen.objects.get(pk=1)
         context = {
                 'request': solicitud,
                 'cliente': data,
                 'vehiculo': n,
+                'img': img,
+
             }
-        return render(request, "report.html", context=context)
+        html_string = render_to_string("Reporte.html", context)
+
+
+        output_path = os.path.join("C:/Users/tetro/OneDrive/Escritorio/S.A.R.A_BACKEND/sara_B/apps/Result/templates", "ptuen.pdf")
+        try:
+            HTML(string=html_string).write_pdf(output_path)
+            return Response("Creación de PDF exitosa", status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error al generar PDF: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
 
@@ -113,19 +165,20 @@ class PostRespuestas(generics.GenericAPIView):
 class PutRespuesta(APIView):
 
     def put(self, request):
-
-        try:
-            instancia_original = Respuestas.objects.get(id_solicitud=request.data['solicitud'])
-        except Respuestas.DoesNotExist:
-            raise Respuestas.DoesNotExist("La respuesta no existe")
+        solicitud = request.data.get('solicitud')
+        formulario = request.data.get('formulario')
+        instancia = Respuestas.objects.filter(id_solicitud=solicitud, id_formulario=formulario).first()
+        if not instancia:
+            return Response("No existe respuesta para actualizar", status=status.HTTP_404_NOT_FOUND)
 
         serializer = RespuestaSerializer(
-            instance=instancia_original,
+            instancia,
             data=request.data,
-            partial=True  # permite Actualiciones Parciales / no Sirve de nada en repuestas 
+            partial=True
         )
-
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         resultado_actualizado = serializer.save()
+        print("Esto devuelve el resultado actualizado", resultado_actualizado)
 
         return Response(resultado_actualizado, status=status.HTTP_200_OK)
