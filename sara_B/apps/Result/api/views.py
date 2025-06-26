@@ -1,11 +1,11 @@
-from apps.Result.api.serializers import CategoriaOpcionesSerializer, Opciones,RespuestaSerializer,Respuestas,RespuestaModelSerializers,ImagenSerializer,Imagen
+from apps.Result.api.serializers import CategoriaOpcionesSerializer, Opciones,RespuestaSerializer,Respuestas,RespuestaModelSerializers,ImagenSerializer,Fotos
 from rest_framework import generics,status
 from rest_framework.response import Response
 from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
 from rest_framework.views import APIView
 from django.shortcuts import render
 from apps.Requests.models import Solicitud
-from apps.Result.api.tools import Amount_Items
+from apps.Result.api.tools import Amount_Items,FunctionClose
 from apps.Forms.models import Items
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -23,7 +23,7 @@ from django.conf import settings
 
 class Prueba(APIView):
     def get(self, request):
-        imagenes = Imagen.objects.all()
+        imagenes = Fotos.objects.all()
         for img in imagenes:
             #Remplazar la URL relativa por la absoluta
 
@@ -44,18 +44,26 @@ class Prueba(APIView):
         
 
 
-class ImagenUploadView(APIView):
+class FotosUploadView(APIView):
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles = BASE_PERMISOSOS
+    """
+    serializer_class = ImagenSerializer
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, *args, **kwargs):
-        serializer = ImagenSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            instancia = serializer.save()
-            instancia.imagen = request.build_absolute_uri(instancia.imagen.url)
-            instancia.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+        try:
+            serializer = ImagenSerializer(data=request.data, context={'request': request})
+            if serializer.is_valid():
+                instancia = serializer.save()
+                instancia.imagen = request.build_absolute_uri(instancia.imagen.url)
+                instancia.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class PDF(APIView):
     def get(self, request):
@@ -82,29 +90,39 @@ class Close_Request(APIView):
         data = Respuestas.objects.filter(id_solicitud = id_request, id_formulario=3).order_by('id_formulario') 
         data_V = Respuestas.objects.filter(id_solicitud=id_request)
         n = {}
+        functiones = FunctionClose(id_request)
+        print(f"Cantidad de Resultados:{functiones.fugas()}")
   
 
         for respuesta in data_V:
             n.update({respuesta.id_item.pk:  respuesta.id_opcion if respuesta.id_opcion else respuesta.respuesta_texto})
         solicitud=Solicitud.objects.get(pk=id_request)
-        print("Esto devuelve Request",request.build_absolute_uri())
-        img = Imagen.objects.get(pk=1)
+
+        img = Fotos.objects.get(pk=1)
         context = {
                 'request': solicitud,
                 'cliente': data,
                 'vehiculo': n,
                 'img': img,
+                'fugas': functiones.fugas(),
+                'carroceria': functiones.carroceria(),
+                'novedades': functiones.novedades(),
+                'pintura': functiones.pintura(),
+                'PMC': False
 
             }
         html_string = render_to_string("Reporte.html", context)
 
-
-        output_path = os.path.join("C:/Users/tetro/OneDrive/Escritorio/S.A.R.A_BACKEND/sara_B/apps/Result/templates", "ptuen.pdf")
+        """        Generación del PDF
+                output_path = os.path.join("C:/Users/tetro/OneDrive/Escritorio/S.A.R.A_BACKEND/sara_B/apps/Result/templates", "ptuen.pdf")
         try:
             HTML(string=html_string).write_pdf(output_path)
             return Response("Creación de PDF exitosa", status=status.HTTP_200_OK)
         except Exception as e:
             return Response(f"Error al generar PDF: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        """
+        return render(request, "Reporte.html", context)
         
 
 

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.Result.models import CategoriaOpciones,Opciones, Respuestas,Imagen
+from apps.Result.models import CategoriaOpciones,Opciones, Respuestas,Fotos
 from apps.Utilidades.Permisos import set_serializers
 from apps.Requests.models import Solicitud
 from apps.Forms.models import Formulario,Items
@@ -153,7 +153,7 @@ class RespuestaSerializer(serializers.Serializer):
 
 class ImagenSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Imagen
+        model = Fotos
         fields =  '__all__'
 
 

@@ -25,8 +25,8 @@
 
     .container {
       width: 100%;
-      max-width: 1200px; /* Asegura que el contenido no se estire demasiado */
-      margin: 20px auto 0 auto; /* Centra el contenido */
+      max-width: 1200px; 
+      margin: 20px auto 0 auto; 
       padding: 20px;
       background: #fff;
     }
@@ -85,7 +85,7 @@
 
     .tabla-datos table {
       width: 100%;
-      max-width: 100%; /* Esto asegurará que no se agranden demasiado */
+      max-width: 100%; 
       border-collapse: collapse;
     }
 
@@ -106,6 +106,8 @@
       justify-content: center;
       border: 1px solid #ccc;
       margin-right: 15px;
+      border-radius: 10px;
+      overflow: hidden;
     }
 
     .imagen-vehiculo img {
@@ -118,9 +120,10 @@
     .card {
       margin-top: 20px;
       background: #fff;
-      padding: 15px;
+      padding: 0;
       border-radius: 10px;
       width: 100%;
+      border: 1px solid #ccc;
     }
 
     .card-title {
@@ -128,8 +131,10 @@
       padding: 8px;
       font-weight: bold;
       text-align: center;
-      border-radius: 5px;
-      margin-bottom: 10px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      margin-bottom: 0;
+      font-size: 15px;
     }
 
     .tabla-vehiculo {
@@ -142,6 +147,7 @@
       border-bottom: 1px solid #ddd;
       padding: 6px 8px;
       text-align: left;
+      font-size: 15px;
     }
 
     .tabla-vehiculo tr:nth-child(even) {
@@ -197,10 +203,24 @@
       border-radius: 5px;
       overflow: hidden;
       display: flex;
+      position: relative;
     }
 
     .progress-segment {
       height: 100%;
+      position: relative;
+    }
+
+    .progress-segment::after {
+      content: attr(data-label);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
     }
 
     .progress-fill {
@@ -210,8 +230,10 @@
     .diagram-container {
       width: 96%;
       height: 200px;
-      border: 2px solid #000;
+      border: 1px solid #ccc;
       margin-left: 18px;
+      border-radius: 10px;
+      overflow: hidden;
     }
 
     .status-section {
@@ -232,20 +254,74 @@
 
     .status-box {
       flex: 1;
-      min-width: 300px; /* Esto limita el ancho mínimo de cada caja */
-      background: #e6e2e2;
+      min-width: 300px; 
+      background: #fff;
       border-radius: 10px;
-      border: 2px solid #000000;
-      padding: 10px;
+      border: 1px solid #ccc;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .status-box h3 {
+      background-color: #bce4e2;
+      color: #333;
+      padding: 8px;
+      margin: 0;
+      font-size: 15px;
+      text-align: center;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+
+    .status-box table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .status-box td {
+      padding: 6px 8px;
+      font-size: 15px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .status-box tr:nth-child(even) {
+      background-color: #f9f9f9;
     }
 
     .general-status {
       width: 100%;
-      background: #e6e2e2;
+      background: #fff;
       border-radius: 10px;
-      border: 2px solid #000000;
-      padding: 10px;
+      border: 1px solid #ccc;
+      padding: 0;
       margin: 20px 0;
+      overflow: hidden;
+    }
+
+    .general-status h3 {
+      background-color: #bce4e2;
+      color: #333;
+      padding: 8px;
+      margin: 0;
+      font-size: 15px;
+      text-align: center;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+
+    .general-status table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .general-status td {
+      padding: 6px 8px;
+      font-size: 15px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .general-status tr:nth-child(even) {
+      background-color: #f9f9f9;
     }
 
     .footer {
@@ -259,6 +335,31 @@
       display: inline-block;
       margin-top: 5px;
     }
+    .diagram-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: #f9f9f9; /* opcional */
+}
+
+.diagram-container {
+  max-width: 100%;
+  width: 600px; /* o el ancho que necesites */
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background-color: #fff;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.diagram-container img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
   </style>
 </head>
 <body>
@@ -266,7 +367,7 @@
   <div class="container">
     <!-- ENCABEZADO -->
     <div class="header">
-        <img src="{{ img.imagen }}" alt="{{ imagenes.titulo }}">
+      <img src="{% static '/Result/img/autosef.png' %}" alt="Logo Autosef" />
       <div class="titulo-header">
         <div>No. 0001</div>
         <div>AVALÚO COMERCIAL</div>
@@ -382,125 +483,110 @@
         <div class="progress-legend">
           <div class="legend-item">
             <div class="legend-color" style="background-color: #007bff;"></div>
-            <span style="color: #007bff;">45%</span>
+            <span style="color: #007bff;">Malo (50%)</span>
           </div>
           <div class="legend-item">
             <div class="legend-color" style="background-color: #E07B39;"></div>
-            <span style="color: #E07B39;">33%</span>
+            <span style="color: #b45211;">Medio (80%)</span>
           </div>
           <div class="legend-item">
             <div class="legend-color" style="background-color: #4A4A4A;"></div>
-            <span style="color: #4A4A4A;">22%</span>
+            <span style="color: #4A4A4A;">Bueno (100%)</span>
           </div>
         </div>
         <div class="progress-track">
-          <div class="progress-segment" style="width: 45%; background-color: #007bff;"></div>
-          <div class="progress-segment" style="width: 33%; background-color: #E07B39;"></div>
-          <div class="progress-segment" style="width: 22%; background-color: #4A4A4A;"></div>
+          <div class="progress-segment" style="width: 45%; background-color: #c20b0b;" data-label="MAlo"></div>
+          <div class="progress-segment" style="width: 33%; background-color: #E07B39;" data-label="MEDIO"></div>
+          <div class="progress-segment" style="width: 22%; background-color: #0ef43f;" data-label="BUENO"></div>
         </div>
       </div>
     </div>
 
     <!-- DIAGRAMA DEL VEHÍCULO -->
-    <div class="diagram-section">
-      <div class="diagram-container">
-        <!-- imagen del diagrama -->
-      </div>
+  <div class="diagram-section">
+    <div class="diagram-container">
+      <img src="{% static 'Result/img/vehiculo.png' %}" alt="Diagrama del vehículo">
     </div>
+  </div>
 
     <!-- SECCIÓN DE ESTADOS -->
 <div class="status-section">
   <div class="status-containers">
     <!-- Caja de Vida Útil de Llantas -->
     <div class="status-box">
-      <h3 style="margin: 5px 0; text-align: center;">Vida útil de las llantas</h3>
-      <div style="display: flex; justify-content: space-around; margin-top: 10px;">
-        <div style="text-align: center;">
-          <div style="font-weight: bold; font-size: 11px;">Del. Izq.</div>
-          <div style="font-size: 12px;">{{vehiculo.148}}</div>
-        </div>
-        <div style="text-align: center;">
-          <div style="font-weight: bold; font-size: 11px;">Del. Der.</div>
-          <div style="font-size: 12px;">{{vehiculo.127}}</div>
-        </div>
-        <div style="text-align: center;">
-          <div style="font-weight: bold; font-size: 11px;">Tras. Izq.</div>
-          <div style="font-size: 12px;">{{vehiculo.153}}</div>
-        </div>
-        <div style="text-align: center;">
-          <div style="font-weight: bold; font-size: 11px;">Tras. Der.</div>
-          <div style="font-size: 12px;">{{vehiculo.132}}</div>
-        </div>
-      </div>
+      <h3>Vida útil de las llantas</h3>
+      <table>
+        <tr>
+          <td><strong>Del. Izq.</strong></td><td>{{vehiculo.148}} %</td>
+          <td><strong>Del. Der.</strong></td><td>{{vehiculo.127}} %</td>
+        </tr>
+        <tr>
+          <td><strong>Tras. Izq.</strong></td><td>{{vehiculo.153}} %</td>
+          <td><strong>Tras. Der.</strong></td><td>{{vehiculo.132}} %</td>
+        </tr>
+      </table>
     </div>
 
+    <div class="status-box">
+      <h3>Fuga de fluidos</h3>
+      <table >
+        {% for valor in fugas.values %}
 
-      <div class="status-box">
-        <h3 style="margin: 10px 0; text-align: center;">Fuga de fluidos</h3>
-        <h5 style="text-align: center;">100%</h5>
-      </div>
+        <tr>
+            <td >
+            {{ valor.0 }}   : {{valor.1 }}
+            </td>
+        </tr>
+          {% endfor %}
 
-      <div class="status-box">
-        <h3 style="margin: 10px 0; text-align: center;">Pintura</h3>
-        <table class="tabla-vehiculo" style="margin: 0 auto; width: 80%; font-size: 12px;">
-          <tr>
-            <td><strong>Estado general:</strong></td>
-            <td>Buena, algunos rayones</td>
-          </tr>
-          <tr>
-            <td><strong>Retoques:</strong></td>
-            <td>3 áreas repintadas</td>
-          </tr>
-          <tr>
-            <td><strong>Brillo:</strong></td>
-            <td>85% uniformidad</td>
-          </tr>
-        </table>
-      </div>
+      </table>
 
-      <div class="status-box" style="min-width: 350px;">
-        <h3 style="margin: 10px 0; text-align: center;">Carrocería - exterior</h3>
-        <table class="tabla-vehiculo" style="margin: 10px auto; width: 95%;">
-          <tr>
-            <td><strong>Puerta delantera izquierda</strong></td>
-            <td>Buen estado</td>
-          </tr>
-          <tr>
-            <td><strong>Puerta delantera derecha</strong></td>
-            <td>Rayón leve</td>
-          </tr>
-          <tr>
-            <td><strong>Puerta trasera izquierda</strong></td>
-            <td>Buen estado</td>
-          </tr>
-          <tr>
-            <td><strong>Puerta trasera derecha</strong></td>
-            <td>Abolladura pequeña</td>
-          </tr>
-          <tr>
-            <td><strong>Capó</strong></td>
-            <td>Buen estado</td>
-          </tr>
-          <tr>
-            <td><strong>Techo</strong></td>
-            <td>Buen estado</td>
-          </tr>
-          <tr>
-            <td><strong>Parachoques delantero</strong></td>
-            <td>Rayones</td>
-          </tr>
-          <tr>
-            <td><strong>Parachoques trasero</strong></td>
-            <td>Buen estado</td>
-          </tr>
-        </table>
-      </div>
+
     </div>
+
+    <div class="status-box">
+      <h3>Pintura</h3>
+      <table>
+        {% for values in pintura.values %}
+        <tr>
+          <td><strong>{{ values.0 }}  :</strong></td>
+          <td>{{ values.1 }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    <div class="status-box" style="min-width: 350px;">
+      <h3>Carrocería - exterior</h3>
+      <table>
+        {% for values in carroceria.values %}
+        <tr>
+          <td><strong>{{ values.0 }}  :</strong></td>
+          <td>{{ values.1 }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+
+  
+        <!-- Novedades del la Solicitud-->
+    <div class="general-status">
+      <h3>Novedades</h3>
+      <table>
+               {% for values in novedades.values %}
+        <tr>
+          <td>{{ values.1 }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+
 
     <!-- ESTADO GENERAL -->
     <div class="general-status">
-      <h3 style="margin: 0 0 10px 0; text-align: center;">ESTADO GENERAL</h3>
-      <table class="tabla-vehiculo" style="width: 100%;">
+      <h3>ESTADO GENERAL</h3>
+      <table>
         <tr>
           <td><strong>Classe</strong></td>
           <td>120%</td>
@@ -531,11 +617,15 @@
         </tr>
       </table>
     </div>
-
-    <!-- FOOTER -->
+  {% if PMC %}
+    <h1>
+      Prueba de ID renderizado
+    </h1>
+  {% endif %}
+      <!-- FOOTER -->
     <div class="footer">
-      Ver términos y condiciones del servicio en www.automas.com.co o escanee este código QR<br>
-      <strong>🚗 Un sello de <span style="color:#f26522;">confianza</span> para su vehículo</strong>
+      Ver términos y condiciones del servicio en www.autosef.com.co o escanee este código QR<br>
+      <strong>🚗 Un sello de <span style="color:#0790a8;">confianza</span> para su vehículo</strong>
     </div>
   </div>
 </body>

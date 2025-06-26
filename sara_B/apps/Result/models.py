@@ -7,6 +7,11 @@ from apps.Requests.models import Solicitud
 # Create your models here.
 #Modelo Temporal pruebas 
 @set_model
+class CategoriaFotos(models.TextChoices):
+    PRINCIAPAL = 'PRI', 'Categoría 1'
+    ACCESORIOS = 'ACC', 'Categoría 2'
+    GENERALES = 'GEN', 'Categoría 3'
+
 class CategoriaOpciones(models.Model):
     nombre = models.CharField(max_length=100)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
@@ -40,10 +45,12 @@ class Respuestas(models.Model):
     def __str__(self):
         return self.id_solicitud.placa
     
-class Imagen(models.Model):
-    titulo = models.CharField(max_length=100)
+class Fotos(models.Model):
+
+    id_solicitud = models.ForeignKey(Solicitud, on_delete=models.CASCADE, null=True)
+    categoria_foto = models.CharField(max_length=3, choices=CategoriaFotos.choices, default=CategoriaFotos.GENERALES)
     imagen = models.ImageField(upload_to='imagenes/')
     creado_en = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return self.titulo
+        return self.categoria_foto

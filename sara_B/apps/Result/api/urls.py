@@ -1,5 +1,5 @@
 from django.urls import path
-from apps.Result.api.views import PostRespuestas,GetRespuestas,PutRespuesta,PDF,Close_Request,ImagenUploadView,Prueba
+from apps.Result.api.views import PostRespuestas,GetRespuestas,PutRespuesta,PDF,Close_Request,FotosUploadView,Prueba
 
 urlpatterns=[
 
@@ -8,7 +8,7 @@ urlpatterns=[
     path('api/resultado/put/',PutRespuesta.as_view()),
     path('api/result/pdf/',PDF.as_view()),
     path('api/finalizar/get/<int:id_request>',Close_Request.as_view()),
-    path('subirimagen/', ImagenUploadView.as_view(), name='subir-imagen'),
+    path('subirimagen/', FotosUploadView.as_view(), name='subir-imagen'),
     path('imagen/', Prueba.as_view()),
 
 
