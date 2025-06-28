@@ -588,40 +588,71 @@
       <h3>ESTADO GENERAL</h3>
       <table>
         <tr>
-          <td><strong>Classe</strong></td>
+          <td><strong>Chasis</strong></td>
           <td>120%</td>
         </tr>
         <tr>
-          <td><strong>Fugier / Judas</strong></td>
+          <td><strong>Fugas</strong></td>
           <td>57%</td>
         </tr>
         <tr>
-          <td><strong>Identificador</strong></td>
+          <td><strong>Identificacion</strong></td>
           <td>190%</td>
         </tr>
         <tr>
-          <td><strong>Lektor(s)</strong></td>
+          <td><strong>Latoneria</strong></td>
           <td>79%</td>
         </tr>
         <tr>
-          <td><strong>Pistura</strong></td>
+          <td><strong>Pintura</strong></td>
           <td>60%</td>
         </tr>
         <tr>
-          <td><strong>Tipos(mB)</strong></td>
+          <td><strong>Tapiceria</strong></td>
           <td>50%</td>
         </tr>
         <tr>
-          <td><strong>Volvo</strong></td>
+          <td><strong>Vidrios</strong></td>
           <td>180%</td>
         </tr>
       </table>
     </div>
-  {% if PMC %}
-    <h1>
-      Prueba de ID renderizado
-    </h1>
+
+
+  {% if PMV %}
+  <div class="general-status">
+    <h3>PMV</h3>
+    <table>
+      {% for values in PMV.values %}
+      <tr>
+        <td><strong>{{ values.0 }}  :</strong></td>
+        <td>{{ values.1 }}
+
+        </td>
+      {% endfor %}
+    </table>
+
+  </div>
+
   {% endif %}
+
+  {% if PMC %}
+  <div class="general-status">
+    <h3>PMV</h3>
+    <table>
+      {% for values in PMC.values %}
+      <tr>
+        <td><strong>{{ values.0 }}  :</strong></td>
+        <td>{{ values.1 }}
+
+        </td>
+      {% endfor %}
+    </table>
+
+  </div>
+
+  {% endif %}
+
       <!-- FOOTER -->
     <div class="footer">
       Ver términos y condiciones del servicio en www.autosef.com.co o escanee este código QR<br>

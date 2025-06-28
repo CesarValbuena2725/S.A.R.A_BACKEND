@@ -64,6 +64,7 @@ class FotosUploadView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+  
         
 class PDF(APIView):
     def get(self, request):
@@ -85,30 +86,28 @@ class Close_Request(APIView):
 
         id_request = self.kwargs.get('id_request')
         result = Amount_Items(id_request)
+
         if not result:
             return Response("there is not answer for the forms the request", status=status.HTTP_401_UNAUTHORIZED)
         data = Respuestas.objects.filter(id_solicitud = id_request, id_formulario=3).order_by('id_formulario') 
-        data_V = Respuestas.objects.filter(id_solicitud=id_request)
-        n = {}
-        functiones = FunctionClose(id_request)
-        print(f"Cantidad de Resultados:{functiones.fugas()}")
-  
 
-        for respuesta in data_V:
-            n.update({respuesta.id_item.pk:  respuesta.id_opcion if respuesta.id_opcion else respuesta.respuesta_texto})
+        functiones = FunctionClose(id_request)
+
         solicitud=Solicitud.objects.get(pk=id_request)
 
         img = Fotos.objects.get(pk=1)
+        print("Prueba de envio Vacion",functiones.PMV())
         context = {
                 'request': solicitud,
                 'cliente': data,
-                'vehiculo': n,
+                'vehiculo': functiones.vehiculo(),
                 'img': img,
                 'fugas': functiones.fugas(),
                 'carroceria': functiones.carroceria(),
                 'novedades': functiones.novedades(),
                 'pintura': functiones.pintura(),
-                'PMC': False
+                'PMC': functiones.PMC(),
+                'PMV': functiones.PMV(),
 
             }
         html_string = render_to_string("Reporte.html", context)

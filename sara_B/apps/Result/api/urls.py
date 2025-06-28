@@ -8,7 +8,7 @@ urlpatterns=[
     path('api/resultado/put/',PutRespuesta.as_view()),
     path('api/result/pdf/',PDF.as_view()),
     path('api/finalizar/get/<int:id_request>',Close_Request.as_view()),
-    path('subirimagen/', FotosUploadView.as_view(), name='subir-imagen'),
+    path('api/subirimagen/', FotosUploadView.as_view(), name='subir-imagen'),
     path('imagen/', Prueba.as_view()),
 
 

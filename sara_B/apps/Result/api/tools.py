@@ -35,6 +35,12 @@ class FunctionClose:
     def __init__(self, solicitud):
         self.solicitud = solicitud
         self.respuestas = Respuestas.objects.filter(id_solicitud=solicitud)
+        
+    def vehiculo(self):
+        list_vehiculo = {}
+        for respuesta in self.respuestas:
+            list_vehiculo.update({respuesta.id_item.pk:  respuesta.id_opcion if respuesta.id_opcion else respuesta.respuesta_texto})
+        return list_vehiculo
 
     def _filtrar_respuestas(self, ids_items, ids_opciones=None, usar_respuesta_texto=False):
         """
@@ -84,4 +90,16 @@ class FunctionClose:
         """Obtiene las respuestas relacionadas con el estado de la pintura."""
         return self._filtrar_respuestas(
             ids_items=[19,52]
+        )
+    def PMV(self):
+        """Obtiene las respuestas relacionadas con el estado de la PMV."""
+        return self._filtrar_respuestas(
+            ids_items=[100,101,102,103],
+            usar_respuesta_texto=True
+        )
+    def PMC(self):
+        """Obtiene las respuestas relacionadas con el estado de la PMC."""
+        return self._filtrar_respuestas(
+            ids_items=[55,56,57,59,60,61,62,63],
+            usar_respuesta_texto=True
         )
