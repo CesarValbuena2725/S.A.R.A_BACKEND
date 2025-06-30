@@ -1,12 +1,11 @@
-from apps.Result.api.serializers import CategoriaOpcionesSerializer, Opciones,RespuestaSerializer,Respuestas,RespuestaModelSerializers,ImagenSerializer,Fotos
+from apps.Result.api.serializers import RespuestaSerializer,Respuestas,RespuestaModelSerializers,ImagenSerializer,Fotos
 from rest_framework import generics,status
 from rest_framework.response import Response
 from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
 from rest_framework.views import APIView
 from django.shortcuts import render
 from apps.Requests.models import Solicitud
-from apps.Result.api.tools import Amount_Items,FunctionClose
-from apps.Forms.models import Items
+from apps.Result.api.tools import Amount_Items,FunctionClose,Render_Reporte
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from weasyprint import HTML
@@ -19,29 +18,7 @@ from weasyprint import HTML
 import os
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.conf import settings
-
-
-class Prueba(APIView):
-    def get(self, request):
-        imagenes = Fotos.objects.all()
-        for img in imagenes:
-            #Remplazar la URL relativa por la absoluta
-
-            img.url_absoluta = request.build_absolute_uri(img.imagen.url)
-            print(img.url_absoluta)
-            print(img.imagen.url)
-
-        html_string = render_to_string('galeria.html', {
-            'imagenes': imagenes})
-
-        output_path = os.path.join("C:/Users/tetro/OneDrive/Escritorio/S.A.R.A_BACKEND/sara_B/apps/Result/templates", "ptuen.pdf")
-
-        try:
-            HTML(string=html_string, base_url=settings.MEDIA_ROOT).write_pdf(output_path)
-            return Response("Creación de PDF exitosa", status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(f"Error al generar PDF: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+from django.utils.timezone  import localdate
 
 
 class FotosUploadView(APIView):
@@ -82,6 +59,13 @@ class PDF(APIView):
 
 
 class Close_Request(APIView):
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles = ["PR", "AD"]
+    """
+
+
     def get(self, request, *args ,**kwargs):
 
         id_request = self.kwargs.get('id_request')
@@ -89,44 +73,52 @@ class Close_Request(APIView):
 
         if not result:
             return Response("there is not answer for the forms the request", status=status.HTTP_401_UNAUTHORIZED)
-        data = Respuestas.objects.filter(id_solicitud = id_request, id_formulario=3).order_by('id_formulario') 
 
-        functiones = FunctionClose(id_request)
-
-        solicitud=Solicitud.objects.get(pk=id_request)
-
-        img = Fotos.objects.get(pk=1)
-        print("Prueba de envio Vacion",functiones.PMV())
-        context = {
-                'request': solicitud,
-                'cliente': data,
-                'vehiculo': functiones.vehiculo(),
-                'img': img,
-                'fugas': functiones.fugas(),
-                'carroceria': functiones.carroceria(),
-                'novedades': functiones.novedades(),
-                'pintura': functiones.pintura(),
-                'PMC': functiones.PMC(),
-                'PMV': functiones.PMV(),
-
-            }
-        html_string = render_to_string("Reporte.html", context)
-
-        """        Generación del PDF
-                output_path = os.path.join("C:/Users/tetro/OneDrive/Escritorio/S.A.R.A_BACKEND/sara_B/apps/Result/templates", "ptuen.pdf")
         try:
-            HTML(string=html_string).write_pdf(output_path)
-            return Response("Creación de PDF exitosa", status=status.HTTP_200_OK)
+            solicitud = Solicitud.objects.get(pk=id_request)
+        except Solicitud.DoesNotExist:
+            return Response("Solicitud no encontrada", status=status.HTTP_404_NOT_FOUND)
+        try:
+            solicitud.estado = Solicitud.Estados_solcitud.FINALIZADO
+            solicitud.fecha_fin = localdate()
+            solicitud.save()
         except Exception as e:
-            return Response(f"Error al generar PDF: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(f"Error al cerrar la solicitud: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        """
+        try:
+            functiones = FunctionClose(id_request)
+
+            context = {
+                    'request': solicitud,
+                    'cliente': functiones.cliente(),
+                    'vehiculo': functiones.vehiculo(),
+                    'fugas': functiones.fugas(),
+                    'carroceria': functiones.carroceria(),
+                    'novedades': functiones.novedades(),
+                    'pintura': functiones.pintura(),
+                    'PMC': functiones.PMC(),
+                    'PMV': functiones.PMV(),
+                    'porcentaje': functiones.porcentaje(),
+
+                }
+            html_string = render_to_string("Reporte.html", context)
+            output_path = os.path.join("C:/Users/tetro/OneDrive/Escritorio/S.A.R.A_BACKEND/sara_B/apps/Result/Reports", f"{solicitud.placa}.pdf")
+
+        except Exception as e:
+            return Response(f"Error al renderizar el reporte: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if not Render_Reporte(html_string, output_path):
+            return Response("Error al generar el reporte PDF", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
         return render(request, "Reporte.html", context)
         
-
-
-
 class GetRespuestas(generics.GenericAPIView):
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles = ["PR", "AD"]
+    """
     model = Respuestas
     serializer_class = RespuestaModelSerializers
 
@@ -180,6 +172,11 @@ class PostRespuestas(generics.GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class PutRespuesta(APIView):
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles = ["PR", "AD"]
+    """
 
     def put(self, request):
         solicitud = request.data.get('solicitud')
