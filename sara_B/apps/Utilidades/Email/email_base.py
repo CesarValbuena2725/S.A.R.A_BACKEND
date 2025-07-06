@@ -1,39 +1,51 @@
 import uuid
 from django.core.mail import EmailMessage
 from django.template.loader import get_template
+from django.template.loader import render_to_string
+
 from django.conf import settings
+import os
 
 
-def send_email_sara(affair, template, destinario=["tosaraweb@gmail.com"], solicitante=None, contexto=None):
+def send_email_sara(affair, template, destinario=["tosaraweb@gmail.com"], solicitante=None, contexto=None, files=None):
+    unique_id = uuid.uuid4().hex[:6]
+    subject = f"{affair} - Código de Solicitud {unique_id}"
 
-    unique_id = uuid.uuid4().hex[:6]  # Tomar los primeros 6 caracteres del UUID
-    subject = f"{affair}  codigo de Solicitud {unique_id}"  # Agregar el identificador único al asunto
-
-   
-
-    # Renderizar la plantilla HTML
-    template = get_template(template)
+    #template = get_template(template)
     context = {
         'asunto': affair,
         'informacion': contexto,
         'datos': solicitante
     }
-    body_html = template.render(context)
+    html_string = render_to_string(template, context)
 
-    # Crear el correo electrónico
+    #body_html = template.render(context)
+
     email = EmailMessage(
-        subject=subject,  # Usar el asunto con el identificador único
-        body=body_html,
+        subject=subject,
+        body=html_string,
         from_email=settings.EMAIL_HOST_USER,
         to=destinario
     )
     email.content_subtype = 'html'
-    message_id = f"<{uuid.uuid4()}@gmail.com>"
-    email.extra_headers = {'Message-ID': message_id}
+    email.extra_headers = {'Message-ID': f"<{uuid.uuid4()}@gmail.com>"}
+
+    if files:
+        for f in files:
+            try:
+                if hasattr(f, 'read'):  # Archivos cargados desde request.FILES
+                    email.attach(f.name, f.read(), f.content_type)
+                    f.seek(0)  # Rebobinar el archivo por si hay que usarlo después
+                elif isinstance(f, str):  # Ruta de archivo local
+                    if os.path.isfile(f) and os.access(f, os.R_OK):
+                        email.attach_file(f)
+                    else:
+                        print(f"Advertencia: No se pudo acceder al archivo {f}")
+            except Exception as e:
+                print(f"Error al adjuntar archivo {f}: {str(e)}")
 
     try:
         email.send()
-        return ("HTTP_200_OK")
-
+        return "HTTP_200_OK"
     except Exception as e:
-        return {"status": "error", "message": str(e)}  # ✅ Agregamos return aquí
+        return {"status": "error", "message": str(e)}

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reestablecimiento de contraseña</title>
+  <style>
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, sans-serif;
+    background: linear-gradient(to bottom, #0affff    25%, white 25%);
+    min-height: 100vh; /* Se ajusta a la altura completa de la pantalla */
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Ajusta el contenido verticalmente */
+}
+
+
+    /* Contenedor principal con borde azul */
+    .main-container {
+      max-width: 600px;
+      margin: 40px auto;
+      position: relative;
+      border: 2px solid #b9d4dc      ;
+      /* Borde azul */
+      border-radius: 8px;
+      overflow: hidden;
+      /* Para que no se salga el contenido del borde */
+      background-color: #ffffff;
+    }
+
+    /* Banner azul en la parte superior */
+    .banner {
+      background-color: #ccfcff      ;
+      text-align: center;
+      padding: 40px 20px;
+      color: black;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    /* Contenedor blanco que se superpone con el banner */
+    .content-container {
+      padding: 40px 20px 20px;
+      margin-top: -20px;
+      /* Superposición con el banner */
+    }
+
+    .content-container p {
+      color: #333;
+      font-size: 16px;
+      line-height: 1.5;
+      margin: 10px 0;
+    }
+
+    /* Estilos del botón */
+    .btn {
+      display: inline-block;
+      background-color: #00c5d6;
+      /* Fondo del botón */
+      color: white;
+      /* Cambiar color del texto a blanco */
+      text-decoration: none;
+      /* Eliminar subrayado del enlace */
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: #777777;
+      background-color: #f4f4f4;
+    }
+
+    .footer a {
+      text-decoration: none;
+      color: #00c5d6;
+    }
+
+    .logo {
+      display: block;
+      margin: 20px auto;
+      width: 200px;
+      height: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-container">
+    <!-- Banner azul -->
+    <div class="banner">
+      <h3>Solicitud Finalizada</h3>
+    </div>
+
+    <!-- Contenedor del contenido que se superpone con el banner -->
+    <div class="content-container">
+      <p>Estimado/a </p><br>
+      <p>
+        Le informamos que su solicitud ha sido finacinalizado  exitosamente en nuestro sistema. A continuación, le proporcionamos los detalles:
+    </p><br>
+
+    <ul style="color: #222; font-family:'Helvetica' 16px; text-align: left;">
+        <li><strong>Número de Solicitud:</strong> {{datos.pk}}</li>
+        <li><strong>Placa:</strong> {{datos.placa}}</li>
+        <li><strong>Estado:</strong> {{datos.estado}}</li>
+        <li><strong>Fecha de Solicitud:</strong> {{datos.fecha}}</li>
+        <li><strong>Fecha de Finalización:</strong> {{datos.fecha_fin}}</li>
+        <li><strong>Descripción:</strong> {{datos.observaciones}}s</li>
+    </ul> 
+
+      <p>
+        Para consultar más detalles sobre su solicitud, haga clic en el siguiente enlace:
+    </p><br>
+      <p style="text-align: center;">
+        <a href="{{link}}" class="btn" style="color: white">Ver Solicitud </a>
+      </p><br>
+      
+      <p>
+        Si tiene alguna duda o requiere asistencia, no dude en contactarnos mediante nuestro caneles de atencion.
+      <p>
+        Atentamente,<br>
+        El equipo de S.A.R.A
+      </p>
+    </div>
+
+    <!-- Logo centrado -->
+    <div style="text-align: center;">
+        <img src={{informacion.imagen}} alt="Vehículo inspeccionado" />
+    </div>
+
+
+    <!-- Pie de página -->
+    <div class="footer">
+      <p>¿Necesitas ayuda? <a href="mailto:SARAsoporte@gmail.com">Contáctanos</a></p>
+      <p>Recibiste este correo porque te registraste en nuestro servicio.</p>
+      <p>
+        Este es un mensaje generado automáticamente, por lo que te pedimos que no respondas a este correo.
+      </p>
+    </div>
+  </div>
+</body>
+
+</html>

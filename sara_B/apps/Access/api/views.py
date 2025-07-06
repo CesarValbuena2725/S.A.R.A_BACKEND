@@ -101,7 +101,7 @@ class Login(APIView):
                 return Response({
                     'access': str(access_token),
                     'refresh': str(refresh),
-                    'usuario': serializer.data['usuario'],
+                    'usuario': user.id_empleado.nombres,
                     'rol':user.rol
                 }, status=status.HTTP_200_OK)
 

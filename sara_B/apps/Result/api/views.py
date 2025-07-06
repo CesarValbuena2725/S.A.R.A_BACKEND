@@ -1,24 +1,36 @@
-from apps.Result.api.serializers import RespuestaSerializer,Respuestas,RespuestaModelSerializers,ImagenSerializer,Fotos
-from rest_framework import generics,status
-from rest_framework.response import Response
-from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
-from rest_framework.views import APIView
-from django.shortcuts import render
-from apps.Requests.models import Solicitud
-from apps.Result.api.tools import Amount_Items,FunctionClose,Render_Reporte
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from weasyprint import HTML
-from django.template.loader import get_template
-from django.template.loader import render_to_string
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from weasyprint import HTML
+# Librerías estándar
 import os
-from rest_framework.parsers import MultiPartParser, FormParser
+
+# Django
 from django.conf import settings
-from django.utils.timezone  import localdate
+from django.shortcuts import render
+from django.template.loader import get_template, render_to_string
+from django.utils.timezone import localdate
+
+# REST Framework
+from rest_framework import generics, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+# Librerías externas
+from weasyprint import HTML
+
+# Apps del proyecto
+from apps.Requests.models import Solicitud
+from apps.Result.api.serializers import (
+    RespuestaSerializer,
+    Respuestas,
+    RespuestaModelSerializers,
+    ImagenSerializer,
+    Fotos,
+)
+from apps.Result.api.tools import Amount_Items, FunctionClose, Render_Reporte
+from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
+from apps.Utilidades.Email.email_base import send_email_sara
+
 
 
 class FotosUploadView(APIView):
@@ -64,8 +76,6 @@ class Close_Request(APIView):
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ["PR", "AD"]
     """
-
-
     def get(self, request, *args ,**kwargs):
 
         id_request = self.kwargs.get('id_request')
@@ -99,6 +109,7 @@ class Close_Request(APIView):
                     'PMC': functiones.PMC(),
                     'PMV': functiones.PMV(),
                     'porcentaje': functiones.porcentaje(),
+                    'foto':Fotos.objects.get(pk=2)
 
                 }
             html_string = render_to_string("Reporte.html", context)
@@ -106,10 +117,17 @@ class Close_Request(APIView):
 
         except Exception as e:
             return Response(f"Error al renderizar el reporte: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
         if not Render_Reporte(html_string, output_path):
             return Response("Error al generar el reporte PDF", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+        if send_email_sara(
+            affair="Solicitud Finalizada",
+            template="email.html",
+            destinario=[solicitud.id_empleado.correo],
+            solicitante=solicitud,
+            contexto=Fotos.objects.get(pk=2),
+            files=[output_path]
+        ):
+            return Response("Reporte enviado por correo electrónico", status=status.HTTP_200_OK)
 
         return render(request, "Reporte.html", context)
         

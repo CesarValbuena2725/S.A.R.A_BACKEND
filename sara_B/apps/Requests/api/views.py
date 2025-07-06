@@ -19,6 +19,32 @@ from apps.Utilidades.CRUD import FiltroGeneral
 from apps.Utilidades.Email.email_base import send_email_sara
 from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
 from apps.Utilidades.tasks import send_email_asincr
+from apps.Utilidades.Permisos import getModelName
+
+
+
+class ReportAdmin(APIView):
+   
+    """ 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles = ["AD"]
+    """
+
+    def get(self, request, *args, **kwargs):
+        try:
+
+            name_model = self.kwargs.get('name_model', None)
+            model = getModelName(name_model)
+            if not model:
+                return Response({"error": "Modelo no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        
+        
+            model_fields = model._meta.fields
+            field_names = [field.name for field in model_fields]
+            return Response({"fields": field_names}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class GetForms(generics.GenericAPIView):
     authentication_classes = [JWTAuthentication]
@@ -149,7 +175,9 @@ class PatchRequest(APIView):
     
     def get(self, request, pk):
         try:
+
             instance = self.model.objects.get(pk=pk)
+
             serializer = self.serializer_class(instance)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -159,6 +187,8 @@ class PatchRequest(APIView):
     def patch(self, request, pk):
         try:
             instancia = self.model.objects.get(pk=pk)
+            if instancia.estado == 'FIN':
+                return Response("Solicitud ya finalizada No se puede editar", status=status.HTTP_400_BAD_REQUEST)
         except self.model.DoesNotExist:
             return Response({"detail": "Solicitud no encontrada"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -171,6 +201,7 @@ class PatchRequest(APIView):
 
 
         if model_serializers.validated_data.get('estado') == "CAL":
+            print("Solicitud Cancelada")
             try:
                 #Crear Pantilla de modificacion
                 send_email_sara(

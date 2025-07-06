@@ -38,7 +38,8 @@ class VehiculoPlan(models.Model):
         constraints=[
             models.UniqueConstraint(fields=['id_plan','id_vehiculo'], name="Vehiculo_plan_pk")
         ]
-
+        
+@set_model 
 class Solicitud(models.Model):
 
 
