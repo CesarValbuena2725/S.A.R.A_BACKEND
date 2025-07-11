@@ -102,7 +102,9 @@ class Login(APIView):
                     'access': str(access_token),
                     'refresh': str(refresh),
                     'usuario': user.id_empleado.nombres,
-                    'rol':user.rol
+                    'rol':user.rol,
+                    'id_usuario': user.pk,
+                    'id_empleado': user.id_empleado.pk,
                 }, status=status.HTTP_200_OK)
 
             else:

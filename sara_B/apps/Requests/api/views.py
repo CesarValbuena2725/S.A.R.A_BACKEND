@@ -165,8 +165,8 @@ class PatchRequest(APIView):
     def patch(self, request, pk):
         try:
             instancia = self.model.objects.get(pk=pk)
-            if instancia.estado == 'FIN':
-                return Response("Solicitud ya finalizada No se puede editar", status=status.HTTP_400_BAD_REQUEST)
+            #if instancia.estado == 'FIN':
+             #   return Response("Solicitud ya finalizada No se puede editar", status=status.HTTP_400_BAD_REQUEST)
         except self.model.DoesNotExist:
             return Response({"detail": "Solicitud no encontrada"}, status=status.HTTP_404_NOT_FOUND)
 

@@ -76,18 +76,21 @@ class Close_Request(APIView):
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ["PR", "AD"]
     """
+    
     def get(self, request, *args ,**kwargs):
 
         id_request = self.kwargs.get('id_request')
         result = Amount_Items(id_request)
 
         if not result:
-            return Response("there is not answer for the forms the request", status=status.HTTP_401_UNAUTHORIZED)
+           return Response("there is not answer for the forms the request", status=status.HTTP_400_BAD_REQUEST)
 
         try:
             solicitud = Solicitud.objects.get(pk=id_request)
         except Solicitud.DoesNotExist:
             return Response("Solicitud no encontrada", status=status.HTTP_404_NOT_FOUND)
+        
+        
         try:
             solicitud.estado = Solicitud.Estados_solcitud.FINALIZADO
             solicitud.fecha_fin = localdate()
@@ -119,7 +122,7 @@ class Close_Request(APIView):
             return Response(f"Error al renderizar el reporte: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         if not Render_Reporte(html_string, output_path):
             return Response("Error al generar el reporte PDF", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        if send_email_sara(
+        if  not send_email_sara(
             affair="Solicitud Finalizada",
             template="email.html",
             destinario=[solicitud.id_empleado.correo],
@@ -127,10 +130,12 @@ class Close_Request(APIView):
             contexto=Fotos.objects.get(pk=2),
             files=[output_path]
         ):
-            return Response("Reporte enviado por correo electrónico", status=status.HTTP_200_OK)
+            return Response("Falla al envair el correo", status=status.HTTP_406_NOT_ACCEPTABLE)
 
-        return render(request, "Reporte.html", context)
-        
+        return Response("Se Envio el correo con el reporte Creacod",status=status.HTTP_200_OK)
+    
+    
+    
 class GetRespuestas(generics.GenericAPIView):
     """
     authentication_classes = [JWTAuthentication]
@@ -151,7 +156,7 @@ class GetRespuestas(generics.GenericAPIView):
         if not respuestas:
             return Response("no hay registro para los datos enviados", status=status.HTTP_404_NOT_FOUND)
         
-        serilizer = self.serializer_class(respuestas , many = True)
+        serilizer = self.serializer_class(respuestas ,many = True)
         return Response(serilizer.data, status=status.HTTP_200_OK)
 
 
