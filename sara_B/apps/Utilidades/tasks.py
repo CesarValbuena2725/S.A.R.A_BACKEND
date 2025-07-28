@@ -9,37 +9,35 @@ from django.conf import settings
 
 
 @shared_task(bind=True, autoretry_for=(Exception,), retry_kwargs={'max_retries': 3, 'countdown': 30})
-def send_email_asincr(self, affair, template, destinatario=["tosaraweb@gmail.com"], solicitante=None, contexto=None, delay_second=5):
+def send_email_asincr(self, pdf_path, affair, template, destinatario=["tosaraweb@gmail.com"], solicitante=None, contexto=None, delay_second=5, files=None):
     try:
+        import time
         time.sleep(delay_second)
-        resultado = send_email_sara(affair, template, destinatario, solicitante, contexto)
-        return {'status': resultado, 'message': 'Correo enviado'}	
-    
+
+        # Agrega el PDF generado como archivo adjunto si no se pasó manualmente
+        if files is None:
+            files = [pdf_path]
+
+        resultado = send_email_sara(affair, template, destinatario, solicitante, contexto, files)
+        return {'status': resultado, 'message': 'Correo enviado'}
+
     except Exception as e:
-        print(f"Error en send_email_asincr: {e}")  # Registrar el error
-        return Retry(exc=e)
+        print(f"Error en send_email_asincr: {e}")
+        raise self.retry(exc=e)
 
 
 @shared_task(bind=True, autoretry_for=(Exception,), retry_kwargs={'max_retries': 3, 'countdown': 3000})
-def create_pdf_from_html(self, rendered_html, output_filename):
+def render_reporte_asyn(self, rendered_html, url):
+    from weasyprint import HTML
+    import time
+
     try:
-        time.sleep(5)  
-
-        full_path = os.path.join(settings.MEDIA_ROOT, output_filename)
-        os.makedirs(os.path.dirname(full_path), exist_ok=True)
-
-        HTML(string=rendered_html).write_pdf(full_path)
-
-        if os.path.exists(full_path):
-            return {
-                'status': 'success',
-                'message': f"PDF generado correctamente en {full_path}"
-            }
-        else:
-            return {
-                'status': 'error',
-                'message': "El archivo no se generó"
-            }
-
+        time.sleep(5)
+        HTML(string=rendered_html).write_pdf(url)
+        return url  
     except Exception as e:
         raise self.retry(exc=e)
+
+
+    
+    

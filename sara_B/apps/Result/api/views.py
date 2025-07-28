@@ -6,6 +6,9 @@ from django.conf import settings
 from django.shortcuts import render
 from django.template.loader import get_template, render_to_string
 from django.utils.timezone import localdate
+from django.forms.models import model_to_dict
+
+
 
 # REST Framework
 from rest_framework import generics, status
@@ -15,8 +18,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-# Librerías externas
-from weasyprint import HTML
+#
 
 # Apps del proyecto
 from apps.Requests.models import Solicitud
@@ -27,9 +29,10 @@ from apps.Result.api.serializers import (
     ImagenSerializer,
     Fotos,
 )
-from apps.Result.api.tools import Amount_Items, FunctionClose, Render_Reporte
+from apps.Result.api.tools import Amount_Items, FunctionClose
 from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
 from apps.Utilidades.Email.email_base import send_email_sara
+from apps.Utilidades.tasks import send_email_asincr, render_reporte_asyn
 
 
 
@@ -54,20 +57,6 @@ class FotosUploadView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
   
-        
-class PDF(APIView):
-    def get(self, request):
-        
-        html_string = render_to_string("report.html")
-
-
-        output_path = os.path.join("C:/Users/tetro/OneDrive/Escritorio/S.A.R.A_BACKEND/sara_B/apps/Result/templates", "ptuen.pdf")
-
-        try:
-            HTML(string=html_string).write_pdf(output_path)
-            return Response("Creación de PDF exitosa", status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(f"Error al generar PDF: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class Close_Request(APIView):
@@ -116,25 +105,27 @@ class Close_Request(APIView):
 
                 }
             html_string = render_to_string("Reporte.html", context)
-            output_path = os.path.join("C:/Users/tetro/OneDrive/Escritorio/S.A.R.A_BACKEND/sara_B/apps/Result/Reports", f"{solicitud.placa}.pdf")
-
+            output_path = os.path.join(settings.REPORTS_DIR, f"{solicitud.placa}.pdf")
+            fotos = Fotos.objects.get(pk=2)
+            dirrecion = Respuestas.objects.get(id_formulario =3, id_item =46)
         except Exception as e:
             return Response(f"Error al renderizar el reporte: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        if not Render_Reporte(html_string, output_path):
-            return Response("Error al generar el reporte PDF", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        if  not send_email_sara(
-            affair="Solicitud Finalizada",
-            template="email.html",
-            destinario=[solicitud.id_empleado.correo],
-            solicitante=solicitud,
-            contexto=Fotos.objects.get(pk=2),
-            files=[output_path]
-        ):
-            return Response("Falla al envair el correo", status=status.HTTP_406_NOT_ACCEPTABLE)
+        try:
 
-        return Response("Se Envio el correo con el reporte Creacod",status=status.HTTP_200_OK)
-    
-    
+            (render_reporte_asyn.s(html_string, output_path) | 
+            send_email_asincr.s(
+                affair="Solicitud Finalizada",
+                template="email.html",
+                destinatario=[solicitud.id_empleado.correo, dirrecion.respuesta_texto],
+                solicitante=model_to_dict(solicitud),
+                contexto=fotos.imagen.url,
+                delay_second=5
+            )).delay()
+
+
+            return Response("Se Envio el correo con el reporte Solicitado",status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(f"Error al enviar el correo: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 class GetRespuestas(generics.GenericAPIView):
     """

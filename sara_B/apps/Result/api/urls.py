@@ -1,12 +1,11 @@
 from django.urls import path
-from apps.Result.api.views import PostRespuestas,GetRespuestas,PutRespuesta,PDF,Close_Request,FotosUploadView
+from apps.Result.api.views import PostRespuestas,GetRespuestas,PutRespuesta,Close_Request,FotosUploadView
 
 urlpatterns=[
 
     path('api/resultado/post/',PostRespuestas.as_view()),
     path('api/resultado/get/<int:id_request>/<int:id_form>/',GetRespuestas.as_view()),
     path('api/resultado/put/',PutRespuesta.as_view()),
-    path('api/result/pdf/',PDF.as_view()),
     path('api/finalizar/get/<int:id_request>',Close_Request.as_view()),
     path('api/subirimagen/post/', FotosUploadView.as_view(), name='subir-imagen'),
 

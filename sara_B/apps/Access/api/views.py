@@ -156,7 +156,6 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
              
                     data_usuario = EmpleadoSerialzers(usuario.id_empleado).data
 
-                    print(data_usuario)
                     send_email_asincr.delay(affair="Restablecer Password",
                                             template="base_email.html",
                                             destinatario=[request.data['correo']], 

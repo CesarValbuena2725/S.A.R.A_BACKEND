@@ -165,6 +165,7 @@ class PatchRequest(APIView):
     def patch(self, request, pk):
         try:
             instancia = self.model.objects.get(pk=pk)
+            
             #if instancia.estado == 'FIN':
              #   return Response("Solicitud ya finalizada No se puede editar", status=status.HTTP_400_BAD_REQUEST)
         except self.model.DoesNotExist:
@@ -182,7 +183,7 @@ class PatchRequest(APIView):
             print("Solicitud Cancelada")
             try:
                 #Crear Pantilla de modificacion
-                send_email_sara(
+                send_email_asincr.delay(
                 #Es informacion infortante para el correo 
                 contexto= instancia.pk,
                 #Asusnto de la Solcitud 
