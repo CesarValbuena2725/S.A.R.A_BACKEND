@@ -73,7 +73,7 @@ Instalación y uso de Celery
 * Inicia el servidor de Flower:
     - cd nombre del proyecto # SARA es sara_B
         -Ejecutar Servidor:
-            - celery -A nombre del proyecto flower  # SARA es sara_B
+            - celery -A sara_B worker --loglevel=info --pool=solo
             -ingresar Al link  http://localhost:5555/  # Esto tiende a ser siempre el mismo 
 
 

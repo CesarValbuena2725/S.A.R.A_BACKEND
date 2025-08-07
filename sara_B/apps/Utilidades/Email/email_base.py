@@ -17,6 +17,7 @@ def send_email_sara(affair, template, destinario=["tosaraweb@gmail.com"], solici
         'informacion': contexto,
         'datos': solicitante
     }
+    print(context)
     html_string = render_to_string(template, context)
 
     #body_html = template.render(context)

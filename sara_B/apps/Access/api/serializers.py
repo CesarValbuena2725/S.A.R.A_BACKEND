@@ -79,11 +79,12 @@ class RestablecerPasswordSerializers(serializers.Serializer):
             user = Usuario.objects.get(pk=user_id)
         except (ValueError, TypeError, OverflowError, Usuario.DoesNotExist):
             raise ValidationError("El enlace no es válido.")
-        
+        # Se intancia la cases para Generar tokes de rest de DJANGO
         token_generator = PasswordResetTokenGenerator()
+        #Se verifica si el token es correcto
         if not token_generator.check_token(user, token):
             raise ValidationError("El token no es válido o ha expirado.")
-    
+        # Actualiza la contraseña
         user.set_password(self.validated_data['password'])
         user.save()
 

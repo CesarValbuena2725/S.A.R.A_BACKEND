@@ -2,7 +2,6 @@ from rest_framework import serializers
 import re
 
 
-
 """
 Ejemplo una exprexion regular de usos de los Verificiaion de terminos para las validacions Estudialar
 pattern = r'^\+?\d{1,3}?[-.\s]?\(?\d{1,4}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$'

@@ -199,7 +199,7 @@ class CloseRequest(APIView):
                 affair="Solicitud Finalizada",
                 template="email.html",
                 destinatario=[solicitud.id_empleado.correo, dirrecion.respuesta_texto],
-                solicitante=model_to_dict(solicitud),
+                solicitante=model_to_dict(solicitud,fields=['id', 'placa', 'estado', 'fecha', 'fecha_fin', 'observaciones']),
                 contexto=fotos.imagen.url,
                 delay_second=5
             )).delay()

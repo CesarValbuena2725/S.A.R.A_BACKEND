@@ -16,11 +16,7 @@ from apps.Forms.api.serializers import (
     FormularioSerializers,
     ItemsSerializers
 )
-from apps.Forms.models import CreacionFormulario, Formulario, FormularioPlan, Items
-from apps.Requests.models import Plan
-from apps.Result.api.serializers import OpcionesSeralizers
-from apps.Result.models import Opciones
-from apps.Utilidades.CRUD import FiltroGeneral
+from apps.Forms.models import CreacionFormulario, Formulario, Items
 from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
 
 
@@ -38,7 +34,6 @@ class PostCreateForms(APIView):
             formulario = serializer.save()
 
             return Response(formulario, status=status.HTTP_201_CREATED)
-
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -116,7 +111,6 @@ class UpdateForms(APIView):
         return Response(formulario_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
                             
-
 class DeleteForms(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -146,65 +140,3 @@ class DeleteForms(APIView):
             return Response({'Errors':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
-
-
-class ShowForms(generics.ListAPIView):
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, RolePermission]
-    allowed_roles = BASE_PERMISOSOS
-
-
-    serializer_class = FormularioSerializers
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = FiltroGeneral
-
-    def get_queryset(self):
-        # Obtiene el pk desde la URL
-        pk = self.kwargs.get("pk")
-        try:
-            # Validar que el plan exista
-            Plan.objects.get(pk=pk)
-        except Plan.DoesNotExist:
-            return Formulario.objects.none()  # Retorna un queryset vacío si el Plan no existe
-
-        # Obtener los formularios relacionados con el Plan
-        formularios_ids = FormularioPlan.objects.filter(id_plan=pk).values_list("id_formulario", flat=True)
-        return Formulario.objects.filter(pk__in=formularios_ids)
-
-    def list(self, request, *args, **kwargs):
-        # Sobrescribir list para aplicar tu lógica personalizada
-        response_data = []
-        for formulario in self.get_queryset():
-            # Obtener ítems relacionados al formulario
-            items_ids = Items.objects.filter(
-                pk__in=CreacionFormulario.objects.filter(id_formulario=formulario.pk).values_list("id_items", flat=True)
-            )
-
-            serialized_items = []
-            for item in items_ids:
-                opciones_ids = Opciones.objects.filter(id_categoria_opciones=item.id_categoria_opciones)
-                serialized_item = ItemsSerializers(item).data
-                serialized_item["opciones"] = OpcionesSeralizers(opciones_ids, many=True).data
-                serialized_items.append(serialized_item)
-
-            response_data.append({
-                "formulario": FormularioSerializers(formulario).data,
-                "items": serialized_items,
-            })
-
-        # Aplicar filtros y paginación a la respuesta final
-        page = self.paginate_queryset(response_data)
-        if page is not None:
-            return self.get_paginated_response(page)
-
-        return Response(response_data, status=status.HTTP_200_OK)
-
-    def filter_queryset(self, queryset):
-        # Aquí se aplican tus filtros usando DjangoFilterBackend y FiltroGeneral
-        return super().filter_queryset(queryset)
-
-    def paginate_queryset(self, queryset):
-        # Pagina los resultados automáticamente usando los métodos de ListAPIView
-        return super().paginate_queryset(queryset)

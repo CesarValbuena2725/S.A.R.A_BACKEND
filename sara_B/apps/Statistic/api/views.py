@@ -1,8 +1,8 @@
-#BookShow 
+# NOTE:BookShow 
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment,Border,Side,PatternFill
 from openpyxl.utils import get_column_letter
-from datetime import date, timedelta
+from datetime import date, timedelta,datetime
 
 #Django
 from django.http import HttpResponse
@@ -15,7 +15,7 @@ from rest_framework import status
 #Apps locals
 from apps.Utilidades.Permisos import getModelName
 from apps.Requests.models import Solicitud,Plan
-from apps.Requests.api.serializers import SolicitudSerializers
+from apps.Requests.api.serializers import SolicitudSerializers,PlanSerializers
 
 #PErmisos 
 from rest_framework.permissions import IsAuthenticated
@@ -44,7 +44,7 @@ class GetStatisticSolicitud(APIView):
             else:
                 print("hay mes")
                 data = Solicitud.objects.filter(fecha__year=year, fecha__month=month, is_active=True)
-            information = self.serializer_class(data, many=True).data
+                information = self.serializer_class(data, many=True).data
             data_count = {
                 'total_solicitudes': len(information),
                 'solicitudes_activo': len([sol for sol in information if sol['estado'] == 'AC']),
@@ -58,27 +58,28 @@ class GetStatisticSolicitud(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
-class GetStatisticPlan(APIView):
+class GETPlanes(APIView):
     """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ["AD"]
     """
+    serializer_class = PlanSerializers
 
-    def get(self, request):
+    def get(self,request):
         try:
-            Requets= Solicitud.objects.filter(is_active=True)
-            plan = Plan.objects.filter(is_active=True)
-            if not Requets:
-                return Response({"error": "No hay solicitudes activas"}, status=status.HTTP_404_NOT_FOUND)
-            data = {}
+            data = Solicitud.objects.filter(is_active = True)
+            column_name = self.serializer_class( Plan.objects.filter(is_active=True), many = True)
 
-            for p in plan:
-                data.update({p.nombre_plan: len(Requets.filter(id_plan=p.pk,is_active=True))})
-            return Response({"data": data}, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            data_acount= {}
+            for data in column_name.data:
+                data_acount[data["nombre_plan"]] =  "De momento Esto"
+            
+            return Response({'data':data_acount}, status=status.HTTP_200_OK)
+        
+        except Exception as E:
+            return Response({"error": str(E)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
         
 class ReportAdmin(APIView):
    
@@ -107,22 +108,28 @@ class ReportAdmin(APIView):
 
 class ReporteEmpleadosExcel(APIView):
     #Ejempli de URL Que e Debe utilizar 
-    #http://localhost:8000/reporte/?year_start=2024&month_start=6&year_end=2025&month_end=7&state=inactivo
+    #http://localhost:8000/statistic/reporte/?year_start=2024&month_start=6&year_end=2025&month_end=7&state=inactivo
 
     def get(self, request, *args, **kwargs):
         # 1. Obtener y validar los datos
         try:
             year_start = int(request.GET.get("year_start", 2000)) 
             month_start = int(request.GET.get("month_start", 1)) 
-            year_end = int(request.GET.get("year_end", 3000)) 
-            month_end = int(request.GET.get("month_end", 12)) 
-
+            year_end = int(request.GET.get("year_end", int(datetime.now().year))) 
+            month_end = int(request.GET.get("month_end", int(datetime.now().month))) 
             state = request.GET.get("state", "Todos")  # valor por defecto
+            boolean = request.GET.get("boolean", 0)  # valor por defecto
+
+
+
         except (ValueError, TypeError):
             return HttpResponse("Parámetros inválidos", status=400)
         
         # 2. Construir queryset con filtros
         queryset = Solicitud.objects.all()
+
+        if boolean:
+            return Response("Datos Verda", status=status.HTTP_200_OK)
         
         # Filtro por fechas
         if all([year_start, month_start, year_end, month_end]):

@@ -80,7 +80,7 @@ class CreateFormsSerializers(serializers.Serializer):
             
             try:
 
-                with transaction.atomic(): #obliga  que todo se complete con exito, de lo contrario no guarda nada 
+                with transaction.atomic(): #NOTE:obliga  que todo se complete con exito, de lo contrario no guarda nada 
 
                 # Crear Formulario
                     formulario = Formulario.objects.create(**form_data)

@@ -84,7 +84,6 @@ class GetFormsItems(generics.GenericAPIView):
         data = CreacionFormulario.objects.filter(id_formulario=id_form)
         serializer = self.serializer_class(data, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
     
 
 class GetRequests(generics.GenericAPIView):
@@ -131,9 +130,13 @@ class PostRequests(generics.GenericAPIView):
             affair= f"Nueva solicitud {instance.pk}"
             template="base_request.html"
             solicitante_data = self.serializer_class(instance).data
-
-            send_email_asincr.delay(affair, template, ["tosaraweb@gmail.com"], solicitante_data, contexto)
-        
+            send_email_asincr.delay(
+                affair = affair,
+                destinatario = ["tosaraweb@gmail.com",instance.id_empleado.correo],
+                solicitante=self.serializer_class(instance).data,
+                contexto=contexto,
+                template =template
+            )
             return Response(serializers.data ,status=status.HTTP_201_CREATED)
 
         except Exception as e:
@@ -165,7 +168,8 @@ class PatchRequest(APIView):
     def patch(self, request, pk):
         try:
             instancia = self.model.objects.get(pk=pk)
-            
+            #FIXME: Pendiente por Quiatar Cometarios, y Evitar modificaicon despues de que se Finalice 
+        
             #if instancia.estado == 'FIN':
              #   return Response("Solicitud ya finalizada No se puede editar", status=status.HTTP_400_BAD_REQUEST)
         except self.model.DoesNotExist:
@@ -186,6 +190,7 @@ class PatchRequest(APIView):
                 send_email_asincr.delay(
                 #Es informacion infortante para el correo 
                 contexto= instancia.pk,
+                solicitante=self.serializer_class(instancia).data,
                 #Asusnto de la Solcitud 
                 affair= f"Solicitud Cancelada {instancia.pk}",
                 #Base HTMl que se va a renderiar para el correo
@@ -221,62 +226,3 @@ class DeleteRequestDB(APIView):
 
 
 
-#Crear un  en path para hacer el filtro de planes de solictudes  // el Frontend debe poder  enviar el tipo de Vehiculo y hacer la peticion al Servidor ; 
-class FiltrarPlanes(APIView):
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated,RolePermission]
-    allowed_roles = BASE_PERMISOSOS
-    def get(self, request, id_tipo_vehiculo):
-        """
-        Filtra los planes según el tipo de vehículo dado.
-        """
-        # Verificamos si el id_tipo_vehiculo existe en VehiculoPlan, filtrando los planes asociados al tipo_vehiculo
-        planes_ids = VehiculoPlan.objects.filter(id_vehiculo=id_tipo_vehiculo).values_list('id_plan', flat=True)
-        
-
-        #Si no se encuentran planes asociados a ese id, retorna un error 404
-        if not planes_ids:
-            return Response(
-                {"error": "No hay planes disponibles para este tipo de vehículo."},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        #Filtra los objetos de plan que tengan un id dentro del tipo_vehiculo
-        planes = Plan.objects.filter(id__in=planes_ids)
-        serializer = PlanSerializers(planes, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-
-class CrearVehiculo(APIView):
-
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated,RolePermission]
-    allowed_roles = BASE_PERMISOSOS
-
-    def post(self, request):
-        serializer = TipovehiculoSerializers(data=request.data)
-        if serializer.is_valid():
-            tipo_vehiculo = serializer.save()
-            return Response(TipovehiculoSerializers(tipo_vehiculo).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-
-
-class ActualizarTipoVehiculo(generics.RetrieveUpdateAPIView): 
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated,RolePermission]
-    allowed_roles = ['AD', 'RC', 'CA']
-
-    queryset = TipoVehiculo.objects.all()
-    serializer_class = TipovehiculoSerializers
-
-
-class EliminarTipoVehiculo(generics.RetrieveDestroyAPIView):
-
-    authentication_classes=[JWTAuthentication]
-    permission_classes = [IsAuthenticated,RolePermission]
-    allowed_roles = ['AD', 'RC', 'CA']
-
-    queryset = TipoVehiculo.objects.all()
-    serializer_class = TipovehiculoSerializers

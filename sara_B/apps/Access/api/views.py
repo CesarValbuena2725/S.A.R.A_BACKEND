@@ -25,7 +25,6 @@ from apps.Access.api.serializers import (
 )
 from apps.Utilidades.Permisos import RolePermission
 from apps.Utilidades.tasks import send_email_asincr
-from apps.Utilidades.Email.email_base import send_email_sara
 
 
 class CreateUser(APIView):
@@ -160,7 +159,8 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
                                             template="base_email.html",
                                             destinatario=[request.data['correo']], 
                                             solicitante=data_usuario, contexto=reset_link)
-                    
+                        # FIXME:Pendiente la correcion del Link 
+                        # ! Modificar la Respuesta para enviar los tokes para que el frontend los procese 
 
                     return Response({'message':'Se realizo el envio correo para el restablecimiento de contarseña'},
                                     status=status.HTTP_200_OK)

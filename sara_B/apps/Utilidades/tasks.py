@@ -9,7 +9,7 @@ from django.conf import settings
 
 
 @shared_task(bind=True, autoretry_for=(Exception,), retry_kwargs={'max_retries': 3, 'countdown': 30})
-def send_email_asincr(self, pdf_path, affair, template, destinatario=["tosaraweb@gmail.com"], solicitante=None, contexto=None, delay_second=5, files=None):
+def send_email_asincr(self, pdf_path = None,destinatario=["tosaraweb@gmail.com"], solicitante=None, contexto=None, delay_second=int(5), files=None, affair=None, template= None, ):
     try:
         import time
         time.sleep(delay_second)
