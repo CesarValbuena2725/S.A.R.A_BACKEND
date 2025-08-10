@@ -14,7 +14,9 @@ from rest_framework import status
 
 #Apps locals
 from apps.Utilidades.Permisos import getModelName
+from apps.Access.models import UserSession
 from apps.Requests.models import Solicitud,Plan
+from apps.Access.api.serializers import SerializersUserSession
 from apps.Requests.api.serializers import SolicitudSerializers,PlanSerializers
 
 #PErmisos 
@@ -22,9 +24,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from apps.Utilidades.Permisos import RolePermission
 
-
-
-
+#NOTE:Clase para consultar la cantidad de soliciutdes  Activas en cada estado
+#!Pendiente a Rivison y refacturizacion 
 class GetStatisticSolicitud(APIView):
     """
     authentication_classes = [JWTAuthentication]
@@ -57,7 +58,7 @@ class GetStatisticSolicitud(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-
+#NOTE: La Vista esta terminada pendiente que frontend haga pruebas necesarias
 class GETPlanes(APIView):
     """
     authentication_classes = [JWTAuthentication]
@@ -68,18 +69,36 @@ class GETPlanes(APIView):
 
     def get(self,request):
         try:
-            data = Solicitud.objects.filter(is_active = True)
+            datas = Solicitud.objects.filter(is_active = True)
             column_name = self.serializer_class( Plan.objects.filter(is_active=True), many = True)
-
             
             data_acount= {}
             for data in column_name.data:
-                data_acount[data["nombre_plan"]] =  "De momento Esto"
+                data_acount[data["nombre_plan"]] = len( [sol for sol in datas if sol.id_plan.pk== data["id"]])
             
             return Response({'data':data_acount}, status=status.HTTP_200_OK)
         
         except Exception as E:
             return Response({"error": str(E)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+
+#NOTE:La vista esta terminada pendiente que frontend haga pruebas necesarias
+class ReportLogins(APIView):
+    serializer_class = SerializersUserSession
+
+    def get(self, request):
+        try:
+            logins = UserSession.objects.all().order_by('-login_count')[:3]
+            data_count = {}
+
+            for data in logins:
+                usurname = data.id_usuario.usuario  
+                data_count[usurname] = data.login_count
+
+            return Response(data_count, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         
 class ReportAdmin(APIView):
    

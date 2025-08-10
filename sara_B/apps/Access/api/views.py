@@ -15,7 +15,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 
 # Local application imports
-from apps.Access.models import Usuario, Empleado
+from apps.Access.models import Usuario, Empleado,UserSession
 from apps.Access.api.serializers import (
     UsuarioSerializers,
     SolicitudRestablecerPassSerializers,
@@ -51,7 +51,6 @@ class CreateUser(APIView):
             if isinstance(objet, Usuario):
                 #token, created = Token.objects.get_or_create(user=objet)
                 #return Response({'token': token.key, **serializers.data}, status=status.HTTP_201_CREATED)
-
                 refresh=RefreshToken.for_user(user=objet)
                 return Response({
                     'refresh': str(refresh),
@@ -94,7 +93,16 @@ class Login(APIView):
                 # Generar los tokens (JWT)
                 refresh = RefreshToken.for_user(user)
                 access_token = refresh.access_token
+                count_session =UserSession.objects.filter(id_usuario =user.pk).exists()
 
+                if not count_session:
+                    data= UserSession.objects.create(
+                        id_usuario=user,
+                        login_count = 1
+                    )
+                    data.save()
+                else:
+                    login_count = UserSession.objects.get(id_usuario=user.pk).registrar_login()
                 # Serializar los datos del usuario
 
                 return Response({

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.contrib.auth.hashers import make_password, check_password
 from apps.Utilidades.Permisos import set_model
+from django.utils import timezone
 
 class Estado(models.TextChoices):
     ACTIVO = 'AC', 'Activo'
@@ -124,3 +125,17 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.usuario
+
+
+class UserSession(models.Model):
+    id_usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
+    login_count = models.IntegerField(default=0)
+    last_login = models.DateTimeField( default= timezone.now(), null=True, blank=True)
+
+    def registrar_login(self):
+        self.login_count += 1
+        self.last_login = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return f"{self.id_usuario} - {self.login_count} inicios"

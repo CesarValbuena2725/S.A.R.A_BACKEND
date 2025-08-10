@@ -1,5 +1,5 @@
 from django.urls import path
-from apps.Statistic.api.views import (ReportAdmin,GetStatisticSolicitud,ReporteEmpleadosExcel,GETPlanes)
+from apps.Statistic.api.views import (ReportAdmin,GetStatisticSolicitud,ReporteEmpleadosExcel,GETPlanes,ReportLogins)
 
 urlpatterns = [
     path('solicitud/<int:year>/', GetStatisticSolicitud.as_view(), name='solicitud-year'),  # Sin mes
@@ -7,6 +7,7 @@ urlpatterns = [
     path('plan',GETPlanes.as_view()),
     path('reporte/',
         ReporteEmpleadosExcel.as_view()),
+    path('prueba/',ReportLogins.as_view())
 
 ]
     

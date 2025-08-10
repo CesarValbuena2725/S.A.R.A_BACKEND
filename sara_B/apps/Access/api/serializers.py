@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.Access.models import Convenio,Sucursal,Empleado,Usuario
+from apps.Access.models import Convenio,Sucursal,Empleado,Usuario,UserSession
 from .Validaciones import logitud_minima,validate_positive,validate_number,validate_text
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
@@ -56,6 +56,10 @@ class UsuarioSerializers(serializers.ModelSerializer):
         validated_data.pop('password', None)  # Si password no está en validated_data, no lo cambia
         return super().update(instance, validated_data)
 
+class SerializersUserSession(serializers.ModelSerializer):
+    class Meta:
+        model = UserSession
+        fields = '__all__'
 
 class SolicitudRestablecerPassSerializers(serializers.Serializer):
     usuario = serializers.CharField(max_length=100)
