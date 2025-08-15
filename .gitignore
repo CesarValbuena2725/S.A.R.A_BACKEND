@@ -1,5 +1,6 @@
 # Ignorar el entorno virtual llamado "sara"
 ZARA/
+myvenv/
 
 # Ignorar archivos compilados de Python
 *.pyc

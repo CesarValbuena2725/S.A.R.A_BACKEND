@@ -118,6 +118,8 @@ class Login(APIView):
 ######################################################################################################
 #Se realiza el envio de la dirrecion para restablecer contraseña
 
+#Se realiza el envio de la dirrecion para restablecer contraseña
+
 class SolicitudRestablecerPass(generics.GenericAPIView):
     serializer_class = SolicitudRestablecerPassSerializers
 
@@ -146,7 +148,7 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
                 token_generator = PasswordResetTokenGenerator()
                 token = token_generator.make_token(usuario)
                 uid = urlsafe_base64_encode(force_bytes(usuario.pk))
-                reset_link = f"http://127.0.0.1:8000/access/restablecerpassword/{uid}/{token}/"
+                reset_link = "http://localhost:5173/reset"
 
                 #Realiza el envio del correo / pendiente por mejorar y cambiar esta aspecto
                 try:
@@ -154,15 +156,15 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
              
                     data_usuario = EmpleadoSerialzers(usuario.id_empleado).data
 
-                    print(data_usuario)
                     send_email_asincr.delay(affair="Restablecer Password",
                                             template="base_email.html",
                                             destinatario=[request.data['correo']], 
                                             solicitante=data_usuario, contexto=reset_link)
                     
-
-                    return Response({'message':'Se realizo el envio correo para el restablecimiento de contarseña'},
-                                    status=status.HTTP_200_OK)
+                    return Response({'data':{'token':token,'uid':uid}},status=status.HTTP_200_OK)
+                
+                    """return Response({'message':'Se realizo el envio correo para el restablecimiento de contarseña'},
+                                    status=status.HTTP_200_OK)"""
                 
                 except Exception as error_valid:
                     return Response({'detail': 'Error al enviar el correo: ' + str(error_valid)}, 
