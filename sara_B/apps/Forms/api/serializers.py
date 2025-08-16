@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.Forms.models import Formulario,Items,FormularioPlan,CreacionFormulario
+from apps.Forms.models import Formulario,Items,FormularioPlan,CreacionFormulario, CategoriaFormularios
 from apps.Requests.models import Plan
 from apps.Utilidades.Permisos import set_serializers
 from rest_framework.exceptions import APIException
@@ -7,6 +7,11 @@ from django.db import transaction
 from apps.Result.models import CategoriaOpciones
 
 
+@set_serializers
+class CategoriaFormulariosSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = CategoriaFormularios
+        fields= '__all__'
 
 @set_serializers
 class ItemsSerializers(serializers.ModelSerializer):
@@ -30,6 +35,8 @@ class FormularioPlanSerializers(serializers.ModelSerializer):
 
 @set_serializers
 class CreacionFormularioSerializers(serializers.ModelSerializer):
+    id_items = ItemsSerializers(read_only=True)  # Me trae el objeto completo 
+
     class Meta:
         model = CreacionFormulario
         fields = '__all__'
@@ -73,7 +80,7 @@ class CreateFormsSerializers(serializers.Serializer):
             
             try:
 
-                with transaction.atomic(): #obliga  que todo se complete con exito, de lo contrario no guarda nada 
+                with transaction.atomic(): #NOTE:obliga  que todo se complete con exito, de lo contrario no guarda nada 
 
                 # Crear Formulario
                     formulario = Formulario.objects.create(**form_data)
@@ -165,6 +172,3 @@ class CreateFormsSerializers(serializers.Serializer):
                 ]
             }
 
-
-
-            
