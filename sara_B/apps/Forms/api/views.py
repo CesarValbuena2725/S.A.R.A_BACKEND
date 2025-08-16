@@ -17,13 +17,15 @@ from apps.Forms.api.serializers import (
     ItemsSerializers
 )
 from apps.Forms.models import CreacionFormulario, Formulario, Items
-from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
+from apps.Utilidades.Permisos import  RolePermission
 
 
 class PostCreateForms(APIView):
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
-    allowed_roles = ['AD', 'RC', 'CA',] 
+    allowed_roles = ['AD'] 
+
     serializer_class = CreateFormsSerializers
 
     def post(self, request):
@@ -42,7 +44,7 @@ class UpdateForms(APIView):
 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
-    allowed_roles = ['AD', 'RC', 'CA',] 
+    allowed_roles = ['AD'] 
     
     def get(self, request, pk):
         try:
@@ -56,7 +58,6 @@ class UpdateForms(APIView):
 
         # Obtener los ítems relacionados desde CreacionFormulario
         items_relacionados = CreacionFormulario.objects.filter(id_formulario=nombre_formulario)
-        print(items_relacionados)
         items_serializer = CreacionFormularioSerializers(items_relacionados, many=True)
 
         return Response({
@@ -64,7 +65,7 @@ class UpdateForms(APIView):
             "items": items_serializer.data
         }, status=status.HTTP_200_OK)
 
-
+    #!Pendiente Revision y refactorizacion
     def patch(self, request, pk): # Funcion para Actualiacion parcial de los Datos.
         try:
             # Obtener la instancia del formulario
@@ -115,25 +116,24 @@ class DeleteForms(APIView):
 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
-    allowed_roles = ['AD', 'RC', 'CA',] 
+    allowed_roles = ['AD'] 
 
     def delete(self,request,pk):
         try:
 
             instanacia= Formulario.objects.get(pk=pk)
-            creacionformulario =  CreacionFormulario.objects.filter(id_formulario=instanacia.pk)
+            creacion_formulario =  CreacionFormulario.objects.filter(id_formulario=instanacia.pk)
 
         except Formulario.DoesNotExist:
             return Response({'Errors':f"Form key not exist: {pk}"},status=status.HTTP_404_NOT_FOUND)
         
-        #serralizers  = CreacionFormularioSerializers(creacionformulario,many=True)
         try:
             with transaction.atomic():
 
-                for items  in  creacionformulario: #Elimina Cada items de cada formulario
+                for items  in  creacion_formulario: #Elimina Cada items de cada formulario
                     delete_items= Items.objects.filter(pk=items.id_items.pk)
                     delete_items.delete()
-                creacionformulario.delete()
+                creacion_formulario.delete()
                 instanacia.delete()
                 return Response({"Exito":"El formulario Fue eliminado"}, status=status.HTTP_202_ACCEPTED)
         except Exception as e:

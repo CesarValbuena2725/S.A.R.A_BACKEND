@@ -32,8 +32,8 @@ from apps.Result.api.serializers import (
 )
 from apps.Result.api.tools import Amount_Items, FunctionClose
 from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
-from apps.Utilidades.Email.email_base import send_email_sara
-from apps.Utilidades.tasks import send_email_asincr, render_reporte_asyn
+from apps.Utilidades.Email.email_base import Send_Email_Sara
+from apps.Utilidades.tasks import Send_Email_Asyn, Render_Reporte_Asyn
 
 
 class GetRespuestas(generics.GenericAPIView):
@@ -64,7 +64,7 @@ class FotosUploadView(APIView):
     """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
-    allowed_roles = BASE_PERMISOSOS
+    allowed_roles = ['PR','AD']
     """
     serializer_class = ImagenSerializer
     parser_classes = [MultiPartParser, FormParser]
@@ -85,7 +85,7 @@ class PostRespuestas(generics.GenericAPIView):
     """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
-    allowed_roles =BASE_PERMISOSOS
+    allowed_roles =["PR","AD"]
     """
     serializer_class = RespuestaSerializer
     model_base= Respuestas
@@ -150,9 +150,9 @@ class CloseRequest(APIView):
     def get(self, request, *args ,**kwargs):
 
         id_request = self.kwargs.get('id_request')
+        #funciona que valida que cada formulario Tenga respuesta Guardad 
         result = Amount_Items(id_request)
-        print(result)
-
+        
         if not result:
            return Response("there is not answer for the forms the request", status=status.HTTP_400_BAD_REQUEST)
 
@@ -164,38 +164,45 @@ class CloseRequest(APIView):
     
         
         try:
+            # Clase que permite crear los contextos necesarios crear el informe, la logia esta separada 
             functiones = FunctionClose(id_request)
-
+            # Se Guarda Cada uno de estos datos par pasarlo a la funcion que crea el informe
             context = {
                     'request': solicitud,
-                    'cliente': functiones.cliente(),
-                    'vehiculo': functiones.vehiculo(),
-                    'fugas': functiones.fugas(),
-                    'carroceria': functiones.carroceria(),
-                    'novedades': functiones.novedades(),
-                    'pintura': functiones.pintura(),
-                    'PMC': functiones.PMC(),
-                    'PMV': functiones.PMV(),
-                    'porcentaje': functiones.porcentaje(),
+                    'cliente': functiones.Cliente(),
+                    'vehiculo': functiones.Vehiculo(),
+                    'fugas': functiones.Fugas(),
+                    'carroceria': functiones.Carroceria(),
+                    'novedades': functiones.Novedades(),
+                    'pintura': functiones.Pintura(),
+                    'PMC': functiones.Pmc(),
+                    'PMV': functiones.Pmv(),
+                    'porcentaje': functiones.Porcentaje(),
                     'foto':Fotos.objects.get(pk=2)
 
                 }
+            # Se Renderiza la informacion en un HTML con los datos necesarios 
             html_string = render_to_string("Reporte.html", context)
+            # Se Crea una ruta donde Guardar e informe 
             output_path = os.path.join(settings.REPORTS_DIR, f"{solicitud.placa}.pdf")
             fotos = Fotos.objects.get(pk=2)
+            # Se optine dirrecion de correo a donde se debe Enviar el informe PDF 
             dirrecion = Respuestas.objects.get(id_formulario =3, id_item =46, id_solicitud = id_request)
         except Exception as e:
             return Response(f"Error al renderizar el reporte: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         try:
+            # Se actualizandos los datos de la solicitud
             solicitud.estado = Solicitud.Estados_solcitud.FINALIZADO
             solicitud.fecha_fin = localdate()
             solicitud.save()
         except Exception as e:
             return Response(f"Error al cerrar la solicitud: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         try:
-
-            (render_reporte_asyn.s(html_string, output_path) | 
-            send_email_asincr.s(
+            # funciones Asinconicas para crear el informa PDF apartir del HTML Creado se guarda en la ruta indica
+            #!De manera automatica cuando termina la creacion del PDF Se hace en envio del correo adjuntado el informa creado 
+            # Al ser asincronicas no retrasan la ejecucion del programa
+            (Render_Reporte_Asyn.s(html_string, output_path) | 
+            Send_Email_Asyn.s(
                 affair="Solicitud Finalizada",
                 template="email.html",
                 destinatario=[solicitud.id_empleado.correo, dirrecion.respuesta_texto],
@@ -210,7 +217,7 @@ class CloseRequest(APIView):
             return Response(f"Error al enviar el correo: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
-
+# Clase para Descargar el informe de manera manual en el caso de ser necesaria 
 class DownloadReport(APIView):
     """
     authentication_classes = [JWTAuthentication]

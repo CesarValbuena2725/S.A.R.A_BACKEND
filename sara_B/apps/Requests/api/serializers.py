@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from apps.Access.models import Empleado
 from apps.Requests.models import Solicitud, Plan, VehiculoPlan,TipoVehiculo
-from apps.Utilidades.Permisos import set_serializers
+from apps.Utilidades.Permisos import Set_Serializers
 from apps.Forms.models import FormularioPlan,Formulario
 from rest_framework.exceptions import APIException
 from django.db import transaction
@@ -42,9 +42,9 @@ class SolicitudSerializers(serializers.ModelSerializer):
 
         return data
     
-@set_serializers
+@Set_Serializers
 class PlanSerializers(serializers.ModelSerializer):
-
+    # Campos Espcial que permite un  agregar un campo que  cumple las caractetircas indicadas 
     lista_adicionales = serializers.PrimaryKeyRelatedField(
         queryset=Formulario.objects.filter(id_categoria=3),
         many=True
@@ -55,15 +55,16 @@ class PlanSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
     def create(self, data):
         list_adic = data.get('lista_adicionales', [])
-        data.pop('lista_adicionales', None)  # <- Esto es clave
+        data.pop('lista_adicionales', None)  
+        # NOTE: Obliga a que toda  se ejecute bien o devuelos los cambios hechos hasta el error 
         with transaction.atomic():
             instance = Plan.objects.create(**data)
             instance.lista_adicionales.set(list_adic)
 
             try:
+                # Registra a reacion de los planes y los formularios en la table intermedia 
                 for formulario in list_adic:
                     FormularioPlan.objects.create(id_plan=instance, id_formulario=formulario)
 
@@ -117,7 +118,7 @@ class PlanSerializers(serializers.ModelSerializer):
 
 
 
-@set_serializers
+@Set_Serializers
 class TipovehiculoSerializers(serializers.ModelSerializer):
     planes = serializers.PrimaryKeyRelatedField(queryset=Plan.objects.all(), many=True, write_only=True)
 
@@ -148,7 +149,7 @@ class TipovehiculoSerializers(serializers.ModelSerializer):
         return instance
     
     
-@set_serializers
+@Set_Serializers
 class VehiculoplanSerializers(serializers.ModelSerializer):
 
     class Meta:

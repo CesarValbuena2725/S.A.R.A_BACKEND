@@ -4,12 +4,12 @@ from .Validaciones import logitud_minima,validate_positive,validate_number,valid
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from rest_framework.exceptions import ValidationError
-from apps.Utilidades.Permisos import set_serializers
+from apps.Utilidades.Permisos import Set_Serializers
 
 
 
 
-@set_serializers
+@Set_Serializers
 class ConvenioSerializers(serializers.ModelSerializer):
     class Meta:
         model=Convenio
@@ -18,19 +18,19 @@ class ConvenioSerializers(serializers.ModelSerializer):
 
     # Funciones que hacen validacion de Cada campo 
 
-@set_serializers
+@Set_Serializers
 class SucursalSeralizers(serializers.ModelSerializer):
     class Meta:
         model=Sucursal
         fields= '__all__'
         
-@set_serializers
+@Set_Serializers
 class EmpleadoSerialzers(serializers.ModelSerializer):
     class Meta:
         model=Empleado
         fields='__all__'
 
-@set_serializers
+@Set_Serializers
 class UsuarioSerializers(serializers.ModelSerializer):
     password = serializers.CharField(required=False, write_only=True)  # Hacer opcional
 

@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 #Apps locals
-from apps.Utilidades.Permisos import getModelName
+from apps.Utilidades.Permisos import Get_Model_Name
 from apps.Access.models import UserSession
 from apps.Requests.models import Solicitud,Plan
 from apps.Access.api.serializers import SerializersUserSession
@@ -24,8 +24,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from apps.Utilidades.Permisos import RolePermission
 
-#NOTE:Clase para consultar la cantidad de soliciutdes  Activas en cada estado
-#!Pendiente a Rivison y refacturizacion 
 class GetStatisticSolicitud(APIView):
     """
     authentication_classes = [JWTAuthentication]
@@ -100,38 +98,21 @@ class ReportLogins(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         
-class ReportAdmin(APIView):
-   
+
+
+class ReportesExcel(APIView):
     """ 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ["AD"]
     """
-
-    def get(self, request, *args, **kwargs):
-        try:
-
-            name_model = self.kwargs.get('name_model', None)
-            model = getModelName(name_model)
-            if not model:
-                return Response({"error": "Modelo no encontrado"}, status=status.HTTP_404_NOT_FOUND)
-        
-        
-            model_fields = model._meta.fields
-            field_names = [field.name for field in model_fields]
-            return Response({"fields": field_names}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-
-
-class ReporteEmpleadosExcel(APIView):
     #Ejempli de URL Que e Debe utilizar 
-    #http://localhost:8000/statistic/reporte/?year_start=2024&month_start=6&year_end=2025&month_end=7&state=inactivo
+    #http://localhost:8000/statistic/reporte/?model=convenio&year_start=2024&month_start=6&year_end=2025&month_end=7&state=IN
 
     def get(self, request, *args, **kwargs):
         # 1. Obtener y validar los datos
         try:
+            tabla = str(request.GET.get("model", None))
             year_start = int(request.GET.get("year_start", 2000)) 
             month_start = int(request.GET.get("month_start", 1)) 
             year_end = int(request.GET.get("year_end", int(datetime.now().year))) 
@@ -140,27 +121,35 @@ class ReporteEmpleadosExcel(APIView):
             boolean = request.GET.get("boolean", 0)  # valor por defecto
 
 
-
+            print(state)
         except (ValueError, TypeError):
             return HttpResponse("Parámetros inválidos", status=400)
-        
+        model = Get_Model_Name(tabla)
         # 2. Construir queryset con filtros
-        queryset = Solicitud.objects.all()
+        queryset = model.objects.all()
 
         if boolean:
             return Response("Datos Verda", status=status.HTTP_200_OK)
-        
         # Filtro por fechas
         if all([year_start, month_start, year_end, month_end]):
             try:
                 date_start = date(year_start, month_start, 1)
-                # Calcular último día del mes final
+                # calcular último día del mes final
                 if month_end == 12:
                     date_end = date(year_end, month_end, 31)
                 else:
                     date_end = date(year_end, month_end + 1, 1) - timedelta(days=1)
-                
-                queryset = queryset.filter(fecha__range=(date_start, date_end))
+
+                # Detectar dinámicamente un campo de fecha
+                fecha_fields = ["fecha", "fecha_creacion", "created_at"]
+                campos_modelo = [f.name for f in model._meta.fields]
+
+                campo_fecha = next((f for f in fecha_fields if f in campos_modelo), None)
+
+                if campo_fecha:
+                    queryset = queryset.filter(**{f"{campo_fecha}__range": (date_start, date_end)})
+
+
             except (ValueError, TypeError):
                 return HttpResponse("Rango de fechas inválido", status=400)
 
@@ -183,13 +172,13 @@ class ReporteEmpleadosExcel(APIView):
         fill = PatternFill(start_color="DDDDDD", end_color="DDDDDD", fill_type="solid")
         
         # Titulo principal
-        campos = [field.name for field in Solicitud._meta.fields if field.name not in ['id']]
+        campos = [field.name for field in model._meta.fields if field.name not in ['id','password']]
         num_cols = len(campos)
         col_fin = get_column_letter(num_cols)
         
         ws.merge_cells(f"A1:{col_fin}1")
         celda_titulo = ws["A1"]
-        celda_titulo.value = "REPORTE DE EMPLEADOS"
+        celda_titulo.value = f"REPORTE DE {tabla.upper()}"
         celda_titulo.font = Font(bold=True, size=14)
         celda_titulo.alignment = Alignment(horizontal="center", vertical="center")
 
@@ -204,7 +193,7 @@ class ReporteEmpleadosExcel(APIView):
         # Datos
         for row_num, empleado in enumerate(queryset, 3):
             for col_num, campo in enumerate(campos, 1):
-                valor = getattr(empleado, campo)
+                valor = getattr(empleado, campo, None)
                 if isinstance(valor, bool):
                     valor = "SI" if valor else "NO"
                 elif isinstance(valor, date):
@@ -223,8 +212,9 @@ class ReporteEmpleadosExcel(APIView):
 
         # Preparar respuesta
         response = HttpResponse(
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            headers={'Content-Disposition': 'attachment; filename="reporte_empleados.xlsx"'},
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
+        response['Content-Disposition'] = f'attachment; filename="reporte_{tabla}.xlsx"'
+
         wb.save(response)
         return response

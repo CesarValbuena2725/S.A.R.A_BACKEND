@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.contrib.auth.hashers import make_password, check_password
-from apps.Utilidades.Permisos import set_model
+from apps.Utilidades.Permisos import Set_Model
 from django.utils import timezone
 
 class Estado(models.TextChoices):
@@ -16,7 +16,7 @@ Errores = {
     'invalid': 'Formato no válido',
 }
 
-@set_model
+@Set_Model
 class Convenio(models.Model):
     nombre = models.CharField(max_length=100, unique=True, error_messages=Errores)
     nit = models.CharField(max_length=100, unique=True, null=False, error_messages=Errores)
@@ -33,7 +33,7 @@ class Convenio(models.Model):
     def __str__(self):
         return self.nombre
     
-@set_model
+@Set_Model
 class Sucursal(models.Model):
     nombre = models.CharField(max_length=100, error_messages=Errores)
     ciudad = models.CharField(max_length=100, error_messages=Errores)
@@ -52,7 +52,7 @@ class Sucursal(models.Model):
         return self.nombre
     
     
-@set_model
+@Set_Model
 class Empleado(models.Model):
     nombres = models.CharField(max_length=100, error_messages=Errores)
     apellidos = models.CharField(max_length=100, error_messages=Errores)
@@ -91,7 +91,7 @@ class UsuarioManager(BaseUserManager):
 
         return self.create_user(usuario, password, **extra_fields)
     
-@set_model
+@Set_Model
 class Usuario(AbstractBaseUser, PermissionsMixin):
     class Roles(models.TextChoices):
         ADMINISTRADOR = 'AD', "Administrador"

@@ -24,13 +24,14 @@ from apps.Access.api.serializers import (
     EmpleadoSerialzers
 )
 from apps.Utilidades.Permisos import RolePermission
-from apps.Utilidades.tasks import send_email_asincr
+from apps.Utilidades.tasks import Send_Email_Asyn
 
 
 class CreateUser(APIView):
-    
+    # clase para hace Validacion de Tokes 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
+    # Funcion para la validacion de Roles Permitidos para el path
     allowed_roles = ['AD','CA'] 
     
     model = Usuario
@@ -45,13 +46,13 @@ class CreateUser(APIView):
             return Response({'error': str(e)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
     def post(self, request):
+        # Se toma la Data y se pasa la Serilizer para ser procesa 
         serializers = self.serializer_class(data=request.data)
         if serializers.is_valid():
             objet = serializers.save()
             if isinstance(objet, Usuario):
-                #token, created = Token.objects.get_or_create(user=objet)
-                #return Response({'token': token.key, **serializers.data}, status=status.HTTP_201_CREATED)
                 refresh=RefreshToken.for_user(user=objet)
+                # Se Reponde los tokes de Acceso y usuarios creados 
                 return Response({
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
@@ -68,21 +69,22 @@ class CreateUser(APIView):
 
 
 class Login(APIView):
+    # instancion los modelos y serealizers necesarios 
     model = Usuario
     serializer_class= loginserializers
 
     def post(self, request):
+        # se toma la data y se pasa a la serilizer para ser procesada
         serializer= self.serializer_class(data=request.data)
         if  not serializer.is_valid():
             return Response({'error': 'Usuario y contraseña son requeridos'}, status=status.HTTP_400_BAD_REQUEST)            
-
+        # Se guarda cada uno de los datos validos 
         usuario = serializer.validated_data['usuario']
         password = serializer.validated_data['password']
       
         try:
             # Buscar al usuario
             user = get_object_or_404(Usuario, usuario=request.data['usuario'])
-
 
             # Verificar si el usuario está activo
             if user.estado == 'AC':
@@ -94,7 +96,7 @@ class Login(APIView):
                 refresh = RefreshToken.for_user(user)
                 access_token = refresh.access_token
                 count_session =UserSession.objects.filter(id_usuario =user.pk).exists()
-
+                #  Se hace la validancion para registar la Sesiones 
                 if not count_session:
                     data= UserSession.objects.create(
                         id_usuario=user,
@@ -135,7 +137,6 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
         serializer = self.serializer_class(data= request.data)
 
         if serializer.is_valid():
-
             try:
 
                 #Hace la instancia del Usuario 
@@ -155,23 +156,19 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
                 token_generator = PasswordResetTokenGenerator()
                 token = token_generator.make_token(usuario)
                 uid = urlsafe_base64_encode(force_bytes(usuario.pk))
-                reset_link = f"http://127.0.0.1:8000/access/restablecerpassword/{uid}/{token}/"
+                reset_link = "http://localhost:5173/reset"
 
                 #Realiza el envio del correo / pendiente por mejorar y cambiar esta aspecto
                 try:
                     
-             
                     data_usuario = EmpleadoSerialzers(usuario.id_empleado).data
 
-                    send_email_asincr.delay(affair="Restablecer Password",
+                    Send_Email_Asyn.delay(affair="Restablecer Password",
                                             template="base_email.html",
                                             destinatario=[request.data['correo']], 
                                             solicitante=data_usuario, contexto=reset_link)
-                        # FIXME:Pendiente la correcion del Link 
-                        # ! Modificar la Respuesta para enviar los tokes para que el frontend los procese 
-
-                    return Response({'message':'Se realizo el envio correo para el restablecimiento de contarseña'},
-                                    status=status.HTTP_200_OK)
+                    
+                    return Response({'data':{'token':token,'uid':uid}},status=status.HTTP_200_OK)
                 
                 except Exception as error_valid:
                     return Response({'detail': 'Error al enviar el correo: ' + str(error_valid)}, 
@@ -185,7 +182,7 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
 
 #############################################################################
 
-#Serealiza el cambio de contarseña 
+#Clase el cambio de contarseña 
 class ContraseñaRestablecida(APIView):
     serializer_class =RestablecerPasswordSerializers
     

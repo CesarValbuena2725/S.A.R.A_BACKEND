@@ -1,19 +1,19 @@
 from rest_framework import serializers
 from apps.Forms.models import Formulario,Items,FormularioPlan,CreacionFormulario, CategoriaFormularios
 from apps.Requests.models import Plan
-from apps.Utilidades.Permisos import set_serializers
+from apps.Utilidades.Permisos import Set_Serializers
 from rest_framework.exceptions import APIException
 from django.db import transaction
 from apps.Result.models import CategoriaOpciones
 
 
-@set_serializers
+@Set_Serializers
 class CategoriaFormulariosSerializers(serializers.ModelSerializer):
     class Meta:
         model = CategoriaFormularios
         fields= '__all__'
 
-@set_serializers
+@Set_Serializers
 class ItemsSerializers(serializers.ModelSerializer):
     id_categoria_opciones = serializers.PrimaryKeyRelatedField(queryset=CategoriaOpciones.objects.all())
 
@@ -22,18 +22,18 @@ class ItemsSerializers(serializers.ModelSerializer):
         fields= '__all__'
 
 
-@set_serializers
+@Set_Serializers
 class FormularioSerializers(serializers.ModelSerializer):
     class Meta:
         model = Formulario
         fields= '__all__'
-@set_serializers
+@Set_Serializers
 class FormularioPlanSerializers(serializers.ModelSerializer):
     class Meta:
         model=FormularioPlan
         fields='__all__'
 
-@set_serializers
+@Set_Serializers
 class CreacionFormularioSerializers(serializers.ModelSerializer):
     id_items = ItemsSerializers(read_only=True)  # Me trae el objeto completo 
 
@@ -44,9 +44,10 @@ class CreacionFormularioSerializers(serializers.ModelSerializer):
 
 
 class CreateFormsSerializers(serializers.Serializer):
-
+        # Anidamos los serrializer que compone los formularios 
         formulario = FormularioSerializers() 
         items = ItemsSerializers(many=True)
+        # Atributo Especial para que Reciba un listado de los multiples planes 
         plan = serializers.PrimaryKeyRelatedField(queryset=Plan.objects.all())
 
         def validate(self, data):
@@ -67,8 +68,8 @@ class CreateFormsSerializers(serializers.Serializer):
             return data
 
         def create(self, validated_data):
+            # Despues de valida los datos los Separamoa para poder procesarlos 
             form_data = validated_data.get('formulario')
-
             items_data = validated_data.get('items', [])
             plan_data = validated_data.get('plan')
 
@@ -90,7 +91,7 @@ class CreateFormsSerializers(serializers.Serializer):
 
                     # Crear Items y asociarlos al Formulario
                     created_items = []
-
+                    # Recore cada unos de los items  enviados 
                     for item_data in items_data:
                         try:
                             categoria = CategoriaOpciones.objects.get(pk=item_data.get('id_categoria_opciones').pk)
@@ -119,6 +120,7 @@ class CreateFormsSerializers(serializers.Serializer):
         
         def update(self, instance, validated_data):
             try:
+                #NOTE:obliga  que todo se complete con exito, de lo contrario no guarda nada 
                 with transaction.atomic():
                     
                     formulario_data = validated_data.get("formulario", {})

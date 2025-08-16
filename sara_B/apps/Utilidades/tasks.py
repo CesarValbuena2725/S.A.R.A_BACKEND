@@ -1,5 +1,5 @@
 from celery import shared_task
-from apps.Utilidades.Email.email_base import send_email_sara
+from apps.Utilidades.Email.email_base import Send_Email_Sara
 from weasyprint import HTML
 from celery.exceptions import Retry
 from django.template.loader import render_to_string
@@ -9,7 +9,7 @@ from django.conf import settings
 
 
 @shared_task(bind=True, autoretry_for=(Exception,), retry_kwargs={'max_retries': 3, 'countdown': 30})
-def send_email_asincr(self, pdf_path = None,destinatario=["tosaraweb@gmail.com"], solicitante=None, contexto=None, delay_second=int(5), files=None, affair=None, template= None, ):
+def Send_Email_Asyn(self, pdf_path = None,destinatario=["tosaraweb@gmail.com"], solicitante=None, contexto=None, delay_second=int(5), files=None, affair=None, template= None, ):
     try:
         import time
         time.sleep(delay_second)
@@ -18,7 +18,7 @@ def send_email_asincr(self, pdf_path = None,destinatario=["tosaraweb@gmail.com"]
         if files is None:
             files = [pdf_path]
 
-        resultado = send_email_sara(affair, template, destinatario, solicitante, contexto, files)
+        resultado = Send_Email_Sara(affair, template, destinatario, solicitante, contexto, files)
         return {'status': resultado, 'message': 'Correo enviado'}
 
     except Exception as e:
@@ -27,7 +27,7 @@ def send_email_asincr(self, pdf_path = None,destinatario=["tosaraweb@gmail.com"]
 
 
 @shared_task(bind=True, autoretry_for=(Exception,), retry_kwargs={'max_retries': 3, 'countdown': 3000})
-def render_reporte_asyn(self, rendered_html, url):
+def Render_Reporte_Asyn(self, rendered_html, url):
     from weasyprint import HTML
     import time
 

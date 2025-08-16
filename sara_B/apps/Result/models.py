@@ -1,12 +1,12 @@
 from django.db import models
 from apps.Access.models import Estado
-from apps.Utilidades.Permisos import set_model
+from apps.Utilidades.Permisos import Set_Model
 
 from apps.Requests.models import Solicitud
 
 # Create your models here.
 #Modelo Temporal pruebas 
-@set_model
+@Set_Model
 class CategoriaFotos(models.TextChoices):
     PRINCIAPAL = 'PRI', 'Categoría 1'
     ACCESORIOS = 'ACC', 'Categoría 2'
@@ -21,7 +21,7 @@ class CategoriaOpciones(models.Model):
     def __str__(self):
         return self.nombre
     
-@set_model
+@Set_Model
 class Opciones(models.Model):
     nombre_opcion= models.CharField(max_length=50, null=False)
     descripcion = models.CharField(max_length=250, null=True)

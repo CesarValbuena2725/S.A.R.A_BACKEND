@@ -2,11 +2,11 @@ from django.db import models
 from apps.Access.models import Estado
 from django.utils.timezone  import localdate
 from apps.Access.models import Empleado
-from apps.Utilidades.Permisos import set_model
+from apps.Utilidades.Permisos import Set_Model
 from apps.Access.models import Convenio,Sucursal
 
 
-@set_model  
+@Set_Model  
 class TipoVehiculo(models.Model):
     nombre_vehiculo = models.CharField(max_length=50)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
@@ -14,7 +14,7 @@ class TipoVehiculo(models.Model):
 
     def __str__(self):
         return self.nombre_vehiculo
-@set_model
+@Set_Model
 class Plan(models.Model):
     nombre_plan = models.CharField(max_length=50, unique=True)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
@@ -27,7 +27,7 @@ class Plan(models.Model):
         return self.nombre_plan
 
 
-@set_model 
+@Set_Model 
 class VehiculoPlan(models.Model):
     id_plan =models.ForeignKey(Plan, on_delete=models.CASCADE)
     id_vehiculo = models.ForeignKey(TipoVehiculo, on_delete=models.CASCADE)
@@ -39,7 +39,7 @@ class VehiculoPlan(models.Model):
             models.UniqueConstraint(fields=['id_plan','id_vehiculo'], name="Vehiculo_plan_pk")
         ]
 
-@set_model 
+@Set_Model 
 class Solicitud(models.Model):
 
 

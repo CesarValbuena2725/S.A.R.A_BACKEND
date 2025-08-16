@@ -7,7 +7,8 @@ from django.conf import settings
 import os
 
 
-def send_email_sara(affair, template, destinario=["tosaraweb@gmail.com"], solicitante=None, contexto=None, files=None):
+def Send_Email_Sara(affair, template, destinario=["tosaraweb@gmail.com"], solicitante=None, contexto=None, files=None):
+    # Codigos Generados para que cada correo sea Unico
     unique_id = uuid.uuid4().hex[:6]
     subject = f"{affair} - Código de Solicitud {unique_id}"
 
@@ -17,11 +18,10 @@ def send_email_sara(affair, template, destinario=["tosaraweb@gmail.com"], solici
         'informacion': contexto,
         'datos': solicitante
     }
-    print(context)
+    # Se renderiaza el template pasado 
     html_string = render_to_string(template, context)
 
-    #body_html = template.render(context)
-
+    # Se Estrucutra el email
     email = EmailMessage(
         subject=subject,
         body=html_string,
@@ -30,7 +30,8 @@ def send_email_sara(affair, template, destinario=["tosaraweb@gmail.com"], solici
     )
     email.content_subtype = 'html'
     email.extra_headers = {'Message-ID': f"<{uuid.uuid4()}@gmail.com>"}
-
+    
+    # Validacion para archivos Adjuntos 
     if files:
         for f in files:
             try:

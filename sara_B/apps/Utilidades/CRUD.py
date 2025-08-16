@@ -9,8 +9,8 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 # Local application imports
 from apps.Utilidades.Permisos import (
     RolePermission,
-    getModelName,
-    getSerializer
+    Get_Model_Name,
+    Get_Serializer_Name
 )
 
 
@@ -20,31 +20,31 @@ class FiltroGeneral(filters.FilterSet):
     class Meta:
         model = None  # Será asignado dinámicamente
 
-
+# BAse General para el CRUD
 class BaseGeneral(generics.GenericAPIView):
 
     """
-        authentication_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     """
     allowed_roles = [] 
-    
  
-    
+    # Funcion que Valida el serializers Pasado dinamicamente por la URL
     def get_serializer_class(self):
         namemodel = self.kwargs.get('namemodel')
-        serializer_class = getSerializer(namemodel)
+        serializer_class = Get_Serializer_Name(namemodel)
         if not serializer_class:
             raise NotFound(detail=f"Modelo no encontrado: {namemodel}")
         return serializer_class
-
+    
+    # Funcion que Valida el model Pasado dinamicamente por la URL
     def get_model(self):
         namemodel = self.kwargs.get('namemodel')
-        model = getModelName(namemodel)
+        model = Get_Model_Name(namemodel)
         if not model:
             raise NotFound(detail=f"Modelo no encontrado: {namemodel}")
         return model
-
+    # Funcion General para el renderizados de diversas objetos
     def get_queryset(self):
         model = self.get_model()
         queryset = model.objects.all()
@@ -55,7 +55,7 @@ class BaseGeneral(generics.GenericAPIView):
             queryset = filterset.qs
 
         return queryset
-
+    #Funcion que permite el renderizado unico de objeto
     def get_object(self, pk):
         queryset = self.get_queryset()
         try:
@@ -167,6 +167,7 @@ class PatchGeneral(BaseGeneral):
 class PutGeneral(BaseGeneral):
 
     allowed_roles = ['AD', 'CA']
+
     def put(self, request, pk, *args, **kwargs):
         try:
             instance = self.get_object(pk)
@@ -181,6 +182,7 @@ class PutGeneral(BaseGeneral):
             return Response({'errors': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
 class DeleteGeneral(BaseGeneral):
+
     allowed_roles = ['AD', 'CA']
 
     def delete(self, request, pk, *args, **kwargs):
@@ -198,6 +200,7 @@ class DeleteGeneral(BaseGeneral):
 
 
 class DeleteAdmin(BaseGeneral):
+    
     allowed_roles = ['AD', 'CA']
 
     def delete(self, request, pk, *args, **kwargs):

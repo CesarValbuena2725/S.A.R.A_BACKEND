@@ -16,15 +16,16 @@ from apps.Requests.models import Plan, Solicitud, TipoVehiculo, VehiculoPlan
 from apps.Forms.models import Formulario, Items,CreacionFormulario
 from apps.Forms.api.serializers import FormularioSerializers,ItemsSerializers,CreacionFormularioSerializers
 from apps.Utilidades.CRUD import FiltroGeneral
-from apps.Utilidades.Email.email_base import send_email_sara
+from apps.Utilidades.Email.email_base import Send_Email_Sara
 from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
-from apps.Utilidades.tasks import send_email_asincr
-from apps.Utilidades.Permisos import getModelName
+from apps.Utilidades.tasks import Send_Email_Asyn
+from apps.Utilidades.Permisos import Get_Model_Name
 
 
 
 
 class GetForms(generics.GenericAPIView):
+    
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles =BASE_PERMISOSOS
@@ -87,6 +88,9 @@ class GetFormsItems(generics.GenericAPIView):
     
 
 class GetRequests(generics.GenericAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles =BASE_PERMISOSOS
 
     serializer_class = SolicitudSerializers
     model_base = Solicitud
@@ -109,8 +113,7 @@ class PostRequests(generics.GenericAPIView):
     
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
-    allowed_roles =BASE_PERMISOSOS
-    
+    allowed_roles =['AD', 'CA',] 
     model = Solicitud
     serializer_class=SolicitudSerializers
 
@@ -130,7 +133,9 @@ class PostRequests(generics.GenericAPIView):
             affair= f"Nueva solicitud {instance.pk}"
             template="base_request.html"
             solicitante_data = self.serializer_class(instance).data
-            send_email_asincr.delay(
+
+            # Realia el llamado a la tarea asincronica de enviao de correos 
+            Send_Email_Asyn.delay(
                 affair = affair,
                 destinatario = ["tosaraweb@gmail.com",instance.id_empleado.correo],
                 solicitante=self.serializer_class(instance).data,
@@ -149,7 +154,7 @@ class PatchRequest(APIView):
     
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
-    allowed_roles = ['AD', 'CA',] 
+    allowed_roles = ['AD', 'RC', 'CA']
     
     model = Solicitud
     serializer_class = SolicitudSerializers
@@ -158,7 +163,6 @@ class PatchRequest(APIView):
         try:
 
             instance = self.model.objects.get(pk=pk)
-
             serializer = self.serializer_class(instance)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -169,9 +173,9 @@ class PatchRequest(APIView):
         try:
             instancia = self.model.objects.get(pk=pk)
             #FIXME: Pendiente por Quiatar Cometarios, y Evitar modificaicon despues de que se Finalice 
-        
+            #!DEscomentariar despues de pruebas
             #if instancia.estado == 'FIN':
-             #   return Response("Solicitud ya finalizada No se puede editar", status=status.HTTP_400_BAD_REQUEST)
+            #    return Response("Solicitud ya finalizada No se puede editar", status=status.HTTP_400_BAD_REQUEST)
         except self.model.DoesNotExist:
             return Response({"detail": "Solicitud no encontrada"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -182,12 +186,10 @@ class PatchRequest(APIView):
             return Response(model_serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
         if model_serializers.validated_data.get('estado') == "CAL":
-            print("Solicitud Cancelada")
             try:
                 #Crear Pantilla de modificacion
-                send_email_asincr.delay(
+                Send_Email_Asyn.delay(
                 #Es informacion infortante para el correo 
                 contexto= instancia.pk,
                 solicitante=self.serializer_class(instancia).data,
