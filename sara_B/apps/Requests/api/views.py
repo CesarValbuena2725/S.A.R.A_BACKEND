@@ -114,6 +114,7 @@ class PostRequests(generics.GenericAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles =['AD', 'CA',] 
+    
     model = Solicitud
     serializer_class=SolicitudSerializers
 
@@ -220,6 +221,7 @@ class DeleteRequestDB(APIView):
             instancia = Solicitud.objects.get(pk=pk)
             instancia.is_active= False
             instancia.save()
+            
             return Response({"detail": "Eliminado"}, status=status.HTTP_202_ACCEPTED)
         except Solicitud.DoesNotExist:
             return Response({"detail": "PK no válido"}, status=status.HTTP_404_NOT_FOUND)

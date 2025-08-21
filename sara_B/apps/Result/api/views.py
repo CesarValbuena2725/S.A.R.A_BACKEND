@@ -136,7 +136,6 @@ class PutRespuesta(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         resultado_actualizado = serializer.save()
-        print("Esto devuelve el resultado actualizado", resultado_actualizado)
 
         return Response(resultado_actualizado, status=status.HTTP_200_OK)
 
@@ -190,6 +189,7 @@ class CloseRequest(APIView):
             dirrecion = Respuestas.objects.get(id_formulario =3, id_item =46, id_solicitud = id_request)
         except Exception as e:
             return Response(f"Error al renderizar el reporte: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
         try:
             # Se actualizandos los datos de la solicitud
             solicitud.estado = Solicitud.Estados_solcitud.FINALIZADO
@@ -222,7 +222,7 @@ class DownloadReport(APIView):
     """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
-    allowed_roles = ["PR", "AD"]
+    allowed_roles = ["PR", "AD", "CC"]
     """
     def get(self,request, *args,**kwargs ):
         id_resquest = self.kwargs.get('id_request')
