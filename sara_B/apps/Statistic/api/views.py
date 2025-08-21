@@ -3,6 +3,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment,Border,Side,PatternFill
 from openpyxl.utils import get_column_letter
 from datetime import date, timedelta,datetime
+import calendar
 
 #Django
 from django.http import HttpResponse
@@ -36,21 +37,25 @@ class GetStatisticSolicitud(APIView):
         try:
 
             year = self.kwargs.get('year', None)
-            month = self.kwargs.get('month', None)
-            if not month:
-                print("no hay mes")
-                data = Solicitud.objects.filter(fecha__year=year, is_active=True)
-            else:
-                print("hay mes")
-                data = Solicitud.objects.filter(fecha__year=year, fecha__month=month, is_active=True)
+            list_moth= list(calendar.month_name)[1:]
+
+            data_count={}
+            #Recoremos la lista de los meses con sus indixes 
+            for i,month in enumerate(list_moth, start=1):
+
+                #hacemos el Filtro con el año indicado con todos los meses 
+                data = Solicitud.objects.filter(fecha__year=year, fecha__month=i, is_active=True)
                 information = self.serializer_class(data, many=True).data
-            data_count = {
-                'total_solicitudes': len(information),
-                'solicitudes_activo': len([sol for sol in information if sol['estado'] == 'AC']),
-                'solicitudes_cancelado': len([sol for sol in information if sol['estado'] == 'CAL']),
-                'solicitudes_progreso': len([sol for sol in information if sol['estado'] == 'PRO']),
-                'solicitudes_finalizado': len([sol for sol in information if sol['estado'] == 'FIN']),
-            }
+
+                #relacionamos todo con el mes correspodiente
+                data_count[month]={
+                    'total_solicitudes': len(information),
+                    'solicitudes_activo': len([sol for sol in information if sol['estado'] == 'AC']),
+                    'solicitudes_cancelado': len([sol for sol in information if sol['estado'] == 'CAL']),
+                    'solicitudes_progreso': len([sol for sol in information if sol['estado'] == 'PRO']),
+                    'solicitudes_finalizado': len([sol for sol in information if sol['estado'] == 'FIN']),
+                    }
+                
             return Response({"data": data_count}, status=status.HTTP_200_OK)
 
         except Exception as e:
@@ -97,7 +102,34 @@ class ReportLogins(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        
+class GetTiempoSolucion(APIView):
+    model = Solicitud
+    serializer_class = SolicitudSerializers
+
+    def get(self, request):
+        # Filtrar solicitudes finalizadas en enero (ejemplo mes=1)
+        data_create = Solicitud.objects.filter(fecha__year=datetime.now().year,fecha__month=int(datetime.now().month),
+            estado="FIN")
+
+        total_tiempo = timedelta(0)
+        count = 0
+
+        for data in data_create:
+            if data.fecha_fin:  
+                total_tiempo += (data.fecha_fin - data.fecha)
+                count += 1
+
+        promedio = total_tiempo / count
+
+        if promedio:
+            dias = promedio.days
+            horas = promedio.seconds // 3600
+            promedio_str = f"{dias} días, {horas} horas"
+        else:
+            promedio_str = "Sin datos"
+        return Response({
+            "promedio_duracion": promedio_str
+        }, status=status.HTTP_200_OK)
 
 
 class ReportesExcel(APIView):
