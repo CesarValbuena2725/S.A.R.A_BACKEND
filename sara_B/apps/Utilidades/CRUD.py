@@ -23,10 +23,10 @@ class FiltroGeneral(filters.FilterSet):
 # BAse General para el CRUD
 class BaseGeneral(generics.GenericAPIView):
 
-    """
+    
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
-    """
+    
     allowed_roles = [] 
  
     # Funcion que Valida el serializers Pasado dinamicamente por la URL

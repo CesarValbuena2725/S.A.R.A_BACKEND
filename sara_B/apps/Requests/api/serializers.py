@@ -17,6 +17,8 @@ class SolicitudSerializers(serializers.ModelSerializer):
         if value.estado == "IN":
             raise serializers.ValidationError("Empleado inactivo.")
         return value
+    def validate_placa(self, value):
+        return value.upper()
 
     # Validación general
     def validate(self, data):

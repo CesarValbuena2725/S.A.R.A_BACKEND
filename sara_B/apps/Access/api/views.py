@@ -86,8 +86,14 @@ class Login(APIView):
             # Buscar al usuario
             user = get_object_or_404(Usuario, usuario=request.data['usuario'])
 
+            if user.id_empleado.estado =="IN":
+                return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_403_FORBIDDEN)
+
+            
+
             # Verificar si el usuario está activo
             if user.estado == 'AC':
+                
                 # Verificar la contraseña
                 if not user.verificar_contraseña(request.data['password']):
                     return Response({'error': 'Contraseña incorrecta'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -141,7 +147,8 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
 
                 #Hace la instancia del Usuario 
                 usuario = Usuario.objects.select_related('id_empleado').get(usuario=request.data['usuario'])
-
+                if usuario.id_empleado.estado =="IN":
+                    return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_403_FORBIDDEN)
                 #Valida que el usuario Exista y este Activo
                 if not usuario or usuario.estado=='IN':
                     return Response({'detail': 'No puede realizar el restablecimiento'}, 

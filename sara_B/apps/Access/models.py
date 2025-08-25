@@ -26,9 +26,12 @@ class Convenio(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.is_active:
-            #! Si el convenio está siendo desactivado, también las sucursales
-            Sucursal.objects.filter(id_convenio=self, is_active=True).update(is_active=False)
+            sucursales = Sucursal.objects.filter(id_convenio=self, is_active=True)
+            for sucursal in sucursales:
+                sucursal.is_active = False
+                sucursal.save()  
         super().save(*args, **kwargs)
+
 
     def __str__(self):
         return self.nombre
