@@ -101,15 +101,17 @@ class ReportLogins(APIView):
             
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 class GetTiempoSolucion(APIView):
     model = Solicitud
     serializer_class = SolicitudSerializers
 
     def get(self, request):
-        # Filtrar solicitudes finalizadas en enero (ejemplo mes=1)
-        data_create = Solicitud.objects.filter(fecha__year=datetime.now().year,fecha__month=int(datetime.now().month),
-            estado="FIN")
+        # Filtrar solicitudes finalizadas del mes actual
+        data_create = Solicitud.objects.filter(
+            fecha__year=datetime.now().year,
+            fecha__month=datetime.now().month,
+            estado="FIN"
+        )
 
         total_tiempo = timedelta(0)
         count = 0
@@ -119,14 +121,14 @@ class GetTiempoSolucion(APIView):
                 total_tiempo += (data.fecha_fin - data.fecha)
                 count += 1
 
-        promedio = total_tiempo / count
-
-        if promedio:
+        if count > 0:  # evitar división por cero
+            promedio = total_tiempo / count
             dias = promedio.days
             horas = promedio.seconds // 3600
             promedio_str = f"{dias} días, {horas} horas"
         else:
             promedio_str = "Sin datos"
+
         return Response({
             "promedio_duracion": promedio_str
         }, status=status.HTTP_200_OK)
