@@ -64,15 +64,15 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
     def validate_usuario(self, value):
         data =ValidateFields().Length_min(value, 6)
-        if data:
-            data = ValidateFields.validate(data,"STRING")
-            return data.lower()
+        if not data:
+            return data
+        return ValidateFields().validate(data,"STRING").lower()
         
     def validate_password(self,value):
-        return ValidateFields.validate(value,"PASSWORD")
+        return ValidateFields().validate(value,"PASSWORD")
     
     def validate_id_empleado(self, value):
-        return ValidateFields.Validate_Relacion(value=value)
+        return ValidateFields().Validate_Relacion(value)
 
     def update(self, instance, validated_data):
         """ Evitar sobreescribir la contraseña si no se envía en la solicitud """

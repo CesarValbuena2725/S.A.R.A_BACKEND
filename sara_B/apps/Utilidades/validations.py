@@ -11,7 +11,7 @@ class ValidateFields:
             'INT': r'^\d+$',  # solo enteros positivos
             'DECIMAL': r'^\d+(\.\d{1,2})?$',  # números decimales hasta 2 dígitos
             'STRING': r'^[A-Za-zÁÉÍÓÚáéíóúñÑ0-9]+(?:\s+[A-Za-zÁÉÍÓÚáéíóúñÑ0-9]+)*$',  # solo letras y espacios intermedios
-            'PASSWORD': r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',  # contraseña segura
+            'PASSWORD': r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:,.<>?/|~])[A-Za-z\d!@#$%^&*()_\-+=\[{\]};:,.<>?/|~]{8,}$',
             'TEL': r'^(3\d{9}|\d{7}|\d{10})$',
             'EMAIL': r'^[\w\.-]+@[\w\.-]+\.\w{2,}$',  # email
             'PLACA': r'^(?:[A-Z]{3}\d{3}|[A-Z]{3}\d{2}[A-Z])$',  # placas Colombia
@@ -62,8 +62,11 @@ class ValidateFields:
         return data
     #Funciona para tamaño minimo 
     def Length_min(self, value,tamaño):
-        if len(value)< int(tamaño):
-            raise ValueError("Caractereres insuficionetes para realizar el registro")
+        if len(value) < int(tamaño):
+            raise serializers.ValidationError(
+                f"El valor debe tener al menos {tamaño} caracteres."
+            )
+        return value
 
     def Validate_Relacion(self, value):
         if value.estado == "IN":
