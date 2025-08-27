@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 #Apps locals
-from apps.Utilidades.Permisos import Get_Model_Name
+from apps.Utilidades.permisos import Get_Model_Name
 from apps.Access.models import UserSession
 from apps.Requests.models import Solicitud,Plan
 from apps.Access.api.serializers import SerializersUserSession
@@ -23,7 +23,7 @@ from apps.Requests.api.serializers import SolicitudSerializers,PlanSerializers
 #PErmisos 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from apps.Utilidades.Permisos import RolePermission
+from apps.Utilidades.permisos import RolePermission
 
 class GetStatisticSolicitud(APIView):
     """

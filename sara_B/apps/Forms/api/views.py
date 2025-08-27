@@ -17,7 +17,7 @@ from apps.Forms.api.serializers import (
     ItemsSerializers
 )
 from apps.Forms.models import CreacionFormulario, Formulario, Items
-from apps.Utilidades.Permisos import  RolePermission
+from apps.Utilidades.permisos import  RolePermission
 
 
 class PostCreateForms(APIView):

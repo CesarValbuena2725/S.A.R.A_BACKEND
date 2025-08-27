@@ -16,10 +16,8 @@ from apps.Requests.models import Plan, Solicitud, TipoVehiculo, VehiculoPlan
 from apps.Forms.models import Formulario, Items,CreacionFormulario
 from apps.Forms.api.serializers import FormularioSerializers,ItemsSerializers,CreacionFormularioSerializers
 from apps.Utilidades.CRUD import FiltroGeneral
-from apps.Utilidades.Email.email_base import Send_Email_Sara
-from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
+from apps.Utilidades.permisos import BASE_PERMISOSOS, RolePermission
 from apps.Utilidades.tasks import Send_Email_Asyn
-from apps.Utilidades.Permisos import Get_Model_Name
 
 
 
@@ -126,7 +124,7 @@ class PostRequests(generics.GenericAPIView):
 
         serializers=self.serializer_class(data=request.data)
         if not serializers.is_valid():
-             return Response(serializers.errors ,status=status.HTTP_406_NOT_ACCEPTABLE)
+            return Response({"errors": serializers.errors}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             instance= serializers.save()
@@ -184,7 +182,7 @@ class PatchRequest(APIView):
         model_serializers = self.serializer_class(instancia, data=request.data, partial=True)
 
         if not model_serializers.is_valid():
-            return Response(model_serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"errors": model_serializers.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
         if model_serializers.validated_data.get('estado') == "CAL":
@@ -198,8 +196,7 @@ class PatchRequest(APIView):
                 affair= f"Solicitud Cancelada {instancia.pk}",
                 #Base HTMl que se va a renderiar para el correo
                 template="base_update_request.html",
-                #sin Solicitante// default None
-                #sin Destinatario// Default correo SARA
+                destinatario=["tosaraweb@gmail.com",instancia.id_empleado.correo],
                 )
 
             except Exception as e:

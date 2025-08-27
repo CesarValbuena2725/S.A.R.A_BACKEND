@@ -1,13 +1,14 @@
 # Third-party imports
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, status
+from rest_framework import generics, status,serializers
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
+
 # Local application imports
-from apps.Utilidades.Permisos import (
+from apps.Utilidades.permisos import (
     RolePermission,
     Get_Model_Name,
     Get_Serializer_Name
@@ -20,13 +21,14 @@ class FiltroGeneral(filters.FilterSet):
     class Meta:
         model = None  # Será asignado dinámicamente
 
+
 # BAse General para el CRUD
 class BaseGeneral(generics.GenericAPIView):
 
-    
+    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
-    
+    """
     allowed_roles = [] 
  
     # Funcion que Valida el serializers Pasado dinamicamente por la URL

@@ -1,16 +1,22 @@
 from rest_framework import serializers
 from apps.Result.models import CategoriaOpciones,Opciones, Respuestas,Fotos
-from apps.Utilidades.Permisos import Set_Serializers
+from apps.Utilidades.permisos import Set_Serializers
+from apps.Utilidades.validations import ValidateFields
 from apps.Requests.models import Solicitud
 from apps.Forms.models import Formulario,Items
 from apps.Requests.api.tools import List_Form
 from apps.Forms.models import CreacionFormulario
 from django.db import transaction
+
+
 @Set_Serializers
 class CategoriaOpcionesSerializer(serializers.ModelSerializer):
     class Meta:
         model = CategoriaOpciones
         fields = '__all__'
+
+    def validate_nombre(self, value):
+        return ValidateFields().Validate_Relacion(value)
 
 @Set_Serializers
 class OpcionesSeralizers(serializers.ModelSerializer):
@@ -18,16 +24,40 @@ class OpcionesSeralizers(serializers.ModelSerializer):
         model = Opciones
         fields='__all__'
 
+    def validate_nombre_opcion(self, value):
+        return ValidateFields().Validate_Relacion(value)
+    
+    def validate_id_categoria_opciones(self, value):
+        return ValidateFields().Validate_Relacion(value)
+
 class RespuestaModelSerializers(serializers.ModelSerializer):
     class Meta:
         model = Respuestas
         fields = '__all__'
+
+    def validate_id_solicitud(self,value):
+        return ValidateFields().Validate_Relacion(value)
+    
+    def validate_id_formulario(self,value):
+        return ValidateFields().Validate_Relacion(value)
+    
+    def validate_id_item(self,value):
+        return ValidateFields().Validate_Relacion(value)
+
+
+
+
     
 class RespuestaSerializer(serializers.Serializer):
     #Se relacion los Serializer del los modelos necesarios, con sus respectivas restriciones 
     solicitud = serializers.PrimaryKeyRelatedField(queryset=Solicitud.objects.filter(is_active=True))
     formulario = serializers.PrimaryKeyRelatedField(queryset=Formulario.objects.filter(is_active=True))
     resultados = serializers.JSONField()
+
+    def validate_solicitud(self, value):
+        return ValidateFields().Validate_Relacion(value)
+    def validate_formulario(self, value):
+        return ValidateFields().Validate_Relacion(value)
 
     def validate(self, data):
         result = data.get('resultados')

@@ -17,13 +17,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 # Local application imports
 from apps.Access.models import Usuario, Empleado,UserSession
 from apps.Access.api.serializers import (
-    UsuarioSerializers,
+    UsuarioSerializer,
     SolicitudRestablecerPassSerializers,
     RestablecerPasswordSerializers,
-    loginserializers,
+    loginserializer,
     EmpleadoSerialzers
 )
-from apps.Utilidades.Permisos import RolePermission
+from apps.Utilidades.permisos import RolePermission
 from apps.Utilidades.tasks import Send_Email_Asyn
 
 
@@ -35,7 +35,7 @@ class CreateUser(APIView):
     allowed_roles = ['AD','CA'] 
     
     model = Usuario
-    serializer_class = UsuarioSerializers
+    serializer_class = UsuarioSerializer
 
     def get(self, request):
         try:
@@ -71,7 +71,7 @@ class CreateUser(APIView):
 class Login(APIView):
     # instancion los modelos y serealizers necesarios 
     model = Usuario
-    serializer_class= loginserializers
+    serializer_class= loginserializer
 
     def post(self, request):
         # se toma la data y se pasa a la serilizer para ser procesada
@@ -84,10 +84,10 @@ class Login(APIView):
       
         try:
             # Buscar al usuario
-            user = get_object_or_404(Usuario, usuario=request.data['usuario'])
+            user = get_object_or_404(Usuario, usuario=usuario)
 
             if user.id_empleado.estado =="IN":
-                return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_403_FORBIDDEN)
+                return Response({'error': 'Usuarioooo no encontrado.'}, status=status.HTTP_403_FORBIDDEN)
 
             
 
@@ -95,7 +95,7 @@ class Login(APIView):
             if user.estado == 'AC':
                 
                 # Verificar la contraseña
-                if not user.verificar_contraseña(request.data['password']):
+                if not user.verificar_contraseña(password):
                     return Response({'error': 'Contraseña incorrecta'}, status=status.HTTP_401_UNAUTHORIZED)
 
                 # Generar los tokens (JWT)
@@ -125,7 +125,7 @@ class Login(APIView):
             else:
                 return Response({'error': 'Usuario inactivo. Contacte al administrador de SARA'}, status=status.HTTP_403_FORBIDDEN)
         except Http404:
-            return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_403_FORBIDDEN)
+            return Response({'error':'Usuario no encontrado.'}, status=status.HTTP_403_FORBIDDEN)
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

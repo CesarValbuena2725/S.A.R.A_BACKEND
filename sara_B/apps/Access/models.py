@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.contrib.auth.hashers import make_password, check_password
-from apps.Utilidades.Permisos import Set_Model
+from apps.Utilidades.permisos import Set_Model
 from django.utils import timezone
 
 class Estado(models.TextChoices):
@@ -133,7 +133,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 class UserSession(models.Model):
     id_usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
     login_count = models.IntegerField(default=0)
-    last_login = models.DateTimeField( default= timezone.now(), null=True, blank=True)
+    last_login = models.DateTimeField( default= timezone.now, null=True, blank=True)
 
     def registrar_login(self):
         self.login_count += 1

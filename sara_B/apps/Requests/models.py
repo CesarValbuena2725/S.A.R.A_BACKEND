@@ -2,7 +2,7 @@ from django.db import models
 from apps.Access.models import Estado
 from django.utils.timezone  import localdate
 from apps.Access.models import Empleado
-from apps.Utilidades.Permisos import Set_Model
+from apps.Utilidades.permisos import Set_Model
 from apps.Access.models import Convenio,Sucursal
 
 

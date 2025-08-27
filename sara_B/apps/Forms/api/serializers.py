@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from apps.Forms.models import Formulario,Items,FormularioPlan,CreacionFormulario, CategoriaFormularios
 from apps.Requests.models import Plan
-from apps.Utilidades.Permisos import Set_Serializers
+from apps.Utilidades.permisos import Set_Serializers
 from rest_framework.exceptions import APIException
 from django.db import transaction
 from apps.Result.models import CategoriaOpciones

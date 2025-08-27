@@ -1,0 +1,60 @@
+# --- Framework principal ---
+Django==4.2
+djangorestframework==3.15.2
+djangorestframework-simplejwt==5.3.1
+django-filter==25.1
+django-cors-headers==4.5.0
+sqlparse==0.5.3
+asgiref==3.8.1
+tzdata==2025.1
+pytz==2025.1
+
+# --- Base de datos ---
+mysqlclient==2.2.7
+
+# --- Celery y tareas asíncronas ---
+celery==5.4.0
+django-celery-results==2.5.1
+amqp==5.3.1
+billiard==4.2.1
+kombu==5.4.2
+vine==5.1.0
+flower==2.0.1   # ⚠️ opcional, solo si monitorearás workers en producción
+
+# --- Librerías de utilidades ---
+python-dateutil==2.9.0.post0
+requests==2.32.3
+humanize==4.12.1
+six==1.17.0
+colorama==0.4.6
+certifi==2025.1.31
+charset-normalizer==3.4.1
+idna==3.10
+urllib3==2.3.0
+
+# --- Archivos y reportes ---
+openpyxl==3.1.5
+et_xmlfile==2.0.0
+pillow==11.2.1
+weasyprint==65.1
+fonttools==4.58.1
+Brotli==1.1.0
+cffi==1.17.1
+pycparser==2.22
+pyphen==0.17.2
+pydyf==0.11.0
+tinycss2==1.4.0
+tinyhtml5==2.0.0
+webencodings==0.5.1
+zopfli==0.2.3.post1
+
+# --- Comandos y monitoreo ---
+click==8.1.8
+click-didyoumean==0.3.1
+click-plugins==1.1.1
+click-repl==0.3.0
+prompt_toolkit==3.0.50
+wcwidth==0.2.13
+tornado==6.4.2
+prometheus_client==0.21.1
+PyJWT==2.10.1

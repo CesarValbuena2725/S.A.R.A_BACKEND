@@ -1,10 +1,11 @@
 from rest_framework import serializers
 from apps.Access.models import Empleado
 from apps.Requests.models import Solicitud, Plan, VehiculoPlan,TipoVehiculo
-from apps.Utilidades.Permisos import Set_Serializers
+from apps.Utilidades.permisos import Set_Serializers
 from apps.Forms.models import FormularioPlan,Formulario
 from rest_framework.exceptions import APIException
 from django.db import transaction
+from apps.Utilidades.validations import ValidateFields
 
 class SolicitudSerializers(serializers.ModelSerializer):
     class Meta:
@@ -12,27 +13,33 @@ class SolicitudSerializers(serializers.ModelSerializer):
         fields='__all__'
         read_only_fields = ['fecha']  # Bloquea escritura, pero permite lectura
 
-    # Validación de empleado
-    def validate_id_empleado(self, value):
-        if value.estado == "IN":
-            raise serializers.ValidationError("Empleado inactivo.")
-        return value
+    # Funciones para las validaciones 
     def validate_placa(self, value):
-        return value.upper()
+        return ValidateFields().validate(value,"PLACA")
+    
+    def validate_telefono(self, value):
+        return ValidateFields().validate(value,"TEL")
+    
+    def validate_id_convenio(self, value):
+        return ValidateFields().Validate_Relacion(value)
+    
+    def validate_id_sucursal(self, value):
+        return ValidateFields().Validate_Relacion(value)
+    
+    def validate_id_empleado(self, value):
+        return ValidateFields().Validate_Relacion(value)
+    
+    def validate_id_plan(self, value):
+        return ValidateFields().Validate_Relacion(value)
+    
+    def validate_id_tipo_vehiculo(self, value):
+        return ValidateFields().Validate_Relacion(value)
 
     # Validación general
     def validate(self, data):
         # Validar modificación de Placa
         #if self.instance and 'Placa' in data:
          #   raise serializers.ValidationError({"Placa": "No modificable después de creación."})
-
-        # Validar convenio
-        if data.get("id_convenio") and data["id_convenio"].estado == 'IN':
-            raise serializers.ValidationError({"id_convenio": "Convenio inactivo."})
-
-        # Validar sucursal
-        if data.get("id_sucursal") and data["id_sucursal"].estado == 'IN':
-            raise serializers.ValidationError({"id_sucursal": "Sucursal inactiva."})
 
         plan = data["id_plan"]
         tipo_vehiculo = data["id_tipo_vehiculo"]
@@ -55,7 +62,10 @@ class PlanSerializers(serializers.ModelSerializer):
     class Meta:
         model = Plan
         fields = '__all__'
-
+    def validate_nombre_plan(self, value):
+        return ValidateFields().validate(value,"STRING")
+    def validate_id_tipo_vehiculo(self, value):
+        return ValidateFields().Validate_Relacion(value)
 
     def create(self, data):
         list_adic = data.get('lista_adicionales', [])
@@ -119,7 +129,6 @@ class PlanSerializers(serializers.ModelSerializer):
         return instance
 
 
-
 @Set_Serializers
 class TipovehiculoSerializers(serializers.ModelSerializer):
     planes = serializers.PrimaryKeyRelatedField(queryset=Plan.objects.all(), many=True, write_only=True)
@@ -128,6 +137,9 @@ class TipovehiculoSerializers(serializers.ModelSerializer):
         model= TipoVehiculo
         fields= '__all__'
 
+    def validate_nombre_vehiculo(self, value):
+        return ValidateFields().validate(value,"STRING")
+    
     def create(self, validated_data):
         
         tipo_vehiculo = TipoVehiculo.objects.create(**validated_data)
@@ -157,3 +169,8 @@ class VehiculoplanSerializers(serializers.ModelSerializer):
     class Meta:
         model= VehiculoPlan
         fields='__all__'
+    def validate_id_plan(self, value):
+        return ValidateFields().Validate_Relacion(value)
+    
+    def validate_id_vehiculo(self, value):
+        return ValidateFields().Validate_Relacion(value)

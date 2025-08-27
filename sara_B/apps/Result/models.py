@@ -1,6 +1,6 @@
 from django.db import models
 from apps.Access.models import Estado
-from apps.Utilidades.Permisos import Set_Model
+from apps.Utilidades.permisos import Set_Model
 
 from apps.Requests.models import Solicitud
 

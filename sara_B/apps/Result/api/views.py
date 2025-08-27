@@ -31,17 +31,17 @@ from apps.Result.api.serializers import (
     Fotos,
 )
 from apps.Result.api.tools import Amount_Items, FunctionClose
-from apps.Utilidades.Permisos import BASE_PERMISOSOS, RolePermission
+from apps.Utilidades.permisos import BASE_PERMISOSOS, RolePermission
 from apps.Utilidades.Email.email_base import Send_Email_Sara
 from apps.Utilidades.tasks import Send_Email_Asyn, Render_Reporte_Asyn
 
 
 class GetRespuestas(generics.GenericAPIView):
-    """
+    
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ["PR", "AD"]
-    """
+    
     model = Respuestas
     serializer_class = RespuestaModelSerializers
 
@@ -82,11 +82,11 @@ class FotosUploadView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
   
 class PostRespuestas(generics.GenericAPIView):
-    """
+    
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles =["PR","AD"]
-    """
+    
     serializer_class = RespuestaSerializer
     model_base= Respuestas
     
@@ -115,11 +115,11 @@ class PostRespuestas(generics.GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class PutRespuesta(APIView):
-    """
+    
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ["PR", "AD"]
-    """
+    
 
     def put(self, request):
         solicitud = request.data.get('solicitud')
