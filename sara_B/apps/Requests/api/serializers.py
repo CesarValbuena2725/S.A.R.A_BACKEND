@@ -5,7 +5,7 @@ from apps.Utilidades.permisos import Set_Serializers
 from apps.Forms.models import FormularioPlan,Formulario
 from rest_framework.exceptions import APIException
 from django.db import transaction
-from apps.Utilidades.validations import ValidateFields
+from apps.Utilidades.General.validations import ValidateFields
 
 class SolicitudSerializers(serializers.ModelSerializer):
     class Meta:

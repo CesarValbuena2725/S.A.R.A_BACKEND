@@ -15,7 +15,7 @@ from apps.Requests.api.serializers import (
 from apps.Requests.models import Plan, Solicitud, TipoVehiculo, VehiculoPlan
 from apps.Forms.models import Formulario, Items,CreacionFormulario
 from apps.Forms.api.serializers import FormularioSerializers,ItemsSerializers,CreacionFormularioSerializers
-from apps.Utilidades.CRUD import FiltroGeneral
+from apps.Utilidades.General.CRUD import FiltroGeneral
 from apps.Utilidades.permisos import BASE_PERMISOSOS, RolePermission
 from apps.Utilidades.tasks import Send_Email_Asyn
 

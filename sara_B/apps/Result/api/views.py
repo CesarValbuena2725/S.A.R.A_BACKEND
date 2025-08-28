@@ -27,7 +27,7 @@ from apps.Result.api.serializers import (
     RespuestaSerializer,
     Respuestas,
     RespuestaModelSerializers,
-    ImagenSerializer,
+    FotoSerializer,
     Fotos,
 )
 from apps.Result.api.tools import Amount_Items, FunctionClose
@@ -59,6 +59,28 @@ class GetRespuestas(generics.GenericAPIView):
         serilizer = self.serializer_class(respuestas ,many = True)
         return Response(serilizer.data, status=status.HTTP_200_OK)
 
+class GetFoto(APIView):
+    model = Fotos
+
+    def get(self, request, *args, **kwargs):
+        solicitud = self.kwargs.get("id_solicitud")
+        try:
+            foto = self.model.objects.get(id_solicitud=solicitud)
+
+            # Si lo que se guardó fue una URL, limpiamos para obtener la ruta real
+            relative_path = foto.imagen.name  # → esto debería ser "imagenes/..."
+            file_path = os.path.join(settings.MEDIA_ROOT, relative_path)
+
+            imagen_file = open(file_path, "rb")
+            return FileResponse(imagen_file, content_type="image/jpeg")
+
+        except self.model.DoesNotExist:
+            return Response(
+                {"error": "No hay fotos registradas para esa solicitud"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
 
 class FotosUploadView(APIView):
     """
@@ -66,21 +88,23 @@ class FotosUploadView(APIView):
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ['PR','AD']
     """
-    serializer_class = ImagenSerializer
+    serializer_class = FotoSerializer
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, *args, **kwargs):
         try:
-            serializer = ImagenSerializer(data=request.data, context={'request': request})
+            serializer = FotoSerializer(data=request.data, context={'request': request})
             if serializer.is_valid():
                 instancia = serializer.save()
-                instancia.imagen = request.build_absolute_uri(instancia.imagen.url)
+                instancia.imagen_url = request.build_absolute_uri(instancia.imagen.url)
                 instancia.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
   
+
+
 class PostRespuestas(generics.GenericAPIView):
     
     authentication_classes = [JWTAuthentication]
@@ -177,7 +201,7 @@ class CloseRequest(APIView):
                     'PMC': functiones.Pmc(),
                     'PMV': functiones.Pmv(),
                     'porcentaje': functiones.Porcentaje(),
-                    'foto':Fotos.objects.get(pk=2)
+                    'foto':Fotos.objects.get(id_solicitud=id_request)
 
                 }
             # Se Renderiza la informacion en un HTML con los datos necesarios 
@@ -240,7 +264,7 @@ class DownloadReport(APIView):
             if  not os.path.exists(output_path):
                 return Response("Reporte No encontrado Validar con el Administrador", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-            return FileResponse(open(output_path, 'rb'), as_attachment=True, content_type='application/pdf')
+            return FileResponse(open(output_path, 'rb'), as_attachment=True, content_type='application/pdf', filename=file_name )
         except Exception as e:
             return Response({"error":e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from apps.Result.models import CategoriaOpciones,Opciones, Respuestas,Fotos
 from apps.Utilidades.permisos import Set_Serializers
-from apps.Utilidades.validations import ValidateFields
+from apps.Utilidades.General.validations import ValidateFields
 from apps.Requests.models import Solicitud
 from apps.Forms.models import Formulario,Items
 from apps.Requests.api.tools import List_Form
@@ -194,9 +194,15 @@ class RespuestaSerializer(serializers.Serializer):
         return {'respuestas_actualizadas': respuestas}
     
 
-class ImagenSerializer(serializers.ModelSerializer):
+class FotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Fotos
         fields =  '__all__'
+        
+    def validate(self, data):
+        solicitud = data.get("id_solicitud")
+        if (Fotos.objects.filter(id_solicitud= solicitud)):
+            raise serializers.ValidationError("Ya existe una foto guardad para esta solicitud")
+        return data
 
 

@@ -4,6 +4,8 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from django.utils.timezone  import localdate
+
 
 # Third-party imports
 from rest_framework import status, generics
@@ -102,6 +104,10 @@ class Login(APIView):
                 refresh = RefreshToken.for_user(user)
                 access_token = refresh.access_token
                 count_session =UserSession.objects.filter(id_usuario =user.pk).exists()
+                
+                user.last_login= localdate()
+                user.save()
+                print(user.last_login)
                 #  Se hace la validancion para registar la Sesiones 
                 if not count_session:
                     data= UserSession.objects.create(

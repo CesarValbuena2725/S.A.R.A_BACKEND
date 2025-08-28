@@ -159,10 +159,10 @@ class PatchGeneral(BaseGeneral):
             instance = self.get_object(pk)
             serializer_class = self.get_serializer_class()
             serializer = serializer_class(instance, data=request.data, partial=True)
-            if serializer.is_valid(raise_exception=True):
+            if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except NotFound as e:
             return Response({'errors': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
@@ -179,7 +179,7 @@ class PutGeneral(BaseGeneral):
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except NotFound as e:
             return Response({'errors': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
@@ -196,7 +196,7 @@ class DeleteGeneral(BaseGeneral):
             
             instance.is_active=False
             instance.save()
-            return Response({"detail": "Eliminado"}, status=status.HTTP_202_ACCEPTED)
+            return Response({"detail": "Eliminado"}, status=status.HTTP_204_NO_CONTENT)
         except NotFound as e:
             return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)
 
@@ -210,7 +210,7 @@ class DeleteAdmin(BaseGeneral):
             instance = self.get_object(pk)
 
             instance.delete()
-            return Response({"detail": "Eliminado"}, status=status.HTTP_202_ACCEPTED)
+            return Response({"detail": "Eliminado"}, status=status.HTTP_204_NO_CONTENT)
         except NotFound as e:
             return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)
 

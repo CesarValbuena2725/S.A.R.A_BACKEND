@@ -4,7 +4,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from rest_framework.exceptions import ValidationError
 from apps.Utilidades.permisos import Set_Serializers
-from apps.Utilidades.validations import ValidateFields
+from apps.Utilidades.General.validations import ValidateFields
 
 
 @Set_Serializers
@@ -60,7 +60,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Usuario
-        exclude = ['is_active', 'is_staff', 'is_superuser', 'last_login']
+        exclude = ['is_active', 'is_staff', 'is_superuser', ]
 
     def validate_usuario(self, value):
         data =ValidateFields().Length_min(value, 6)

@@ -51,6 +51,7 @@ class Fotos(models.Model):
     categoria_foto = models.CharField(max_length=3, choices=CategoriaFotos.choices, default=CategoriaFotos.GENERALES)
     imagen = models.ImageField(upload_to='imagenes/')
     creado_en = models.DateTimeField(auto_now_add=True)
+    imagen_url = models.CharField(max_length=500, null=True)
     
     def __str__(self):
         return self.categoria_foto
