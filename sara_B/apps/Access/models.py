@@ -10,7 +10,7 @@ class Estado(models.TextChoices):
 
 
 Errores = {
-    'unique': 'Este nombre de usuario está en uso.',
+    'unique': 'Este dato ya existe en el sistema. Verifique e intente con uno distinto.',
     'blank': 'El campo usuario no puede estar vacío.',
     'max_length': 'Valor fuera de los límites.',
     'invalid': 'Formato no válido',

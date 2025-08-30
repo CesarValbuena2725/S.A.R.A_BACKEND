@@ -48,7 +48,7 @@ class EmpleadoSerialzers(serializers.ModelSerializer):
     def validate_apellidos(self, value):
         return ValidateFields().validate(value,"STRING")
     def validate_cedula(self, value):
-        return ValidateFields().validate(value,"INT")
+        return ValidateFields().validate(value,"CEDULA")
     def validate_correo(self, value):
         return ValidateFields().validate(value,"EMAIL")
     def validate_id_sucursal(self,value):

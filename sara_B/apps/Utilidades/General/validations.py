@@ -9,6 +9,7 @@ class ValidateFields:
     def __init__(self):
         self.base = {
             'INT': r'^\d+$',  # solo enteros positivos
+            'CEDULA': r'^\d{6,10}$',
             'DECIMAL': r'^\d+(\.\d{1,2})?$',  # números decimales hasta 2 dígitos
             'STRING': r'^[A-Za-zÁÉÍÓÚáéíóúñÑ0-9]+(?:\s+[A-Za-zÁÉÍÓÚáéíóúñÑ0-9]+)*$',  # solo letras y espacios intermedios
             'PASSWORD': r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:,.<>?/|~])[A-Za-z\d!@#$%^&*()_\-+=\[{\]};:,.<>?/|~]{8,}$',
@@ -48,7 +49,7 @@ class ValidateFields:
             # aquí no transformamos nada, solo validamos
             pass
 
-        elif type_validate in ["INT", "DECIMAL", "TEL", "ZIPCODE"]:
+        elif type_validate in ["INT", "DECIMAL", "TEL", "ZIPCODE","CEDULA"]:
             data = data  # sin cambios
 
         # Validaciones con Expreciones  regulares
@@ -70,8 +71,8 @@ class ValidateFields:
 
     def Validate_Relacion(self, value):
         if value.estado == "IN":
-            raise ValueError(f"{value._meta.model_name } inactivo.")
+            raise serializers.ValidationError(f"{value._meta.model_name } inactivo.")
         if value.is_active == 0:
-            raise ValueError(f"{value._meta.model_name } Eliminado")
+            raise serializers.ValidationError(f"{value._meta.model_name } Eliminado")
         return value
     

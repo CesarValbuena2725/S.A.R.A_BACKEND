@@ -184,7 +184,11 @@ class CloseRequest(APIView):
         except Solicitud.DoesNotExist:
             return Response("Solicitud no encontrada", status=status.HTTP_404_NOT_FOUND)
         
-    
+        try:
+            foto=Fotos.objects.get(id_solicitud=id_request)
+        except Fotos.DoesNotExist:
+            return Response("Registra evidencia del vehiculo para finalizar", status=status.HTTP_406_NOT_ACCEPTABLE)
+
         
         try:
             # Clase que permite crear los contextos necesarios crear el informe, la logia esta separada 
@@ -201,14 +205,12 @@ class CloseRequest(APIView):
                     'PMC': functiones.Pmc(),
                     'PMV': functiones.Pmv(),
                     'porcentaje': functiones.Porcentaje(),
-                    'foto':Fotos.objects.get(id_solicitud=id_request)
-
+                    'foto':foto,
                 }
             # Se Renderiza la informacion en un HTML con los datos necesarios 
             html_string = render_to_string("Reporte.html", context)
             # Se Crea una ruta donde Guardar e informe 
             output_path = os.path.join(settings.REPORTS_DIR, f"{solicitud.placa}.pdf")
-            fotos = Fotos.objects.get(pk=2)
             # Se optine dirrecion de correo a donde se debe Enviar el informe PDF 
             dirrecion = Respuestas.objects.get(id_formulario =3, id_item =46, id_solicitud = id_request)
         except Exception as e:
@@ -231,7 +233,6 @@ class CloseRequest(APIView):
                 template="email.html",
                 destinatario=[solicitud.id_empleado.correo, dirrecion.respuesta_texto],
                 solicitante=model_to_dict(solicitud,fields=['id', 'placa', 'estado', 'fecha', 'fecha_fin', 'observaciones']),
-                contexto=fotos.imagen.url,
                 delay_second=5
             )).delay()
 
