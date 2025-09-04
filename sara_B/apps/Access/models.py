@@ -18,9 +18,9 @@ Errores = {
 
 @Set_Model
 class Convenio(models.Model):
-    nombre = models.CharField(max_length=100, unique=True, error_messages=Errores)
-    nit = models.CharField(max_length=100, unique=True, null=False, error_messages=Errores)
-    telefono = models.BigIntegerField(error_messages=Errores)
+    nombre = models.CharField(max_length=40, unique=True, error_messages=Errores)
+    nit = models.CharField(max_length=50, unique=True, null=False, error_messages=Errores)
+    telefono = models.CharField(max_length=10,error_messages=Errores)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
     is_active = models.BooleanField(default=True) 
 
@@ -38,10 +38,10 @@ class Convenio(models.Model):
     
 @Set_Model
 class Sucursal(models.Model):
-    nombre = models.CharField(max_length=100, error_messages=Errores)
-    ciudad = models.CharField(max_length=100, error_messages=Errores)
-    direccion = models.CharField(max_length=100, error_messages=Errores)
-    telefono = models.BigIntegerField(error_messages=Errores)
+    nombre = models.CharField(max_length=50, error_messages=Errores)
+    ciudad = models.CharField(max_length=50, error_messages=Errores)
+    direccion = models.CharField(max_length=50, error_messages=Errores)
+    telefono = models.CharField(max_length=10,error_messages=Errores)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
     id_convenio = models.ForeignKey(Convenio, on_delete=models.CASCADE, null=False)
     is_active = models.BooleanField(default=True)  
@@ -57,8 +57,8 @@ class Sucursal(models.Model):
     
 @Set_Model
 class Empleado(models.Model):
-    nombres = models.CharField(max_length=100, error_messages=Errores)
-    apellidos = models.CharField(max_length=100, error_messages=Errores)
+    nombres = models.CharField(max_length=60, error_messages=Errores)
+    apellidos = models.CharField(max_length=60, error_messages=Errores)
     cedula = models.BigIntegerField(unique=True, null=False, error_messages=Errores)
     correo = models.EmailField(max_length=50, unique=True, error_messages=Errores)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
@@ -69,7 +69,6 @@ class Empleado(models.Model):
         if not self.is_active:
             Usuario.objects.filter(id_empleado=self, is_active= True).update(is_active=False)
         super().save(*args, **kwargs)
-
 
     def __str__(self):
         return self.nombres
@@ -103,7 +102,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         ADMIN_CONVENIO = 'CA', "Administrador Convenio"
         CONSULTOR_CONVENIO = 'CC', "Consultor Convenio"
 
-    usuario = models.CharField(max_length=100, unique=True)
+    usuario = models.CharField(max_length=20, unique=True)
     password = models.CharField(max_length=150)
     rol = models.CharField(max_length=2, choices=Roles.choices)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)

@@ -44,4 +44,4 @@ class ConvenioFieldValidationsTest(TestCase):
                 telefono=1234567890,
                 estado="INVALIDO"  # Estado no válido
             )
-            convenio.full_clean()
+        self.assertEqual(convenio.full_clean())

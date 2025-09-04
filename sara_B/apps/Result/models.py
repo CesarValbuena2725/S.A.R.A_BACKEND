@@ -13,7 +13,7 @@ class CategoriaFotos(models.TextChoices):
     GENERALES = 'GEN', 'Categoría 3'
 
 class CategoriaOpciones(models.Model):
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=50)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
     is_active = models.BooleanField(default=True) 
 
@@ -51,7 +51,7 @@ class Fotos(models.Model):
     categoria_foto = models.CharField(max_length=3, choices=CategoriaFotos.choices, default=CategoriaFotos.GENERALES)
     imagen = models.ImageField(upload_to='imagenes/')
     creado_en = models.DateTimeField(auto_now_add=True)
-    imagen_url = models.CharField(max_length=500, null=True)
+    imagen_url = models.CharField(max_length=200, null=True)
     
     def __str__(self):
         return self.categoria_foto

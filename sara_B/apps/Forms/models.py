@@ -12,7 +12,7 @@ class Tipo(models.TextChoices):
 @Set_Model  
 class Items(models.Model):
     nombre_items= models.CharField(max_length=50, null=False)
-    tipo = models.CharField(max_length=250, choices=Tipo.choices, default=Tipo.OPCIONES)
+    tipo = models.CharField(max_length=3, choices=Tipo.choices, default=Tipo.OPCIONES)
     id_categoria_opciones = models.ForeignKey(CategoriaOpciones,on_delete=models.CASCADE )
     is_active = models.BooleanField(default=True)  
 

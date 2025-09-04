@@ -101,6 +101,7 @@ class ReportLogins(APIView):
             
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 class GetTiempoSolucion(APIView):
     model = Solicitud
     serializer_class = SolicitudSerializers
@@ -206,7 +207,7 @@ class ReportesExcel(APIView):
         fill = PatternFill(start_color="DDDDDD", end_color="DDDDDD", fill_type="solid")
         
         # Titulo principal
-        campos = [field.name for field in model._meta.fields if field.name not in ['id','password']]
+        campos = [field.name for field in model._meta.fields if field.name not in ['id','password','is_staff','is_superuser']]
         num_cols = len(campos)
         col_fin = get_column_letter(num_cols)
         
@@ -218,7 +219,13 @@ class ReportesExcel(APIView):
 
         # Encabezados de columnas
         for col_num, campo in enumerate(campos, 1):
-            celda = ws.cell(row=2, column=col_num, value=campo.replace('_', ' ').title())
+            print(campo)
+            if campo == "is_active":
+                valor = "Eliminado"
+            else:
+                valor = campo
+            celda=ws.cell(row=2, column=col_num, value=valor.replace('_', ' ').title())
+            
             celda.font = Font(bold=True)
             celda.alignment = Alignment(horizontal='center')
             celda.border = borde_fino
@@ -229,7 +236,7 @@ class ReportesExcel(APIView):
             for col_num, campo in enumerate(campos, 1):
                 valor = getattr(empleado, campo, None)
                 if isinstance(valor, bool):
-                    valor = "SI" if valor else "NO"
+                    valor = "NO" if valor else "si"
                 elif isinstance(valor, date):
                     valor = valor.strftime('%d/%m/%Y')
                 celda = ws.cell(row=row_num, column=col_num, value=str(valor))

@@ -60,25 +60,18 @@ class GetRespuestas(generics.GenericAPIView):
         return Response(serilizer.data, status=status.HTTP_200_OK)
 
 class GetFoto(APIView):
-    model = Fotos
+    model= Fotos
+    serializer_class=FotoSerializer
 
-    def get(self, request, *args, **kwargs):
-        solicitud = self.kwargs.get("id_solicitud")
-        try:
-            foto = self.model.objects.get(id_solicitud=solicitud)
+    def get(self,request,*args,**kwargs):
 
-            # Si lo que se guardó fue una URL, limpiamos para obtener la ruta real
-            relative_path = foto.imagen.name  # → esto debería ser "imagenes/..."
-            file_path = os.path.join(settings.MEDIA_ROOT, relative_path)
+        
+        id_reqeust = self.kwargs.get("id_solicitud")
+        foto = self.model.objects.get(id_solicitud=id_reqeust)
+        print(f"Preba de que estoy enviando{foto.imagen_url}")
 
-            imagen_file = open(file_path, "rb")
-            return FileResponse(imagen_file, content_type="image/jpeg")
-
-        except self.model.DoesNotExist:
-            return Response(
-                {"error": "No hay fotos registradas para esa solicitud"},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        return Response(foto.imagen_url, status=status.HTTP_200_OK)
+            
 
 
 
