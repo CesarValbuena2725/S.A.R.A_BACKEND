@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from apps.Access.models import Empleado
-from apps.Requests.models import Solicitud, Plan, VehiculoPlan,TipoVehiculo
+from apps.Requests.models import Solicitud, Plan,TipoVehiculo
 from apps.Utilidades.permisos import Set_Serializers
 from apps.Forms.models import FormularioPlan,Formulario
 from rest_framework.exceptions import APIException
@@ -129,48 +129,40 @@ class PlanSerializers(serializers.ModelSerializer):
         return instance
 
 
+
 @Set_Serializers
 class TipovehiculoSerializers(serializers.ModelSerializer):
-    planes = serializers.PrimaryKeyRelatedField(queryset=Plan.objects.all(), many=True, write_only=True)
+    # Se reciben los IDs de planes
+    planes = serializers.PrimaryKeyRelatedField(
+        queryset=Plan.objects.all(), 
+        many=True, 
+        write_only=True
+    )
 
     class Meta:
-        model= TipoVehiculo
-        fields= '__all__'
+        model = TipoVehiculo
+        fields = '__all__'
 
     def validate_nombre_vehiculo(self, value):
-        return ValidateFields().validate(value,"STRING")
+        return ValidateFields().validate(value, "STRING")
     
     def create(self, validated_data):
-        
+        # Sacamos planes del diccionario para que no cause error en el modelo
+        planes = validated_data.pop("planes", [])
         tipo_vehiculo = TipoVehiculo.objects.create(**validated_data)
-        planes = validated_data.get("planes", [])
 
-        for plan_id in planes:
-            VehiculoPlan.objects.create(id_vehiculo=tipo_vehiculo, id_plan=plan_id)
+        # Crear relaciones en la tabla intermedia
 
         return tipo_vehiculo
     
     def update(self, instance, validated_data):
-        planes = validated_data.pop("plan", None)
+        # Igual que en create, pero actualizando
+        planes = validated_data.pop("planes", None)
         instance.nombre_vehiculo = validated_data.get("nombre_vehiculo", instance.nombre_vehiculo)
         instance.save()
 
-        if planes is not None:
-            VehiculoPlan.objects.filter(tipo_vehiculo=instance).delete()
-            for plan_id in planes:
-                VehiculoPlan.objects.create(tipo_vehiculo=instance, plan=plan_id)
+
 
         return instance
-    
-    
-@Set_Serializers
-class VehiculoplanSerializers(serializers.ModelSerializer):
 
-    class Meta:
-        model= VehiculoPlan
-        fields='__all__'
-    def validate_id_plan(self, value):
-        return ValidateFields().Validate_Relacion(value)
     
-    def validate_id_vehiculo(self, value):
-        return ValidateFields().Validate_Relacion(value)

@@ -2,8 +2,12 @@ from rest_framework import serializers
 import re 
 
 
-import re
-
+MESSAGES_ERROR = {
+    'unique': 'Este dato ya existe en el sistema. Verifique e intente con uno distinto.',
+    'blank': 'El campo usuario no puede estar vacío.',
+    'max_length': 'Valor fuera de los límites.',
+    'invalid': 'Formato no válido',
+}
 
 class ValidateFields:
     def __init__(self):

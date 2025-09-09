@@ -23,21 +23,21 @@ class Plan(models.Model):
     lista_adicionales = models.ManyToManyField('Forms.Formulario')
     is_active = models.BooleanField(default=True)
 
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['nombre_plan'], condition=models.Q(is_active=True), name='unique_nombre_plan_activo')
+        ]
+    
+    def save(self, *args,**kwargs):
+        if not self.is_active:
+            from apps.Forms.models import FormularioPlan
+            FormularioPlan.objects.filter(id_plan=self).delete()
+        super().save(*args, **kwargs)
     def __str__(self):
         return self.nombre_plan
 
 
-@Set_Model 
-class VehiculoPlan(models.Model):
-    id_plan =models.ForeignKey(Plan, on_delete=models.CASCADE)
-    id_vehiculo = models.ForeignKey(TipoVehiculo, on_delete=models.CASCADE)
-    is_active = models.BooleanField(default=True)  
-
-
-    class Meta:
-        constraints=[
-            models.UniqueConstraint(fields=['id_plan','id_vehiculo'], name="Vehiculo_plan_pk")
-        ]
 
 @Set_Model 
 class Solicitud(models.Model):

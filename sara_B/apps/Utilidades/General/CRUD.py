@@ -196,7 +196,7 @@ class DeleteGeneral(BaseGeneral):
             
             instance.is_active=False
             instance.save()
-            return Response({"detail": "Eliminado"}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"detail": "Eliminado"}, status=status.HTTP_200_OK)
         except NotFound as e:
             return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)
 

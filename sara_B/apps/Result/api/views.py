@@ -64,14 +64,13 @@ class GetFoto(APIView):
     serializer_class=FotoSerializer
 
     def get(self,request,*args,**kwargs):
-
         
         id_reqeust = self.kwargs.get("id_solicitud")
-        foto = self.model.objects.get(id_solicitud=id_reqeust)
-        print(f"Preba de que estoy enviando{foto.imagen_url}")
-
-        return Response(foto.imagen_url, status=status.HTTP_200_OK)
-            
+        try:
+            foto = self.model.objects.get(id_solicitud=id_reqeust)
+            return Response({'imageUrl': foto.imagen_url}, status=status.HTTP_200_OK)
+        except self.model.DoesNotExist:
+            return Response({'imageUrl': ""}, status=status.HTTP_200_OK)
 
 
 

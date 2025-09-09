@@ -12,7 +12,7 @@ from apps.Requests.api.serializers import (
     SolicitudSerializers,
     TipovehiculoSerializers
 )
-from apps.Requests.models import Plan, Solicitud, TipoVehiculo, VehiculoPlan
+from apps.Requests.models import Plan, Solicitud 
 from apps.Forms.models import Formulario, Items,CreacionFormulario
 from apps.Forms.api.serializers import FormularioSerializers,ItemsSerializers,CreacionFormularioSerializers
 from apps.Utilidades.General.CRUD import FiltroGeneral
@@ -36,6 +36,7 @@ class GetForms(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         id_request = self.kwargs.get('id_request')
+
 
         try:
             instancie_request = Solicitud.objects.get(pk=id_request)

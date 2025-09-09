@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 from django.contrib.auth.hashers import make_password, check_password
 from apps.Utilidades.permisos import Set_Model
 from django.utils import timezone
+from apps.Utilidades.General.validations import MESSAGES_ERROR
 
 class Estado(models.TextChoices):
     ACTIVO = 'AC', 'Activo'
@@ -18,11 +19,17 @@ Errores = {
 
 @Set_Model
 class Convenio(models.Model):
-    nombre = models.CharField(max_length=40, unique=True, error_messages=Errores)
-    nit = models.CharField(max_length=50, unique=True, null=False, error_messages=Errores)
-    telefono = models.CharField(max_length=10,error_messages=Errores)
+    nombre = models.CharField(max_length=40, unique=True, error_messages=MESSAGES_ERROR)
+    nit = models.CharField(max_length=50, null=False, error_messages=MESSAGES_ERROR)
+    telefono = models.CharField(max_length=10,error_messages=MESSAGES_ERROR)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
     is_active = models.BooleanField(default=True) 
+    
+    #Restrcion para evitar remitir nit con datos Activos, pero permite si el dato esta inactivo
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['nit'], condition=models.Q(is_active=True), name='unique_nit_activo')
+        ]
 
     def save(self, *args, **kwargs):
         if not self.is_active:
@@ -38,10 +45,10 @@ class Convenio(models.Model):
     
 @Set_Model
 class Sucursal(models.Model):
-    nombre = models.CharField(max_length=50, error_messages=Errores)
-    ciudad = models.CharField(max_length=50, error_messages=Errores)
-    direccion = models.CharField(max_length=50, error_messages=Errores)
-    telefono = models.CharField(max_length=10,error_messages=Errores)
+    nombre = models.CharField(max_length=50,unique=True, error_messages=MESSAGES_ERROR)
+    ciudad = models.CharField(max_length=50, error_messages=MESSAGES_ERROR)
+    direccion = models.CharField(max_length=50, error_messages=MESSAGES_ERROR)
+    telefono = models.CharField(max_length=10,error_messages=MESSAGES_ERROR)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
     id_convenio = models.ForeignKey(Convenio, on_delete=models.CASCADE, null=False)
     is_active = models.BooleanField(default=True)  
@@ -57,10 +64,10 @@ class Sucursal(models.Model):
     
 @Set_Model
 class Empleado(models.Model):
-    nombres = models.CharField(max_length=60, error_messages=Errores)
-    apellidos = models.CharField(max_length=60, error_messages=Errores)
-    cedula = models.BigIntegerField(unique=True, null=False, error_messages=Errores)
-    correo = models.EmailField(max_length=50, unique=True, error_messages=Errores)
+    nombres = models.CharField(max_length=60, error_messages=MESSAGES_ERROR)
+    apellidos = models.CharField(max_length=60, error_messages=MESSAGES_ERROR)
+    cedula = models.BigIntegerField(unique=True, null=False, error_messages=MESSAGES_ERROR)
+    correo = models.EmailField(max_length=50, unique=True, error_messages=MESSAGES_ERROR)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
     id_sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE, null=False)
     is_active = models.BooleanField(default=True)  
@@ -102,7 +109,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         ADMIN_CONVENIO = 'CA', "Administrador Convenio"
         CONSULTOR_CONVENIO = 'CC', "Consultor Convenio"
 
-    usuario = models.CharField(max_length=20, unique=True)
+    usuario = models.CharField(max_length=20, unique=True ,error_messages=MESSAGES_ERROR)
     password = models.CharField(max_length=150)
     rol = models.CharField(max_length=2, choices=Roles.choices)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)

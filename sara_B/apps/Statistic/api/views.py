@@ -239,6 +239,8 @@ class ReportesExcel(APIView):
                     valor = "NO" if valor else "si"
                 elif isinstance(valor, date):
                     valor = valor.strftime('%d/%m/%Y')
+                elif valor ==None:
+                    valor = "N/A"
                 celda = ws.cell(row=row_num, column=col_num, value=str(valor))
                 celda.border = borde_fino
 

@@ -2,6 +2,7 @@ from django.db import models
 from apps.Access.models import Estado
 from apps.Utilidades.permisos import Set_Model
 from apps.Result.models import CategoriaOpciones
+from apps.Utilidades.General.validations import MESSAGES_ERROR
 
 class Tipo(models.TextChoices):
     STRING = 'STR', 'texto'
@@ -11,7 +12,7 @@ class Tipo(models.TextChoices):
 
 @Set_Model  
 class Items(models.Model):
-    nombre_items= models.CharField(max_length=50, null=False)
+    nombre_items= models.CharField(max_length=50, null=False ,error_messages=MESSAGES_ERROR)
     tipo = models.CharField(max_length=3, choices=Tipo.choices, default=Tipo.OPCIONES)
     id_categoria_opciones = models.ForeignKey(CategoriaOpciones,on_delete=models.CASCADE )
     is_active = models.BooleanField(default=True)  

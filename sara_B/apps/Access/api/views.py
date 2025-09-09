@@ -5,6 +5,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.timezone  import localdate
+from django.http import HttpResponse
 
 
 # Third-party imports
@@ -74,6 +75,15 @@ class Login(APIView):
     # instancion los modelos y serealizers necesarios 
     model = Usuario
     serializer_class= loginserializer
+
+    def options(self, request, *args, **kwargs):
+        response = HttpResponse()
+        response["Access-Control-Allow-Origin"] = "https://sarafrontend-git-main-andres-felipes-projects-b859d2f8.vercel.app"
+        response["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+        response["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        response["Access-Control-Max-Age"] = "86400"  # Opcional: cache de preflight por 1 día
+        return response
+
 
     def post(self, request):
         # se toma la data y se pasa a la serilizer para ser procesada
