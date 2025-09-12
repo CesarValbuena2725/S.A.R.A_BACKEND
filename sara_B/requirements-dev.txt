@@ -1,0 +1,6 @@
+# Nuevas Dependecia que se deben pasar a produccio 
+
+pytest
+pytest-django
+pytest-factoryboy
+pytest-cov

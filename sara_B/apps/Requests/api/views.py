@@ -20,14 +20,12 @@ from apps.Utilidades.permisos import BASE_PERMISOSOS, RolePermission
 from apps.Utilidades.tasks import Send_Email_Asyn
 
 
-
-
 class GetForms(generics.GenericAPIView):
-    
+    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles =BASE_PERMISOSOS
-
+    """
     serializer_class= FormularioSerializers
     model_base  =  Formulario
 
@@ -64,10 +62,11 @@ class GetForms(generics.GenericAPIView):
 #!get para traer los items De los formularios:
 
 class GetFormsItems(generics.GenericAPIView):
+    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles =BASE_PERMISOSOS
-
+    """
 
     model = Items
     serializer_class = CreacionFormularioSerializers
@@ -172,10 +171,9 @@ class PatchRequest(APIView):
     def patch(self, request, pk):
         try:
             instancia = self.model.objects.get(pk=pk)
-            #FIXME: Pendiente por Quiatar Cometarios, y Evitar modificaicon despues de que se Finalice 
-            #!DEscomentariar despues de pruebas
-            #if instancia.estado == 'FIN':
-            #    return Response("Solicitud ya finalizada No se puede editar", status=status.HTTP_400_BAD_REQUEST)
+            if instancia.estado == 'FIN':
+                return Response("Solicitud ya finalizada No se puede editar", status=status.HTTP_400_BAD_REQUEST)
+            
         except self.model.DoesNotExist:
             return Response({"detail": "Solicitud no encontrada"}, status=status.HTTP_404_NOT_FOUND)
 

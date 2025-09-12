@@ -111,6 +111,10 @@ class SolicitudRestablecerPassSerializers(serializers.Serializer):
 class RestablecerPasswordSerializers(serializers.Serializer):
     password = serializers.CharField(write_only=True, min_length=10)
     password_conf = serializers.CharField(write_only=True, min_length=10)
+    def validate_password(self,value):
+        return ValidateFields.validate(value,"PASSWORD")
+    def validate_password_conf(self, value):
+        return ValidateFields.validate(value,"PASSWORD")
 
     def validate(self, data):
         if data['password'] != data['password_conf']:

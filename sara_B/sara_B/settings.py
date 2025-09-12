@@ -54,7 +54,7 @@ APPS_EXTERNA=[
 
 LOCAL_APP=[
     'apps.Access',
-    'apps.Forms',  # Mueve esta más arriba si tiene problemas
+    'apps.Forms',  
     'apps.Requests',
     'apps.Result',
 ]

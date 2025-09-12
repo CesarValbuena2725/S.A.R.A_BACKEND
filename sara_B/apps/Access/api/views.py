@@ -76,14 +76,6 @@ class Login(APIView):
     model = Usuario
     serializer_class= loginserializer
 
-    def options(self, request, *args, **kwargs):
-        response = HttpResponse()
-        response["Access-Control-Allow-Origin"] = "https://sarafrontend-git-main-andres-felipes-projects-b859d2f8.vercel.app"
-        response["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-        response["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-        response["Access-Control-Max-Age"] = "86400"  # Opcional: cache de preflight por 1 día
-        return response
-
 
     def post(self, request):
         # se toma la data y se pasa a la serilizer para ser procesada
@@ -209,7 +201,10 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
 class ContraseñaRestablecida(APIView):
     serializer_class =RestablecerPasswordSerializers
     
-    def post(self, request, uidb64, token):
+    def post(self, request , *args, **kargs):
+        uidb64= self.kwargs.get("uidb64")
+        token=self.kwargs.get("token")
+
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             try:

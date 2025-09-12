@@ -15,7 +15,7 @@ class ValidateFields:
             'INT': r'^\d+$',  # solo enteros positivos
             'CEDULA': r'^\d{6,10}$',
             'DECIMAL': r'^\d+(\.\d{1,2})?$',  # números decimales hasta 2 dígitos
-            'STRING': r'^[A-Za-zÁÉÍÓÚáéíóúñÑ0-9]+(?:\s+[A-Za-zÁÉÍÓÚáéíóúñÑ0-9]+)*$',  # solo letras y espacios intermedios
+            'STRING': r'^[A-Za-zÁÉÍÓÚáéíóúñÑ]+(?:\s+[A-Za-zÁÉÍÓÚáéíóúñÑ]+)*$',  
             'PASSWORD': r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:,.<>?/|~])[A-Za-z\d!@#$%^&*()_\-+=\[{\]};:,.<>?/|~]{8,}$',
             'TEL': r'^(3\d{9}|\d{7}|\d{10})$',
             'EMAIL': r'^[\w\.-]+@[\w\.-]+\.\w{2,}$',  # email

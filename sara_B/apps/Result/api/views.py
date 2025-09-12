@@ -9,8 +9,6 @@ from django.utils.timezone import localdate
 from django.forms.models import model_to_dict
 from django.http import FileResponse
 
-
-
 # REST Framework
 from rest_framework import generics, status
 from rest_framework.views import APIView
@@ -37,11 +35,11 @@ from apps.Utilidades.tasks import Send_Email_Asyn, Render_Reporte_Asyn
 
 
 class GetRespuestas(generics.GenericAPIView):
-    
+    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ["PR", "AD"]
-    
+    """
     model = Respuestas
     serializer_class = RespuestaModelSerializers
 
@@ -60,6 +58,11 @@ class GetRespuestas(generics.GenericAPIView):
         return Response(serilizer.data, status=status.HTTP_200_OK)
 
 class GetFoto(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles = ['PR','AD']
+
     model= Fotos
     serializer_class=FotoSerializer
 
@@ -98,11 +101,11 @@ class FotosUploadView(APIView):
 
 
 class PostRespuestas(generics.GenericAPIView):
-    
+    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles =["PR","AD"]
-    
+    """
     serializer_class = RespuestaSerializer
     model_base= Respuestas
     
@@ -131,11 +134,11 @@ class PostRespuestas(generics.GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class PutRespuesta(APIView):
-    
+    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ["PR", "AD"]
-    
+    """
 
     def put(self, request):
         solicitud = request.data.get('solicitud')
