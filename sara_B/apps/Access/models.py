@@ -66,11 +66,16 @@ class Sucursal(models.Model):
 class Empleado(models.Model):
     nombres = models.CharField(max_length=60, error_messages=MESSAGES_ERROR)
     apellidos = models.CharField(max_length=60, error_messages=MESSAGES_ERROR)
-    cedula = models.BigIntegerField(unique=True, null=False, error_messages=MESSAGES_ERROR)
+    cedula = models.CharField(max_length=15,unique=True, null=False, error_messages=MESSAGES_ERROR)
     correo = models.EmailField(max_length=50, unique=True, error_messages=MESSAGES_ERROR)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
     id_sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE, null=False)
     is_active = models.BooleanField(default=True)  
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['cedula'], condition=models.Q(is_active=True), name='unique_cedula_activo')
+        ]
 
     def save(self, *args,**kwargs):
         if not self.is_active:

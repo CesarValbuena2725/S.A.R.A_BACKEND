@@ -183,9 +183,8 @@ REST_FRAMEWORK = {
 
     'DEFAULT_FILTER_BACKENDS' : ['django_filters.rest_framework.DjangoFilterBackend'],
 }   
-
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=5),  # Tiempo de vida del token de acceso
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Tiempo de vida del token de acceso
     'REFRESH_TOKEN_LIFETIME': timedelta(minutes=15),     # Tiempo de vida del token de refresco
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -193,6 +192,17 @@ SIMPLE_JWT = {
     'SIGNING_KEY': 'tu_clave_secreta_aqui',  # Asegúrate de cambiar esto
 }
 
+
+"""
+SIMPLE_JWT = {
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=30),       
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1), 
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': 'tu_clave_secreta_aqui',  
+
+}
+
+"""
 # Configuración de Celery
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//' #Servidor de broker
 CELERY_ACCEPT_CONTENT = ['json'] # Defini que los broker  se hacen mediante Json
