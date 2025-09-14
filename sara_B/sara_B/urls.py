@@ -51,8 +51,6 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  # Refrescar Access Token
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),  # Verificar si el Access Token es válido
 
-    #path("api/token/", TokenObtainSlidingView.as_view(), name="token_obtain_sliding"),
-    #path("api/token/refresh/", TokenRefreshSlidingView.as_view(), name="token_refresh_sliding"),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

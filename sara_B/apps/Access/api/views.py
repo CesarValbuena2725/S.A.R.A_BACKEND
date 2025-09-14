@@ -30,6 +30,20 @@ from apps.Utilidades.permisos import RolePermission
 from apps.Utilidades.tasks import Send_Email_Asyn
 
 
+class GetEmploye(APIView):
+    
+    authentication_classes =[JWTAuthentication]
+    permission_classes=[IsAuthenticated,RolePermission]
+    allowed_roles = ['AD','CA'] 
+    
+    model = Empleado
+    serializer_class = EmpleadoSerialzers
+    def get(self,request):
+        data = self.model.objects.filter(is_active=True)
+        serializers = self.serializer_class(data, many =True)
+        return Response(serializers.data, status=status.HTTP_200_OK)
+
+
 class CreateUser(APIView):
     # clase para hace Validacion de Tokes 
     authentication_classes = [JWTAuthentication]

@@ -26,11 +26,11 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from apps.Utilidades.permisos import RolePermission
 
 class GetStatisticSolicitud(APIView):
-    """
+    
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ["AD"]
-    """
+    
     serializer_class = SolicitudSerializers
 
     def get(self, request, *args, **kwargs):
@@ -63,11 +63,11 @@ class GetStatisticSolicitud(APIView):
         
 #NOTE: La Vista esta terminada pendiente que frontend haga pruebas necesarias
 class GETPlanes(APIView):
-    """
+    
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ["AD"]
-    """
+    
     serializer_class = PlanSerializers
 
     def get(self,request):
@@ -86,6 +86,10 @@ class GETPlanes(APIView):
 
 #NOTE:La vista esta terminada pendiente que frontend haga pruebas necesarias
 class ReportLogins(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles = ["AD"]
     serializer_class = SerializersUserSession
 
     def get(self, request):
@@ -103,6 +107,12 @@ class ReportLogins(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class GetTiempoSolucion(APIView):
+         
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, RolePermission]
+    allowed_roles = ["AD"]
+
+
     model = Solicitud
     serializer_class = SolicitudSerializers
 
@@ -136,11 +146,11 @@ class GetTiempoSolucion(APIView):
 
 
 class ReportesExcel(APIView):
-    """ 
+     
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ["AD"]
-    """
+
     #Ejempli de URL Que e Debe utilizar 
     #http://localhost:8000/statistic/reporte/?model=convenio&year_start=2024&month_start=6&year_end=2025&month_end=7&state=IN
 

@@ -193,16 +193,8 @@ SIMPLE_JWT = {
 }
 
 
-"""
-SIMPLE_JWT = {
-    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=30),       
-    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1), 
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': 'tu_clave_secreta_aqui',  
 
-}
 
-"""
 # Configuración de Celery
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//' #Servidor de broker
 CELERY_ACCEPT_CONTENT = ['json'] # Defini que los broker  se hacen mediante Json

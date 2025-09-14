@@ -6,6 +6,8 @@ from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from apps.Access.api.serializers import UsuarioSerializer
+
 
 # Local application imports
 from apps.Utilidades.permisos import (
@@ -125,6 +127,9 @@ class GetGeneral(BaseGeneral):
     def get(self, request, *args, **kwargs):
         try:
             serializer_class = self.get_serializer_class()
+            if serializer_class == UsuarioSerializer:
+                self.allowed_roles=["AD"]
+                print("ingreso")
             queryset = self.get_queryset().exclude(is_active=False)
             model_serializers = serializer_class(queryset, many=True) 
             return Response(model_serializers.data, status=status.HTTP_200_OK)

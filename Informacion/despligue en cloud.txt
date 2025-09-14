@@ -1,0 +1,90 @@
+
+
+# Configurar consola de GCP
+$env:Path += ";C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\bin"
+
+# Habilitar Proyecto de GCP
+gcloud config set project pro-sara
+
+# Crear repositorio en Artifact Registry
+gcloud artifacts repositories create "sara-artifacts" \
+    --repository-format=docker \
+    --location=us-east1
+
+# Construir y subir imagen Docker
+gcloud builds submit --tag us-east1-docker.pkg.dev/pro-sara/sara-artifacts/api .
+gcloud builds submit --config cloudbuild.yaml .
+
+# Desplegar en Cloud Run
+
+gcloud run deploy api \
+  --image=us-east1-docker.pkg.dev/pro-sara/sara-artifacts/api \
+  --add-cloudsql-instances=pro-sara:us-east1:db-sara \
+  --set-env-vars=DB_HOST=/cloudsql/pro-sara:us-east1:db-sara \
+  --set-env-vars=DB_USER=postgres \
+  --set-env-vars=DB_PASSWORD=SaraAdmin78+ \
+  --set-env-vars=DB_NAME=sara_pro \
+  --set-env-vars=DB_PORT=5432 \
+  --region=us-east1 \
+  --platform=managed
+
+   gcloud run deploy api --image us-east1-docker.pkg.dev/pro-sara/sara-artifacts/api:latest --region us-east1 --platform=managed --allow-unauthenticated --set-env-vars="DB_HOST=/cloudsql/pro-sara:us-east1:db-sara" --set-env-vars="DB_USER=postgres" --set-env-vars="DB_PASSWORD=SaraAdmin78+" --set-env-vars="DB_NAME=sara_pro" --set-env-vars="DB_PORT=5432" --set-env-vars="CELERY_BROKER_URL=redis://10.84.135.219:6379/0" --set-env-vars="CELERY_RESULT_BACKEND=redis://10.84.135.219:6379/0" --add-cloudsql-instances="pro-sara:us-east1:db-sara" --vpc-connector=redis-connector          
+
+  gcloud run deploy api \
+    --image us-east1-docker.pkg.dev/pro-sara/sara-artifacts/api:latest \
+    --region us-east1 \
+    --platform=managed \
+    --allow-unauthenticated \
+    --set-env-vars="DB_HOST=/cloudsql/pro-sara:us-east1:db-sara" \
+    --set-env-vars="DB_USER=postgres" \
+    --set-env-vars="DB_PASSWORD=SaraAdmin78+" \
+    --set-env-vars="DB_NAME=sara_pro" \
+    --set-env-vars="DB_PORT=5432" \
+    --set-env-vars="CELERY_BROKER_URL=redis://10.84.135.219:6379/0" \
+    --set-env-vars="CELERY_RESULT_BACKEND=redis://10.84.135.219:6379/0" \
+    --add-cloudsql-instances="pro-sara:us-east1:db-sara" \
+    --vpc-connector=redis-connector
+
+gcloud run deploy api \
+    --image us-east1-docker.pkg.dev/pro-sara/sara-artifacts/api \
+    --platform managed \
+    --region us-central1 \
+    --allow-unauthenticated
+
+# Desplegar en Cloud Run sin cambiar configuracion del Serve
+gcloud run deploy api   --image=us-east1-docker.pkg.dev/pro-sara/sara-artifacts/api --region us-east1 --no-traffic --tag canary
+
+
+
+
+Crear la Tarea de Celery 
+
+
+
+ gcloud run jobs deploy celery-worker --image us-east1-docker.pkg.dev/pro-sara/sara-artifacts/worker --region us-east1 --command=celery --args="-A,sara_B,worker,--loglevel=info" --set-env-vars="DB_HOST=/cloudsql/pro-sara:us-east1:db-sara,DB_USER=postgres,DB_PASSWORD=SaraAdmin78+,DB_NAME=sara_pro,DB_PORT=5432" --set-env-vars="CELERY_BROKER_URL=redis://10.84.135.219:6379/0" --set-env-vars="CELERY_RESULT_BACKEND=redis://10.84.135.219:6379/0" --set-cloudsql-instances="pro-sara:us-east1:db-sara" --vpc-connector=redis-connector --cpu=1 --memory=1Gi
+ --max-retries=3
+
+gcloud run jobs deploy celery-worker \
+    --image us-east1-docker.pkg.dev/pro-sara/sara-artifacts/celery-worker:latest \
+    --region us-east1 \
+    --command=celery \
+    --args="-A,sara_B,worker,--loglevel=info" \
+    --set-env-vars="DB_HOST=/cloudsql/pro-sara:us-east1:db-sara,DB_USER=postgres,DB_PASSWORD=SaraAdmin78+,DB_NAME=sara_pro,DB_PORT=5432" \
+    --set-env-vars="CELERY_BROKER_URL=redis://10.84.135.219:6379/0" \
+    --set-env-vars="CELERY_RESULT_BACKEND=redis://10.84.135.219:6379/0" \
+    --set-cloudsql-instances="pro-sara:us-east1:db-sara" \
+    --vpc-connector=redis-connector \
+    --cpu=1 \
+    --memory=2Gi \  # Aumentar memoria
+    --max-retries=3 \
+    --timeout=3600  # 1 hora máximo
+
+
+gcloud run jobs execute django-migrate \
+  --region us-east1 \
+  --project pro-sara
+
+
+gcloud run jobs execute celery-worker \
+  --region us-east1 \
+  --project pro-sara
