@@ -44,3 +44,4 @@ Thumbs.db
 # Ignorar archivos de control de versiones o entorno de Git
 #.git/
 
+myvenv/
