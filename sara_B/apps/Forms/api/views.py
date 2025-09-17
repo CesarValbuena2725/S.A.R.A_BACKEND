@@ -138,5 +138,3 @@ class DeleteForms(APIView):
                 return Response({"Exito":"El formulario Fue eliminado"}, status=status.HTTP_202_ACCEPTED)
         except Exception as e:
             return Response({'Errors':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-

@@ -6,6 +6,6 @@ urlpatterns=[
     path('api/createuser/post',CreateUser.as_view()),
     path('api/login/',Login.as_view()),
     path('api/solicitarpassword/', SolicitudRestablecerPass.as_view()),
-    path('api/restablecerpassword/<uidb64>/<token>/',ContraseñaRestablecida.as_view())
+    path('api/restablecerpassword/<str:uidb64>/<str:token>/',ContraseñaRestablecida.as_view())
 ]
     

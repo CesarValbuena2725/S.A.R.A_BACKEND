@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+
 # Local application imports
 from apps.Utilidades.permisos import (
     RolePermission,
@@ -25,10 +26,10 @@ class FiltroGeneral(filters.FilterSet):
 # BAse General para el CRUD
 class BaseGeneral(generics.GenericAPIView):
 
-    """
+    
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
-    """
+    
     allowed_roles = [] 
  
     # Funcion que Valida el serializers Pasado dinamicamente por la URL
@@ -213,4 +214,3 @@ class DeleteAdmin(BaseGeneral):
             return Response({"detail": "Eliminado"}, status=status.HTTP_204_NO_CONTENT)
         except NotFound as e:
             return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)
-
