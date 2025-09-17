@@ -204,5 +204,3 @@ class FotoSerializer(serializers.ModelSerializer):
         if (Fotos.objects.filter(id_solicitud= solicitud)):
             raise serializers.ValidationError("Ya existe una foto guardad para esta solicitud")
         return data
-
-

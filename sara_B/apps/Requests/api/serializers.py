@@ -38,8 +38,8 @@ class SolicitudSerializers(serializers.ModelSerializer):
     # Validación general
     def validate(self, data):
         # Validar modificación de Placa
-        #if self.instance and 'Placa' in data:
-         #   raise serializers.ValidationError({"Placa": "No modificable después de creación."})
+        if self.instance and 'Placa' in data:
+            raise serializers.ValidationError({"Placa": "No modificable después de creación."})
 
         plan = data["id_plan"]
         tipo_vehiculo = data["id_tipo_vehiculo"]

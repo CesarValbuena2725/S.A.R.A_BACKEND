@@ -21,6 +21,3 @@ def List_Form(id):
         return ["Solicitud no Encontrada"]
     except Exception as e:
         return [str(e)]
-
-
-
