@@ -1,11 +1,13 @@
 from django.urls import path
-from apps.Statistic.api.views import (ReportAdmin,GetStatisticSolicitud,GetStatisticPlan,ReporteEmpleadosExcel)
+from apps.Statistic.api.views import (GetStatisticSolicitud,ReportesExcel,GETPlanes,ReportLogins,GetTiempoSolucion)
 
 urlpatterns = [
-    path('solicitud/<int:year>/', GetStatisticSolicitud.as_view(), name='solicitud-year'),  # Sin mes
-    path('solicitud/<int:year>/<int:month>/', GetStatisticSolicitud.as_view(), name='solicitud-year-month'),  # Con mes
-    path('plan/',GetStatisticPlan.as_view()),
-    path('reporte/',
-        ReporteEmpleadosExcel.as_view())
+    path('api/solicitud/<int:year>/', GetStatisticSolicitud.as_view()),  # Sin mes
+    path('api/planes/',GETPlanes.as_view()),
+    path('api/reportesexcel/',
+        ReportesExcel.as_view()),
+    path('api/logins/',ReportLogins.as_view()),
+    path('prueba/',GetTiempoSolucion.as_view())
+
 ]
     

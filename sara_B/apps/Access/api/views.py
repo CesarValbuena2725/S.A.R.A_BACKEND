@@ -4,6 +4,9 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from django.utils.timezone  import localdate
+from django.http import HttpResponse
+
 
 # Third-party imports
 from rest_framework import status, generics
@@ -15,27 +18,27 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 
 # Local application imports
-from apps.Access.models import Usuario, Empleado
+from apps.Access.models import Usuario, Empleado,UserSession
 from apps.Access.api.serializers import (
-    UsuarioSerializers,
+    UsuarioSerializer,
     SolicitudRestablecerPassSerializers,
     RestablecerPasswordSerializers,
-    loginserializers,
+    loginserializer,
     EmpleadoSerialzers
 )
 from apps.Utilidades.Permisos import RolePermission
-from apps.Utilidades.tasks import send_email_asincr
-from apps.Utilidades.Email.email_base import send_email_sara
+from apps.Utilidades.tasks import Send_Email_Asyn
 
 
 class CreateUser(APIView):
-    
+    # clase para hace Validacion de Tokes 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
+    # Funcion para la validacion de Roles Permitidos para el path
     allowed_roles = ['AD','CA'] 
     
     model = Usuario
-    serializer_class = UsuarioSerializers
+    serializer_class = UsuarioSerializer
 
     def get(self, request):
         try:
@@ -46,14 +49,13 @@ class CreateUser(APIView):
             return Response({'error': str(e)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
     def post(self, request):
+        # Se toma la Data y se pasa la Serilizer para ser procesa 
         serializers = self.serializer_class(data=request.data)
         if serializers.is_valid():
             objet = serializers.save()
             if isinstance(objet, Usuario):
-                #token, created = Token.objects.get_or_create(user=objet)
-                #return Response({'token': token.key, **serializers.data}, status=status.HTTP_201_CREATED)
-
                 refresh=RefreshToken.for_user(user=objet)
+                # Se Reponde los tokes de Acceso y usuarios creados 
                 return Response({
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
@@ -70,32 +72,53 @@ class CreateUser(APIView):
 
 
 class Login(APIView):
+    # instancion los modelos y serealizers necesarios 
     model = Usuario
-    serializer_class= loginserializers
+    serializer_class= loginserializer
+
 
     def post(self, request):
+        # se toma la data y se pasa a la serilizer para ser procesada
         serializer= self.serializer_class(data=request.data)
         if  not serializer.is_valid():
             return Response({'error': 'Usuario y contraseña son requeridos'}, status=status.HTTP_400_BAD_REQUEST)            
-
+        # Se guarda cada uno de los datos validos 
         usuario = serializer.validated_data['usuario']
         password = serializer.validated_data['password']
       
         try:
             # Buscar al usuario
-            user = get_object_or_404(Usuario, usuario=request.data['usuario'])
+            user = get_object_or_404(Usuario, usuario=usuario)
 
+            if user.id_empleado.estado =="IN":
+                return Response({'error': 'Usuarioooo no encontrado.'}, status=status.HTTP_403_FORBIDDEN)
+
+            
 
             # Verificar si el usuario está activo
             if user.estado == 'AC':
+                
                 # Verificar la contraseña
-                if not user.verificar_contraseña(request.data['password']):
+                if not user.verificar_contraseña(password):
                     return Response({'error': 'Contraseña incorrecta'}, status=status.HTTP_401_UNAUTHORIZED)
 
                 # Generar los tokens (JWT)
                 refresh = RefreshToken.for_user(user)
                 access_token = refresh.access_token
-
+                count_session =UserSession.objects.filter(id_usuario =user.pk).exists()
+                
+                user.last_login= localdate()
+                user.save()
+                print(user.last_login)
+                #  Se hace la validancion para registar la Sesiones 
+                if not count_session:
+                    data= UserSession.objects.create(
+                        id_usuario=user,
+                        login_count = 1
+                    )
+                    data.save()
+                else:
+                    login_count = UserSession.objects.get(id_usuario=user.pk).registrar_login()
                 # Serializar los datos del usuario
 
                 return Response({
@@ -110,7 +133,7 @@ class Login(APIView):
             else:
                 return Response({'error': 'Usuario inactivo. Contacte al administrador de SARA'}, status=status.HTTP_403_FORBIDDEN)
         except Http404:
-            return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_403_FORBIDDEN)
+            return Response({'error':'Usuario no encontrado.'}, status=status.HTTP_403_FORBIDDEN)
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -128,12 +151,12 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
         serializer = self.serializer_class(data= request.data)
 
         if serializer.is_valid():
-
             try:
 
                 #Hace la instancia del Usuario 
                 usuario = Usuario.objects.select_related('id_empleado').get(usuario=request.data['usuario'])
-
+                if usuario.id_empleado.estado =="IN":
+                    return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_403_FORBIDDEN)
                 #Valida que el usuario Exista y este Activo
                 if not usuario or usuario.estado=='IN':
                     return Response({'detail': 'No puede realizar el restablecimiento'}, 
@@ -148,22 +171,19 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
                 token_generator = PasswordResetTokenGenerator()
                 token = token_generator.make_token(usuario)
                 uid = urlsafe_base64_encode(force_bytes(usuario.pk))
-                reset_link = f"http://127.0.0.1:8000/access/restablecerpassword/{uid}/{token}/"
+                reset_link = "https://sarafrontend-git-main-andres-felipes-projects-b859d2f8.vercel.app/reset"
 
                 #Realiza el envio del correo / pendiente por mejorar y cambiar esta aspecto
                 try:
                     
-             
                     data_usuario = EmpleadoSerialzers(usuario.id_empleado).data
 
-                    send_email_asincr.delay(affair="Restablecer Password",
+                    Send_Email_Asyn.delay(affair="Restablecer Password",
                                             template="base_email.html",
                                             destinatario=[request.data['correo']], 
                                             solicitante=data_usuario, contexto=reset_link)
                     
-
-                    return Response({'message':'Se realizo el envio correo para el restablecimiento de contarseña'},
-                                    status=status.HTTP_200_OK)
+                    return Response({'data':{'token':token,'uid':uid}},status=status.HTTP_200_OK)
                 
                 except Exception as error_valid:
                     return Response({'detail': 'Error al enviar el correo: ' + str(error_valid)}, 
@@ -177,11 +197,14 @@ class SolicitudRestablecerPass(generics.GenericAPIView):
 
 #############################################################################
 
-#Serealiza el cambio de contarseña 
+#Clase el cambio de contarseña 
 class ContraseñaRestablecida(APIView):
     serializer_class =RestablecerPasswordSerializers
     
-    def post(self, request, uidb64, token):
+    def post(self, request , *args, **kargs):
+        uidb64= self.kwargs.get("uidb64")
+        token=self.kwargs.get("token")
+
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             try:

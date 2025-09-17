@@ -36,7 +36,7 @@ MODEL_REGISTRY = {}
 SERIALIZER_REGISTRY = {}
 
 # Decorador para registrar modelos en el diccionario
-def set_model(model):
+def Set_Model(model):
     name = model.__name__.lower()  # Asegurar que siempre sea en minúsculas
     if name in MODEL_REGISTRY:
         raise ValueError(f"El modelo '{name}' ya está registrado. No se pueden duplicar modelos.")
@@ -45,7 +45,7 @@ def set_model(model):
     return model 
 
 # Decorador para registrar serializers
-def set_serializers(serializer):
+def Set_Serializers(serializer):
     try:
         name = serializer.Meta.model.__name__.lower()
     except AttributeError:
@@ -59,7 +59,7 @@ def set_serializers(serializer):
 
 
 # Función para obtener un modelo registrado
-def getModelName(model):
+def Get_Model_Name(model):
     if not model:
         raise ValueError("El nombre del modelo no puede ser None o vacío.")
     
@@ -70,7 +70,7 @@ def getModelName(model):
     return MODEL_REGISTRY[model]
 
 # Función para obtener un serializador registrado
-def getSerializer(serializer):
+def Get_Serializer_Name(serializer):
     if not serializer:
         raise ValueError("El nombre del serializador no puede ser None o vacío.")
 
