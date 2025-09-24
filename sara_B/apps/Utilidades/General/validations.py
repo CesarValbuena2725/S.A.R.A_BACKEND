@@ -22,6 +22,8 @@ class ValidateFields:
             'PLACA': r'^(?:[A-Z]{3}\d{3}|[A-Z]{3}\d{2}[A-Z])$',  # placas Colombia
             'DATE': r'^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$',  # fecha YYYY-MM-DD
             'NIT': r'^\d{9,10}(-\d{1})?$',
+            'DIRRECION':r'^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\.\,#\-°]+$'
+
         }
 
     def validate(self, value, type_validate):
@@ -53,7 +55,7 @@ class ValidateFields:
             # aquí no transformamos nada, solo validamos
             pass
 
-        elif type_validate in ["INT", "DECIMAL", "TEL", "ZIPCODE","CEDULA"]:
+        elif type_validate in ["INT", "DECIMAL", "TEL", "ZIPCODE","CEDULA","DIRRECION"]:
             data = data  # sin cambios
 
         # Validaciones con Expreciones  regulares

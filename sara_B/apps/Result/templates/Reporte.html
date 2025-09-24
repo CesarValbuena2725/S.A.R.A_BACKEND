@@ -7,9 +7,37 @@
   <style>
     @page {
       size: A3;
-      margin: 0;
+      margin: 80px 20px 40px 20px; /* Margen superior para el header */
+      
+      @top-center {
+        content: element(header);
+      }
     }
 
+    .pdf-header {
+      position: running(header);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #ccc;
+      padding: 10px 0;
+      background: white;
+      width: 100%;
+    }
+
+    /* Forzar salto de página */
+    .salto-pagina {
+      page-break-before: always;
+      break-before: page;
+    }
+
+    /* Evitar que secciones se dividan entre páginas */
+    .seccion, .card, .status-section {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* ESTILOS EXISTENTES (tus estilos actuales) */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -20,30 +48,18 @@
       font-family: 'Segoe UI', sans-serif;
       color: #333;
       background: #f8f8f8;
-      margin-top: 20px;  /* Aquí agregamos el margen superior */
+      margin-top: 0; /* Quitamos el margin-top anterior */
     }
 
     .container {
       width: 100%;
-      max-width: 1200px; 
-      margin: 20px auto 0 auto; 
+      max-width: 1200px;
+      margin: 0 auto;
       padding: 20px;
       background: #fff;
     }
 
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid #ccc;
-      padding-bottom: 10px;
-    }
-
-    .header img {
-      max-height: 50px;
-    }
-
+    /* Tus estilos existentes... */
     .titulo-header {
       text-align: center;
       font-weight: bold;
@@ -61,7 +77,7 @@
 
     .seccion {
       display: flex;
-      margin-top: 5px;
+      margin-top: 20px;
       gap: 20px;
     }
 
@@ -70,7 +86,7 @@
       border: 1px solid #ccc;
       border-radius: 10px;
       overflow: hidden;  
-      margin-left: 15px;
+      margin-left: 1px;
     }
 
     .tabla-datos h3 {
@@ -105,16 +121,17 @@
       align-items: center;
       justify-content: center;
       border: 1px solid #ccc;
-      margin-right: 15px;
+      margin-right: 1px;
       border-radius: 10px;
       overflow: hidden;
     }
 
     .imagen-vehiculo img {
       width: 100%;
-      max-height: 370px;
+      max-height: 298px;
       object-fit: cover;
       border-radius: 6px;
+      padding: 10px;
     }
 
     .card {
@@ -341,6 +358,7 @@
   align-items: center;
   padding: 20px;
   background-color: #f9f9f9; /* opcional */
+  height: auto;
 }
 
 .diagram-container {
@@ -425,7 +443,7 @@ meter::-moz-meter-bar {
         </table>
       </div>
       <div class="imagen-vehiculo">
-        <img src={{foto.imagen_url}} alt="Vehículo inspeccionado" />
+        <img src="./logo_autosef.png" alt="Vehículo inspeccionado" />
       </div>
     </div>
 
@@ -516,22 +534,22 @@ meter::-moz-meter-bar {
       <div class="progress-container">
         <div class="progress-legend">
           <div class="legend-item">
-            <div class="legend-color" style="background-color: #007bff;"></div>
-            <span style="color: #007bff;">Malo (50%)</span>
+            <div class="legend-color" style="background-color: #c23131;"></div>
+            <span style="color: #c23131;"> (50%)</span>
           </div>
           <div class="legend-item">
             <div class="legend-color" style="background-color: #E07B39;"></div>
-            <span style="color: #b45211;">Medio (80%)</span>
+            <span style="color: #E07B39;"> (80%)</span>
           </div>
           <div class="legend-item">
-            <div class="legend-color" style="background-color: #4A4A4A;"></div>
-            <span style="color: #4A4A4A;">Bueno (100%)</span>
+            <div class="legend-color" style="background-color: #24c259;"></div>
+            <span style="color: #24c259;"> (100%)</span>
           </div>
         </div>
         <div class="progress-track">
-          <div class="progress-segment" style="width: 45%; background-color: #c20b0b;" data-label="MAlo"></div>
+          <div class="progress-segment" style="width: 45%; background-color: #c20b0b;" data-label="MALO"></div>
           <div class="progress-segment" style="width: 33%; background-color: #E07B39;" data-label="MEDIO"></div>
-          <div class="progress-segment" style="width: 22%; background-color: #0ef43f;" data-label="BUENO"></div>
+          <div class="progress-segment" style="width: 22%; background-color: #24c259;" data-label="BUENO"></div>
         </div>
       </div>
     </div>
@@ -539,7 +557,7 @@ meter::-moz-meter-bar {
     <!-- DIAGRAMA DEL VEHÍCULO -->
   <div class="diagram-section">
     <div class="diagram-container">
-      <img src="{% static 'Result/img/vehiculo.png' %}" alt="Diagrama del vehículo">
+      <img src="./diagrama.png" alt="Diagrama del vehículo">
     </div>
   </div>
 

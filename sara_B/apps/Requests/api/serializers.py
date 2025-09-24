@@ -129,7 +129,6 @@ class PlanSerializers(serializers.ModelSerializer):
         return instance
 
 
-
 @Set_Serializers
 class TipovehiculoSerializers(serializers.ModelSerializer):
     # Se reciben los IDs de planes

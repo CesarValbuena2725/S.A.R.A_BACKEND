@@ -14,12 +14,13 @@ class TipoVehiculo(models.Model):
 
     def __str__(self):
         return self.nombre_vehiculo
+    
 @Set_Model
 class Plan(models.Model):
     nombre_plan = models.CharField(max_length=50, unique=True)
     estado = models.CharField(max_length=2, choices=Estado.choices, default=Estado.ACTIVO)
-    cuestionario = models.ForeignKey('Forms.CategoriaFormularios', on_delete=models.CASCADE, null=True)
-    id_tipo_vehiculo = models.ForeignKey(TipoVehiculo, on_delete=models.CASCADE, null=True)
+    cuestionario = models.ForeignKey('Forms.CategoriaFormularios', on_delete=models.CASCADE, null=False)
+    id_tipo_vehiculo = models.ForeignKey(TipoVehiculo, on_delete=models.CASCADE, null=False)
     lista_adicionales = models.ManyToManyField('Forms.Formulario')
     is_active = models.BooleanField(default=True)
 
@@ -34,9 +35,9 @@ class Plan(models.Model):
             from apps.Forms.models import FormularioPlan
             FormularioPlan.objects.filter(id_plan=self).delete()
         super().save(*args, **kwargs)
+
     def __str__(self):
         return self.nombre_plan
-
 
 
 @Set_Model 

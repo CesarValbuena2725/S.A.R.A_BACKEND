@@ -2,7 +2,7 @@ import pytest
 from apps.Access.models import Convenio,Sucursal,Empleado, Usuario
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError,DataError
-from django.contrib.auth.hashers import make_password, check_password
+
 @pytest.mark.django_db
 class TestAgreementModel:
 
@@ -125,6 +125,7 @@ class TestEmployeModel:
         instance = self.base_create_employe(data)
         assert instance.estado == "AC"
         assert instance.is_active == True
+
     def test_sucursal_incorrect(self):
         data = {
             'nombres':"names tests",
@@ -171,6 +172,7 @@ class TestUserModel:
         assert instance.password.startswith('pbkdf2_sha256$')
         assert instance.verificar_contraseña("123456789")
         assert not instance.verificar_contraseña("488754745")
+
     def test_status_defauld(self,empleado_base):
         data ={
             'usuario':"user test",
@@ -182,3 +184,13 @@ class TestUserModel:
 
         assert instance.estado =="AC"
         assert instance.is_active== True
+    
+    def test_employe_incorrect(self):
+        data ={
+            'usuario':"user test",
+            'password':"123456789",
+            'rol':'AD',
+            'id_empleado':None,
+        }
+        with pytest.raises((IntegrityError, ValidationError)):
+            self.base_create_user(data)

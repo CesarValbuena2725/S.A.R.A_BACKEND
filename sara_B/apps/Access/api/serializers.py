@@ -32,7 +32,8 @@ class SucursalSerializers(serializers.ModelSerializer):
         return ValidateFields().validate(value,"STRING")
     def validate_telefono(self,value):
         return ValidateFields().validate(value,"TEL")
-    
+    def validate_dirrecion(self,value):
+        return ValidateFields().validate(value,"DIRRECION")
     def validate_id_convenio(self,value):
         return ValidateFields().Validate_Relacion(value)
         
@@ -112,9 +113,9 @@ class RestablecerPasswordSerializers(serializers.Serializer):
     password = serializers.CharField(write_only=True, min_length=10)
     password_conf = serializers.CharField(write_only=True, min_length=10)
     def validate_password(self,value):
-        return ValidateFields.validate(value,"PASSWORD")
+        return ValidateFields().validate(value,"PASSWORD")
     def validate_password_conf(self, value):
-        return ValidateFields.validate(value,"PASSWORD")
+        return ValidateFields().validate(value,"PASSWORD")
 
     def validate(self, data):
         if data['password'] != data['password_conf']:

@@ -1,5 +1,6 @@
 # Librerías estándar
 import os
+import io
 
 # Django
 from django.conf import settings
@@ -58,11 +59,11 @@ class GetRespuestas(generics.GenericAPIView):
         return Response(serilizer.data, status=status.HTTP_200_OK)
 
 class GetFoto(APIView):
-
+    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, RolePermission]
     allowed_roles = ['PR','AD']
-
+    """
     model= Fotos
     serializer_class=FotoSerializer
 
@@ -238,12 +239,9 @@ class CloseRequest(APIView):
     
 
 # Clase para Descargar el informe de manera manual en el caso de ser necesaria 
+""""
 class DownloadReport(APIView):
-    """
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, RolePermission]
-    allowed_roles = ["PR", "AD", "CC"]
-    """
+
     def get(self,request, *args,**kwargs ):
         id_resquest = self.kwargs.get('id_request')
         try:
@@ -263,5 +261,53 @@ class DownloadReport(APIView):
             return FileResponse(open(output_path, 'rb'), as_attachment=True, content_type='application/pdf', filename=file_name )
         except Exception as e:
             return Response({"error":e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+"""
 
+
+class DownloadReport(APIView):
+    def get(self, request, *args, **kwargs):
+        id_resquest = self.kwargs.get('id_request')
+
+        try:
+            solicitud = Solicitud.objects.get(pk=id_resquest)
+            if solicitud.estado != "FIN":
+                return Response("La solicitud debe estar finalizada para descargar el reporte",
+                                status=status.HTTP_403_FORBIDDEN)
+        except Solicitud.DoesNotExist:
+            return Response({"error": "Solicitud no encontrada"},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        # recrear contexto
+        functiones = FunctionClose(id_resquest)
+        foto = Fotos.objects.filter(id_solicitud=id_resquest).first()
+        context = {
+            "request": solicitud,
+            "cliente": functiones.Cliente(),
+            "vehiculo": functiones.Vehiculo(),
+            "fugas": functiones.Fugas(),
+            "carroceria": functiones.Carroceria(),
+            "novedades": functiones.Novedades(),
+            "pintura": functiones.Pintura(),
+            "PMC": functiones.Pmc(),
+            "PMV": functiones.Pmv(),
+            "porcentaje": functiones.Porcentaje(),
+            "foto": foto,
+        }
+
+        html_string = render_to_string("Reporte.html", context)
+
+        # generar PDF en memoria
+        pdf_buffer = io.BytesIO()
+        from weasyprint import HTML
+        HTML(string=html_string).write_pdf(pdf_buffer)
+        pdf_buffer.seek(0)
+
+        file_name = f"{solicitud.placa}.pdf"
+
+        return FileResponse(
+            pdf_buffer,
+            as_attachment=True,
+            content_type="application/pdf",
+            filename=file_name
+        )
         
